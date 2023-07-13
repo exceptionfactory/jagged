@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.exceptionfactory.jagged</groupId>
+    <artifactId>jagged</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>jagged</name>
+    <description>Java implementation of age encryption</description>
+    <url>https://github.com/exceptionfactory/jagged</url>
+    <inceptionYear>2023</inceptionYear>
+    <organization>
+        <name>ExceptionFactory</name>
+        <url>https://exceptionfactory.com</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>ExceptionFactory</name>
+            <email>exceptionfactory@exceptionfactory.com</email>
+            <organization>ExceptionFactory</organization>
+            <organizationUrl>https://exceptionfactory.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/exceptionfactory/jagged.git</connection>
+        <developerConnection>scm:git:ssh://github.com:exceptionfactory/jagged.git</developerConnection>
+        <url>https://github.com/exceptionfactory/jagged</url>
+    </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.release>8</maven.compiler.release>
+        <maven.checkstyle.plugin.version>3.3.0</maven.checkstyle.plugin.version>
+        <maven.clean.plugin.version>3.2.0</maven.clean.plugin.version>
+        <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
+        <maven.deploy.plugin.version>3.0.0</maven.deploy.plugin.version>
+        <maven.install.plugin.version>3.1.0</maven.install.plugin.version>
+        <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
+        <maven.javadoc.plugin.version>3.4.1</maven.javadoc.plugin.version>
+        <maven.pmd.plugin.version>3.21.0</maven.pmd.plugin.version>
+        <maven.resources.plugin.version>3.3.0</maven.resources.plugin.version>
+        <maven.source.plugin.version>3.2.1</maven.source.plugin.version>
+        <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
+        <download.maven.plugin.version>1.7.0</download.maven.plugin.version>
+        <checkstyle.version>10.12.1</checkstyle.version>
+        <jacoco.version>0.8.10</jacoco.version>
+        <junit.jupiter.version>5.9.3</junit.jupiter.version>
+        <mockito.version>5.4.0</mockito.version>
+        <pmd.version>6.55.0</pmd.version>
+        <spotbugs.plugin.version>4.7.3.5</spotbugs.plugin.version>
+    </properties>
+
+    <modules>
+        <module>jagged-api</module>
+        <module>jagged-bech32</module>
+        <module>jagged-framework</module>
+        <module>jagged-scrypt</module>
+        <module>jagged-test</module>
+        <module>jagged-x25519</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-bech32</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-framework</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-scrypt</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-test</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-x25519</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-bom</artifactId>
+                <version>${mockito.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven.checkstyle.plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${checkstyle.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven.clean.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven.deploy.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${maven.install.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven.jar.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven.javadoc.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-pmd-plugin</artifactId>
+                    <version>${maven.pmd.plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-core</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>net.sourceforge.pmd</groupId>
+                            <artifactId>pmd-java</artifactId>
+                            <version>${pmd.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resources.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven.source.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${spotbugs.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.googlecode.maven-download-plugin</groupId>
+                    <artifactId>download-maven-plugin</artifactId>
+                    <version>${download.maven.plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <quiet>true</quiet>
+                            <failOnWarnings>true</failOnWarnings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Automatic-Module-Name>${project.groupId}</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                            <checkstyleRules>
+                                <module name="Checker">
+                                    <module name="Header">
+                                        <property name="headerFile" value="HEADER"/>
+                                    </module>
+                                    <module name="NewlineAtEndOfFile"/>
+                                    <module name="FileLength"/>
+                                    <module name="LineLength">
+                                        <property name="max" value="200"/>
+                                    </module>
+                                    <module name="FileTabCharacter"/>
+                                    <module name="RegexpSingleline">
+                                        <property name="format" value="\s+$"/>
+                                        <property name="minimum" value="0"/>
+                                        <property name="maximum" value="0"/>
+                                        <property name="message" value="Line has trailing spaces."/>
+                                    </module>
+                                    <module name="TreeWalker">
+                                        <module name="InvalidJavadocPosition"/>
+                                        <module name="JavadocMethod"/>
+                                        <module name="JavadocType"/>
+                                        <module name="ConstantName"/>
+                                        <module name="LocalFinalVariableName"/>
+                                        <module name="LocalVariableName"/>
+                                        <module name="MemberName"/>
+                                        <module name="MethodName"/>
+                                        <module name="PackageName"/>
+                                        <module name="ParameterName"/>
+                                        <module name="StaticVariableName"/>
+                                        <module name="TypeName"/>
+                                        <module name="AvoidStarImport"/>
+                                        <module name="IllegalImport"/>
+                                        <module name="RedundantImport"/>
+                                        <module name="UnusedImports"/>
+                                        <module name="MethodLength"/>
+                                        <module name="ParameterNumber"/>
+                                        <module name="EmptyForIteratorPad"/>
+                                        <module name="GenericWhitespace"/>
+                                        <module name="MethodParamPad"/>
+                                        <module name="NoWhitespaceAfter"/>
+                                        <module name="NoWhitespaceBefore"/>
+                                        <module name="OperatorWrap"/>
+                                        <module name="ParenPad"/>
+                                        <module name="TypecastParenPad"/>
+                                        <module name="WhitespaceAfter"/>
+                                        <module name="WhitespaceAround"/>
+                                        <module name="ModifierOrder"/>
+                                        <module name="RedundantModifier"/>
+                                        <module name="AvoidNestedBlocks"/>
+                                        <module name="EmptyBlock"/>
+                                        <module name="LeftCurly"/>
+                                        <module name="NeedBraces"/>
+                                        <module name="RightCurly"/>
+                                        <module name="EmptyStatement"/>
+                                        <module name="EqualsHashCode"/>
+                                        <module name="IllegalInstantiation"/>
+                                        <module name="InnerAssignment"/>
+                                        <module name="MagicNumber"/>
+                                        <module name="MissingSwitchDefault"/>
+                                        <module name="MultipleVariableDeclarations"/>
+                                        <module name="SimplifyBooleanExpression"/>
+                                        <module name="SimplifyBooleanReturn"/>
+                                        <module name="FinalClass"/>
+                                        <module name="HideUtilityClassConstructor"/>
+                                        <module name="InterfaceIsType"/>
+                                        <module name="VisibilityModifier"/>
+                                        <module name="ArrayTypeStyle"/>
+                                        <module name="FinalParameters"/>
+                                        <module name="TodoComment"/>
+                                        <module name="UpperEll"/>
+                                    </module>
+                                </module>
+                            </checkstyleRules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <printFailingErrors>true</printFailingErrors>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.exceptionfactory.jagged</groupId>
+        <artifactId>jagged</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jagged-test</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-scrypt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-bech32</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-x25519</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>download-testdata</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://codeload.github.com/C2SP/CCTV/zip/refs/heads/main</url>
+                            <outputFileName>CCTV.zip</outputFileName>
+                            <outputDirectory>${project.build.outputDirectory}/CCTV</outputDirectory>
+                            <unpack>true</unpack>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>report-aggregate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
