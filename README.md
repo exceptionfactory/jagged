@@ -8,8 +8,49 @@ Java implementation of age encryption
 
 # Build Requirements
 
-- Java 11
+- Java 17
 - Maven 3.9
+
+# Runtime Requirements
+
+- Java 17 or 11
+- Java 8 with [Bouncy Castle Security Provider](https://bouncycastle.org/docs/docs1.8on/org/bouncycastle/jce/provider/BouncyCastleProvider.html)
+
+## Java Cryptography Architecture
+
+Jagged uses the
+[Java Cryptography Architecture](https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html)
+framework for the following algorithms:
+
+- `ChaCha20-Poly1305` with [javax.crypto.Cipher](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html)
+- `HmacSHA256` with [javax.crypto.Mac](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Mac.html)
+- `PBKDF2WithHmacSHA256` with [javax.crypto.SecretKeyFactory](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/SecretKeyFactory.html)
+- `X25519` with [javax.crypto.KeyAgreement](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/KeyAgreement.html)
+- `X25519` with [java.security.KeyFactory](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyFactory.html)
+- `X25519` with [java.security.KeyPairGenerator](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyPairGenerator.html)
+
+[JEP 324](https://openjdk.org/jeps/324) introduced X25519 Key Agreement in Java 11. 
+[JEP 329](https://openjdk.org/jeps/329) added ChaCha20-Poly1305 in Java 11.
+
+Jagged does not require additional dependencies when running on Java 11 or higher.
+
+Jagged on Java 8 requires an additional
+[Security Provider](https://docs.oracle.com/javase/8/docs/api/java/security/Provider.html)
+to support X25519 and ChaCha20-Poly1305.
+
+## Bouncy Castle Security Provider
+
+The [Bouncy Castle](https://bouncycastle.org/java.html) framework includes the
+[BouncyCastleProvider](https://bouncycastle.org/docs/docs1.8on/org/bouncycastle/jce/provider/BouncyCastleProvider.html)
+which can be installed to support using Jagged on Java 8.
+
+The `jagged-x25519` library requires access to X25519 encoded keys. The default behavior of the Bouncy Castle library
+includes the public key together with the private key in the encoded representation, which differs from the standard
+Java implementation. The following Java System property must be enabled when using the Bouncy Castle Provider:
+
+```
+org.bouncycastle.pkcs8.v1_info_only
+```
 
 # Versioning
 
@@ -115,6 +156,60 @@ The `DecryptingChannelFactory` interface wraps a provided
 [ReadableByteChannel](https://docs.oracle.com/javase/8/docs/api/java/nio/channels/ReadableByteChannel.html) and returns
 a `ReadableByteChannel` that supports streaming decryption for a matched identity based on supplied
 `RecipientStanzaReader` instances.
+
+## jagged-bech32
+
+The `jagged-bech32` module contains an implementation of the Bech32 encoding specification defined according to
+[Bitcoin Improvement Proposal 0173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki). Bech32 encoding
+supports a standard representation of X25519 private and public keys. The `Bech32` class follows the pattern of
+[java.util.Base64](https://docs.oracle.com/javase/8/docs/api/java/util/Base64.html) and encloses `Bech32.Decoder` and
+`Bech32.Encoder` interfaces. Bech32 encoding consists of a Human-Readable Part prefix, a separator, and data part that
+ends with a checksum.
+
+## jagged-framework
+
+The `jagged-framework` module includes shared components for common cryptographic operations.
+
+The `stream` package includes the `StandardDecryptingChannelFactory` and `StandardEncryptingChannelFactory` classes,
+which implement the corresponding public interfaced for streaming cipher operations.
+
+The `armor` packaged includes the `ArmoredReadableByteChannel` and `ArmoredWritableByteChannel` classes, supporting
+reading and writing ASCII armored files with standard PEM header and footer lines.
+
+## jagged-scrypt
+
+The `jagged-scrypt` module supports encryption and decryption using a passphrase and configurable work factor.
+
+The `ScryptRecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using a passphrase.
+
+The `ScryptRecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using a passphrase and 
+a work factor with a minimum value of 2 and a maximum value of 20.
+
+The module includes a custom implementation of the scrypt key derivation function with predefined settings that
+match age encryption scrypt recipient specifications.
+
+## jagged-x25519
+
+The `jagged-x25519` module supports encryption and decryption using public and private key pairs. Key generation and
+key agreement functions use the Java Cryptography Architecture framework. Key encoding and decoding functions use the
+`jagged-bech32` library.
+
+The `X25519KeyPairGenerator` class implements
+[java.security.KeyPairGenerator](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyPairGenerator.html)
+and returns public and private key pairs encoded using Bech32.
+
+The `X25519RecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using a private key encoded using
+Bech32. Encoded private keys begin with `AGE-SECRET-KEY-1` as the Bech32 Human-Readable Part and separator.
+
+The `X25519RecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using a public key encoded using
+Bech32. Encoded public keys begin with `age1` as the Bech32 Human-Readable Part and separator.
+
+## jagged-test
+
+The `jagged-test` module includes framework tests for [age test vectors](https://github.com/C2SP/CCTV/tree/main/age)
+defined in the [Community Cryptography Test Vectors](https://github.com/C2SP/CCTV) project. The
+`CommunityCryptographyTest` runs test method for each file in the test data directory. The `FrameworkTest` class
+exercises binary and armored encryption and decryption methods using supported recipient types.
 
 # Building
 
