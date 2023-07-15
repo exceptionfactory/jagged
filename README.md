@@ -171,7 +171,7 @@ ends with a checksum.
 The `jagged-framework` module includes shared components for common cryptographic operations.
 
 The `stream` package includes the `StandardDecryptingChannelFactory` and `StandardEncryptingChannelFactory` classes,
-which implement the corresponding public interfaced for streaming cipher operations.
+which implement the corresponding public interfaces for streaming cipher operations.
 
 The `armor` packaged includes the `ArmoredReadableByteChannel` and `ArmoredWritableByteChannel` classes, supporting
 reading and writing ASCII armored files with standard PEM header and footer lines.
@@ -208,7 +208,7 @@ Bech32. Encoded public keys begin with `age1` as the Bech32 Human-Readable Part 
 
 The `jagged-test` module includes framework tests for [age test vectors](https://github.com/C2SP/CCTV/tree/main/age)
 defined in the [Community Cryptography Test Vectors](https://github.com/C2SP/CCTV) project. The
-`CommunityCryptographyTest` runs test method for each file in the test data directory. The `FrameworkTest` class
+`CommunityCryptographyTest` runs a test method for each file in the test data directory. The `FrameworkTest` class
 exercises binary and armored encryption and decryption methods using supported recipient types.
 
 # Building
