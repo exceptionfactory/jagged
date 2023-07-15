@@ -40,12 +40,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EncryptingChannelTest {
     private static final int EMPTY_ENCRYPTED_LENGTH = 0;
+
+    private static final byte[] INVALID_KEY = new byte[]{};
 
     private static final byte[] SYMMETRIC_KEY = new byte[]{
             1, 2, 3, 4, 5, 6, 7, 8,
@@ -106,6 +109,7 @@ class EncryptingChannelTest {
         final List<RecipientStanzaWriter> recipientStanzaWriters = Collections.singletonList(recipientStanzaWriter);
 
         final CipherKey payloadKey = mock(CipherKey.class);
+        lenient().when(payloadKey.getEncoded()).thenReturn(INVALID_KEY);
         when(payloadKeyWriter.writeFileHeader(any(), any())).thenReturn(payloadKey);
         final EncryptingChannel encryptingChannel = new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
 

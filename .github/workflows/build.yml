@@ -49,3 +49,17 @@ jobs:
           cache: 'maven'
       - name: Build
         run: ./mvnw --batch-mode --update-snapshots verify
+  build-java-8:
+    runs-on: ubuntu-latest
+    name: Java 8
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v3
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'zulu'
+          cache: 'maven'
+      - name: Build
+        run: ./mvnw --batch-mode --update-snapshots verify
