@@ -37,9 +37,9 @@ class ScryptRecipientStanza implements RecipientStanza {
     }
 
     /**
-     * Get Recipient Stanza Type returns X25519
+     * Get Recipient Stanza Type returns scrypt
      *
-     * @return X25519 Type
+     * @return scrypt Type
      */
     @Override
     public String getType() {

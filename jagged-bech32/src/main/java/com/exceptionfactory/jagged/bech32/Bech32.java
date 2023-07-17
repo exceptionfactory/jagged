@@ -17,7 +17,7 @@ package com.exceptionfactory.jagged.bech32;
 
 /**
  * Bech32 encoding and decoding implementation of Bitcoin Improvement Proposal 0173 for Segregated Witness addresses.
- * The format consists a Base32 alphabet with checksums for error detection and a maximum length of 90 characters.
+ * The format consists a Base32 alphabet with checksums for error detection.
  * Bech32 addresses consist of human-readable part, a separator, and a data part that contains a checksum.
  */
 public final class Bech32 {
@@ -50,7 +50,7 @@ public final class Bech32 {
         /**
          * Decode sequence containing Bech32 characters to a Bech32 Address
          *
-         * @param encoded Sequence of Bech32 characters with a length of less than 90
+         * @param encoded Sequence of Bech32 characters with a Human-Readable Part length between 1 and 83
          * @return Bech32 Address
          * @throws IllegalArgumentException Thrown when encountering invalid Bech32 encoded sources
          */

@@ -19,7 +19,7 @@ package com.exceptionfactory.jagged.x25519;
  * X2559 Recipient Indicators for reading and writing Recipient Stanzas
  */
 enum RecipientIndicator {
-    /** Bech32 Encoded Public Key Human Readable Part */
+    /** Bech32 Encoded Public Key Human-Readable Part */
     PUBLIC_KEY_HUMAN_READABLE_PART("age"),
 
     /** Recipient Stanza Type */

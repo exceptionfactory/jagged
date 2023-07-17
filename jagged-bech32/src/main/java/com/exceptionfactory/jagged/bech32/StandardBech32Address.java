@@ -29,18 +29,18 @@ class StandardBech32Address implements Bech32Address {
     /**
      * Standard constructor with required properties
      *
-     * @param humanReadablePart Human Readable Part characters
+     * @param humanReadablePart Human-Readable Part characters
      * @param data Data bytes
      */
     StandardBech32Address(final CharSequence humanReadablePart, final byte[] data) {
-        this.humanReadablePart = Objects.requireNonNull(humanReadablePart, "Human Readable Part required");
+        this.humanReadablePart = Objects.requireNonNull(humanReadablePart, "Human-Readable Part required");
         this.data = Objects.requireNonNull(data, "Data required");
     }
 
     /**
-     * Get Human Readable Part characters
+     * Get Human-Readable Part characters
      *
-     * @return Human Readable Part
+     * @return Human-Readable Part
      */
     @Override
     public CharSequence getHumanReadablePart() {

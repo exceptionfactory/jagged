@@ -19,7 +19,7 @@ package com.exceptionfactory.jagged.x25519;
  * X2559 Identity Indicators for reading and writing Identities
  */
 enum IdentityIndicator {
-    /** Bech32 Encoded Private Human Readable Part */
+    /** Bech32 Encoded Private Human-Readable Part */
     PRIVATE_KEY_HUMAN_READABLE_PART("AGE-SECRET-KEY-");
 
     private final String indicator;

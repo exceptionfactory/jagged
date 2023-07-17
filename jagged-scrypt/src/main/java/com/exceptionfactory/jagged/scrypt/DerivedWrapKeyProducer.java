@@ -20,7 +20,7 @@ import com.exceptionfactory.jagged.framework.crypto.CipherKey;
 import java.security.GeneralSecurityException;
 
 /**
- * Abstraction for producing Wrap Key from derived from scrypt parameters
+ * Abstraction for producing Wrap Key derived from scrypt parameters
  */
 interface DerivedWrapKeyProducer {
     /**
