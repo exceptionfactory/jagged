@@ -38,8 +38,6 @@ class StandardRecipientKeyFactoryTest {
 
     private static final String PRIVATE_KEY_ENCODED = "dwdtCnMYpX08FsFyUbJmRd9ML4frwJkqsXf7pR25LCo";
 
-    private static final int KEY_LENGTH = 32;
-
     private static final CanonicalBase64.Decoder DECODER = CanonicalBase64.getDecoder();
 
     private StandardRecipientKeyFactory factory;
@@ -84,7 +82,7 @@ class StandardRecipientKeyFactoryTest {
     private byte[] getDecoded(final Key key) {
         final byte[] encoded = key.getEncoded();
         final int encodedLength = encoded.length;
-        final int startPosition = encodedLength - KEY_LENGTH;
+        final int startPosition = encodedLength - RecipientKeyType.X25519.getKeyLength();
         return Arrays.copyOfRange(encoded, startPosition, encodedLength);
     }
 }

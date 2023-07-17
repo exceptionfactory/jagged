@@ -32,7 +32,7 @@ class X25519SharedWrapKeyProducer extends HashedDerivedKeyProducer implements Sh
     private static final byte[] KEY_INFORMATION = RecipientIndicator.KEY_INFORMATION.getIndicator().getBytes(StandardCharsets.UTF_8);
 
     /** Public Coordinate Length after ASN.1 with DER header */
-    private static final int PUBLIC_COORDINATE_LENGTH = 32;
+    private static final int PUBLIC_COORDINATE_LENGTH = RecipientKeyType.X25519.getKeyLength();
 
     private static final int SHARED_SALT_KEY_LENGTH = 64;
 

@@ -37,7 +37,7 @@ import java.util.Objects;
  * Standard age-encryption Recipient Stanza Writer implementation using X25519 Key Exchange described in RFC 7748 Section 5
  */
 class X25519RecipientStanzaWriter implements RecipientStanzaWriter {
-    private static final int EPHEMERAL_PRIVATE_KEY_LENGTH = 32;
+    private static final int EPHEMERAL_PRIVATE_KEY_LENGTH = RecipientKeyType.X25519.getKeyLength();
 
     private static final BasePointPublicKey BASE_POINT_PUBLIC_KEY = new BasePointPublicKey();
 

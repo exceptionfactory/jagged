@@ -25,9 +25,7 @@ class BasePointPublicKey implements PublicKey {
 
     private static final String FORMAT = "RAW";
 
-    private static final int PUBLIC_KEY_LENGTH = 32;
-
-    private static final byte[] BASE_POINT_PUBLIC_KEY = new byte[PUBLIC_KEY_LENGTH];
+    private static final byte[] BASE_POINT_PUBLIC_KEY = new byte[RecipientKeyType.X25519.getKeyLength()];
 
     static {
         BASE_POINT_PUBLIC_KEY[0] = BASE_POINT;

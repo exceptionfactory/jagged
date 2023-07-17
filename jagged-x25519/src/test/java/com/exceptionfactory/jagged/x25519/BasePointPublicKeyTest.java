@@ -20,8 +20,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BasePointPublicKeyTest {
-    private static final int LENGTH = 32;
-
     private static final int BASE_POINT = 9;
 
     private static final String FORMAT = "RAW";
@@ -45,7 +43,7 @@ class BasePointPublicKeyTest {
         final BasePointPublicKey basePointPublicKey = new BasePointPublicKey();
 
         final byte[] encoded = basePointPublicKey.getEncoded();
-        assertEquals(LENGTH, encoded.length);
+        assertEquals(RecipientKeyType.X25519.getKeyLength(), encoded.length);
         assertEquals(BASE_POINT, encoded[0]);
     }
 }

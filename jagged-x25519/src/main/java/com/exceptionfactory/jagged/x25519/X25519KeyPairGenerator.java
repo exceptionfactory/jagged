@@ -39,8 +39,6 @@ public class X25519KeyPairGenerator extends KeyPairGenerator {
 
     private static final Bech32.Encoder ENCODER = Bech32.getEncoder();
 
-    private static final int ENCODED_COORDINATE_LENGTH = 32;
-
     private final KeyPairGenerator keyPairGenerator;
 
     /**
@@ -88,7 +86,7 @@ public class X25519KeyPairGenerator extends KeyPairGenerator {
 
     private byte[] getCoordinate(final Key key) {
         final byte[] encoded = key.getEncoded();
-        final int coordinateStartIndex = encoded.length - ENCODED_COORDINATE_LENGTH;
+        final int coordinateStartIndex = encoded.length - RecipientKeyType.X25519.getKeyLength();
         return Arrays.copyOfRange(encoded, coordinateStartIndex, encoded.length);
     }
 }
