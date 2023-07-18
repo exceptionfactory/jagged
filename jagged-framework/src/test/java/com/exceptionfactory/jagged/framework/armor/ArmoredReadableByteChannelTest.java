@@ -43,6 +43,8 @@ class ArmoredReadableByteChannelTest {
 
     private static final byte[] BODY_INVALID = new byte[]{1, 2};
 
+    private static final byte[] BODY_WITHOUT_PADDING = new byte[]{65, 119};
+
     private static final byte[] EMPTY_BODY = new byte[]{};
 
     private static final byte[] LINE_FEED_BODY = new byte[]{10};
@@ -61,10 +63,19 @@ class ArmoredReadableByteChannelTest {
 
     private static final int MAXIMUM_LINE_LENGTH = 64;
 
+    private static final String PADDING_KEYWORD = "padding";
+
     @Test
     void testHeaderInvalid() throws IOException {
         final byte[] header = new byte[ArmoredIndicator.HEADER.getLength()];
         final ReadableByteChannel inputChannel = getInputChannel(header);
+
+        assertThrows(ArmoredDecodingException.class, () -> new ArmoredReadableByteChannel(inputChannel));
+    }
+
+    @Test
+    void testHeaderNotFound() throws IOException {
+        final ReadableByteChannel inputChannel = getInputChannel(BODY_DECODED);
 
         assertThrows(ArmoredDecodingException.class, () -> new ArmoredReadableByteChannel(inputChannel));
     }
@@ -112,6 +123,15 @@ class ArmoredReadableByteChannelTest {
 
         final ArmoredDecodingException exception = assertThrows(ArmoredDecodingException.class, () -> new ArmoredReadableByteChannel(inputChannel));
         assertTrue(exception.getMessage().contains(Integer.toString(MAXIMUM_LINE_LENGTH)));
+    }
+
+    @Test
+    void testReadPaddingNotFound() throws IOException {
+
+        final ReadableByteChannel inputChannel = getHeaderFooterInputChannel(BODY_WITHOUT_PADDING);
+
+        final ArmoredDecodingException exception = assertThrows(ArmoredDecodingException.class, () -> new ArmoredReadableByteChannel(inputChannel));
+        assertTrue(exception.getMessage().contains(PADDING_KEYWORD));
     }
 
     @Test

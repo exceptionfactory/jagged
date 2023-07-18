@@ -34,8 +34,6 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
 
     private static final byte END_OF_FILE = -1;
 
-    private static final byte EQUALS_CHARACTER = 61;
-
     private static final int MAXIMUM_LINE_LENGTH = 64;
 
     private static final int MAXIMUM_DECODED_LENGTH = 48;
@@ -249,7 +247,7 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
         decodedBuffer.flip();
     }
 
-    private ByteBuffer getDecodedLineBuffer() {
+    private ByteBuffer getDecodedLineBuffer() throws ArmoredDecodingException {
         final ByteBuffer decoded;
         if (lastEncodedLineFound) {
             final byte[] encoded = new byte[lineBuffer.limit()];
@@ -258,20 +256,15 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
             final byte[] decodedBytes = DECODER.decode(encoded);
             final byte[] encodedWithPadding = ENCODER_WITH_PADDING.encode(decodedBytes);
 
-            if (endsWithPadding(encodedWithPadding) && !Arrays.equals(encodedWithPadding, encoded)) {
-                throw new IllegalArgumentException("Base64 line canonical padding not found");
-            } else {
+            if (Arrays.equals(encodedWithPadding, encoded)) {
                 decoded = ByteBuffer.wrap(decodedBytes);
+            } else {
+                throw new ArmoredDecodingException("Base64 canonical padding not found");
             }
         } else {
             decoded = DECODER.decode(lineBuffer);
         }
 
         return decoded;
-    }
-
-    private boolean endsWithPadding(final byte[] encoded) {
-        final byte lastCharacter = encoded[encoded.length - 1];
-        return EQUALS_CHARACTER == lastCharacter;
     }
 }
