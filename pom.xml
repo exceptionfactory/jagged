@@ -308,9 +308,6 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
-                        <manifestEntries>
-                            <Automatic-Module-Name>${project.groupId}</Automatic-Module-Name>
-                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
