@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Cryptographic Algorithm Key extension of Secret Key Specification with required algorithm and key length restrictions
+ * Cryptographic Algorithm Key implementation of Secret Key with required algorithm and key length restrictions
  */
 class CryptographicAlgorithmKey implements SecretKey {
     private static final String FORMAT = "RAW";
@@ -37,7 +37,7 @@ class CryptographicAlgorithmKey implements SecretKey {
     private final CryptographicAlgorithm cryptographicAlgorithm;
 
     /**
-     * Cryptographic Algorithm  Key constructor with required symmetric key
+     * Cryptographic Algorithm Key constructor with required symmetric key
      *
      * @param key Symmetric Key
      * @param cryptographicKeyType Cryptographic Key Type

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.framework.crypto;
+package com.exceptionfactory.jagged.framework.stream;
 
 /**
  * STREAM Chunk Size definitions according to age-encryption Payload section
  */
-public enum ChunkSize {
+enum ChunkSize {
     /** Encrypted chunk size including ChaCha20-Poly1305 tag */
     ENCRYPTED(65552),
 

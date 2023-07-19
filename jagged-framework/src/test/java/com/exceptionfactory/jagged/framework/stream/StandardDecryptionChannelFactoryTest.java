@@ -16,7 +16,6 @@
 package com.exceptionfactory.jagged.framework.stream;
 
 import com.exceptionfactory.jagged.RecipientStanzaReader;
-import com.exceptionfactory.jagged.framework.format.HeaderDecodingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +27,7 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ReadableByteChannel;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,7 +58,7 @@ class StandardDecryptionChannelFactoryTest {
     void testNewDecryptingChannelReadException() {
         final ReadableByteChannel inputChannel = getInputChannel();
 
-        assertThrows(HeaderDecodingException.class, () -> factory.newDecryptingChannel(inputChannel, Collections.singletonList(recipientStanzaReader)));
+        assertThrows(GeneralSecurityException.class, () -> factory.newDecryptingChannel(inputChannel, Collections.singletonList(recipientStanzaReader)));
     }
 
     private ReadableByteChannel getInputChannel() {

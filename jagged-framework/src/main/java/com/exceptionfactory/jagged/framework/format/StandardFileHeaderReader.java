@@ -45,10 +45,10 @@ final class StandardFileHeaderReader implements FileHeaderReader {
     private static final CanonicalBase64.Decoder DECODER = CanonicalBase64.getDecoder();
 
     /**
-     * Get File Header containing Recipient Stanzas from Channel that starts with standard age header
+     * Get File Header containing Recipient Stanzas from buffer that starts with standard age header
      *
      * @param inputBuffer Input Byte Buffer starting with age header
-     * @return File Header with Recipient Stanzas containing one or more elements
+     * @return File Header with Recipient Stanzas
      * @throws GeneralSecurityException Thrown on failure to read or process File Header bytes
      */
     @Override

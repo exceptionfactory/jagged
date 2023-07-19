@@ -19,7 +19,6 @@ import com.exceptionfactory.jagged.PayloadException;
 import com.exceptionfactory.jagged.RecipientStanzaWriter;
 import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherOperationFactory;
 import com.exceptionfactory.jagged.framework.crypto.ByteBufferEncryptor;
-import com.exceptionfactory.jagged.framework.crypto.ChunkSize;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
 import com.exceptionfactory.jagged.framework.crypto.PayloadIvParameterSpec;
 import com.exceptionfactory.jagged.framework.format.PayloadKeyWriter;

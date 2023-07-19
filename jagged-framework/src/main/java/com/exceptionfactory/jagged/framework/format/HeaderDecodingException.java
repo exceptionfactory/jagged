@@ -20,13 +20,13 @@ import java.security.GeneralSecurityException;
 /**
  * Header Decoding Exception indicates failures while reading File Header section of age encryption messages
  */
-public class HeaderDecodingException extends GeneralSecurityException {
+class HeaderDecodingException extends GeneralSecurityException {
     /**
      * Header Decoding Exception with required message indicating problem details
      *
      * @param message Exception message with problem details
      */
-    public HeaderDecodingException(final String message) {
+    HeaderDecodingException(final String message) {
         super(message);
     }
 
@@ -36,7 +36,7 @@ public class HeaderDecodingException extends GeneralSecurityException {
      * @param message Exception message with problem details
      * @param cause Throwable cause of header failures
      */
-    public HeaderDecodingException(final String message, final Throwable cause) {
+    HeaderDecodingException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

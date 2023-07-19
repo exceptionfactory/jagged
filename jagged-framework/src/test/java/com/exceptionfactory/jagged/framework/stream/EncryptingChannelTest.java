@@ -17,7 +17,6 @@ package com.exceptionfactory.jagged.framework.stream;
 
 import com.exceptionfactory.jagged.PayloadException;
 import com.exceptionfactory.jagged.RecipientStanzaWriter;
-import com.exceptionfactory.jagged.framework.crypto.ChunkSize;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
 import com.exceptionfactory.jagged.framework.format.PayloadKeyWriter;
 import org.junit.jupiter.api.Test;

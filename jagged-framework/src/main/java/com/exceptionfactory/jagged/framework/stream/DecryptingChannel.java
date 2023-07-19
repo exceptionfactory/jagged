@@ -22,7 +22,6 @@ import com.exceptionfactory.jagged.framework.crypto.ByteBufferDecryptor;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
 import com.exceptionfactory.jagged.framework.crypto.PayloadIvParameterSpec;
 import com.exceptionfactory.jagged.framework.format.PayloadKeyReader;
-import com.exceptionfactory.jagged.framework.crypto.ChunkSize;
 
 import javax.crypto.IllegalBlockSizeException;
 import java.io.IOException;
