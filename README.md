@@ -46,11 +46,7 @@ which can be installed to support using Jagged on Java 8.
 
 The `jagged-x25519` library requires access to X25519 encoded keys. The default behavior of the Bouncy Castle library
 includes the public key together with the private key in the encoded representation, which differs from the standard
-Java implementation. The following Java System property must be enabled when using the Bouncy Castle Provider:
-
-```
-org.bouncycastle.pkcs8.v1_info_only
-```
+Java implementation. The Jagged library provides conversion between encoded formats.
 
 # Versioning
 

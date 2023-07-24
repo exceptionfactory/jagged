@@ -157,9 +157,8 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <!-- Enable Bouncy Castle PKCS8 Version 1 for X25519 Private Key encoding -->
+                            <!-- Enable Bouncy Castle Security Provider -->
                             <argLine>
-                                -Dorg.bouncycastle.pkcs8.v1_info_only=true
                                 -Djava.security.properties=${java.security.properties.location}
                             </argLine>
                         </configuration>

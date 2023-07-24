@@ -34,11 +34,19 @@ import java.util.Objects;
 class StandardRecipientKeyFactory implements RecipientKeyFactory {
     private static final int COORDINATE_LENGTH = RecipientKeyType.X25519.getKeyLength();
 
+    /** PKCS8 Private Key specification encoded length in bytes containing 32 byte key plus DER encoded version and algorithm */
+    private static final int PRIVATE_KEY_SPECIFICATION_ENCODED_LENGTH = 48;
+
+    /** PKCS8 Private Key DER encoded length in bytes containing 32 byte key plus version and algorithm identifier */
+    private static final int PRIVATE_KEY_DER_ENCODED_LENGTH = 46;
+
+    private static final int PRIVATE_KEY_DER_ENCODED_LENGTH_INDEX = 1;
+
+    private static final int PRIVATE_KEY_DER_HEADER_LENGTH = 16;
+
     private final int publicKeyEncodedLength;
 
     private final byte[] publicKeyHeader;
-
-    private final int privateKeyEncodedLength;
 
     private final byte[] privateKeyHeader;
 
@@ -53,10 +61,7 @@ class StandardRecipientKeyFactory implements RecipientKeyFactory {
         final KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
         final PrivateKey privateKey = keyPair.getPrivate();
-        final byte[] privateKeyEncoded = privateKey.getEncoded();
-        privateKeyEncodedLength = privateKeyEncoded.length;
-        final int privateKeyHeaderLength = privateKeyEncodedLength - COORDINATE_LENGTH;
-        privateKeyHeader = Arrays.copyOfRange(privateKeyEncoded, 0, privateKeyHeaderLength);
+        privateKeyHeader = getPrivateKeyHeader(privateKey);
 
         final PublicKey publicKey = keyPair.getPublic();
         final byte[] publicKeyEncoded = publicKey.getEncoded();
@@ -108,7 +113,7 @@ class StandardRecipientKeyFactory implements RecipientKeyFactory {
     }
 
     private PKCS8EncodedKeySpec getPrivateKeySpec(final byte[] privateKeyEncoded) {
-        final byte[] keySpec = new byte[privateKeyEncodedLength];
+        final byte[] keySpec = new byte[PRIVATE_KEY_SPECIFICATION_ENCODED_LENGTH];
         System.arraycopy(privateKeyHeader, 0, keySpec, 0, privateKeyHeader.length);
         System.arraycopy(privateKeyEncoded, 0, keySpec, privateKeyHeader.length, privateKeyEncoded.length);
         return new PKCS8EncodedKeySpec(keySpec);
@@ -127,5 +132,13 @@ class StandardRecipientKeyFactory implements RecipientKeyFactory {
 
     private KeyPairGenerator getKeyPairGenerator() throws NoSuchAlgorithmException {
         return KeyPairGenerator.getInstance(RecipientIndicator.KEY_ALGORITHM.getIndicator());
+    }
+
+    private static byte[] getPrivateKeyHeader(final PrivateKey privateKey) {
+        final byte[] privateKeyEncoded = privateKey.getEncoded();
+        final byte[] privateKeyHeader = Arrays.copyOfRange(privateKeyEncoded, 0, PRIVATE_KEY_DER_HEADER_LENGTH);
+        // Set DER encoded length to override potential longer values from other providers
+        privateKeyHeader[PRIVATE_KEY_DER_ENCODED_LENGTH_INDEX] = PRIVATE_KEY_DER_ENCODED_LENGTH;
+        return privateKeyHeader;
     }
 }

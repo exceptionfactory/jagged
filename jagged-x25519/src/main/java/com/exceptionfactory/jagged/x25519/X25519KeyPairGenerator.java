@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -36,6 +35,10 @@ public class X25519KeyPairGenerator extends KeyPairGenerator {
     private static final Charset ENCODING_CHARACTER_SET = StandardCharsets.US_ASCII;
 
     private static final String ALGORITHM = RecipientIndicator.KEY_ALGORITHM.getIndicator();
+
+    private static final int PRIVATE_KEY_START_INDEX = 16;
+
+    private static final int PRIVATE_KEY_END_INDEX = 48;
 
     private static final Bech32.Encoder ENCODER = Bech32.getEncoder();
 
@@ -65,14 +68,14 @@ public class X25519KeyPairGenerator extends KeyPairGenerator {
     }
 
     private X25519PublicKey getPublicKey(final PublicKey publicKey) {
-        final byte[] coordinate = getCoordinate(publicKey);
+        final byte[] coordinate = getPublicKeyCoordinate(publicKey);
         final CharSequence publicKeyEncoded = ENCODER.encode(RecipientIndicator.PUBLIC_KEY_HUMAN_READABLE_PART.getIndicator(), coordinate);
         final byte[] encoded = getEncoded(publicKeyEncoded);
         return new X25519PublicKey(encoded);
     }
 
     private X25519PrivateKey getPrivateKey(final PrivateKey privateKey) {
-        final byte[] coordinate = getCoordinate(privateKey);
+        final byte[] coordinate = getPrivateKeyCoordinate(privateKey);
         final CharSequence privateKeyEncoded = ENCODER.encode(IdentityIndicator.PRIVATE_KEY_HUMAN_READABLE_PART.getIndicator(), coordinate);
         final byte[] encoded = getEncoded(privateKeyEncoded);
         return new X25519PrivateKey(encoded);
@@ -84,8 +87,13 @@ public class X25519KeyPairGenerator extends KeyPairGenerator {
         return buffer.array();
     }
 
-    private byte[] getCoordinate(final Key key) {
-        final byte[] encoded = key.getEncoded();
+    private byte[] getPrivateKeyCoordinate(final PrivateKey privateKey) {
+        final byte[] encoded = privateKey.getEncoded();
+        return Arrays.copyOfRange(encoded, PRIVATE_KEY_START_INDEX, PRIVATE_KEY_END_INDEX);
+    }
+
+    private byte[] getPublicKeyCoordinate(final PublicKey publicKey) {
+        final byte[] encoded = publicKey.getEncoded();
         final int coordinateStartIndex = encoded.length - RecipientKeyType.X25519.getKeyLength();
         return Arrays.copyOfRange(encoded, coordinateStartIndex, encoded.length);
     }
