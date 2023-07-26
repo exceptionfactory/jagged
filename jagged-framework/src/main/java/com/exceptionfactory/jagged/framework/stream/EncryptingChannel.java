@@ -80,6 +80,10 @@ class EncryptingChannel implements WritableByteChannel {
         final int sourceBufferLimit = sourceBuffer.limit();
 
         while (sourceBuffer.hasRemaining()) {
+            if (inputBuffer.remaining() == 0) {
+                flushInputBuffer();
+            }
+
             final int inputBufferRemaining = inputBuffer.remaining();
             final int sourceBufferRemaining = sourceBuffer.remaining();
             if (sourceBufferRemaining > inputBufferRemaining) {
@@ -89,10 +93,6 @@ class EncryptingChannel implements WritableByteChannel {
 
             inputBuffer.put(sourceBuffer);
             sourceBuffer.limit(sourceBufferLimit);
-
-            if (inputBuffer.remaining() == 0) {
-                flushInputBuffer();
-            }
         }
 
         return sourceBufferLimit;

@@ -43,16 +43,22 @@ import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FrameworkTest {
     private static final String CONTENT = FrameworkTest.class.getName();
 
     private static final byte[] CONTENT_BINARY = CONTENT.getBytes(StandardCharsets.UTF_8);
+
+    private static final int PLAIN_CHUNK_SIZE = 65536;
+
+    private static final byte PLAIN_BYTE = 7;
 
     private static final byte[] PASSPHRASE = FrameworkTest.class.getSimpleName().getBytes(StandardCharsets.UTF_8);
 
@@ -81,10 +87,10 @@ class FrameworkTest {
     @Test
     void testScryptBinary() throws GeneralSecurityException, IOException {
         final RecipientStanzaWriter recipientStanzaWriter = ScryptRecipientStanzaWriterFactory.newRecipientStanzaWriter(PASSPHRASE, WORK_FACTOR);
-        final byte[] encrypted = getEncrypted(recipientStanzaWriter, WRITABLE_CONVERTER);
+        final byte[] encrypted = getEncrypted(CONTENT_BINARY, recipientStanzaWriter, WRITABLE_CONVERTER);
 
         final RecipientStanzaReader recipientStanzaReader = ScryptRecipientStanzaReaderFactory.newRecipientStanzaReader(PASSPHRASE);
-        final byte[] decrypted = getDecrypted(recipientStanzaReader, encrypted, READABLE_CONVERTER);
+        final byte[] decrypted = getDecrypted(CONTENT_BINARY.length, recipientStanzaReader, encrypted, READABLE_CONVERTER);
 
         assertArrayEquals(CONTENT_BINARY, decrypted);
     }
@@ -95,11 +101,11 @@ class FrameworkTest {
 
         final String publicKeyEncoded = keyPair.getPublic().toString();
         final RecipientStanzaWriter recipientStanzaWriter = X25519RecipientStanzaWriterFactory.newRecipientStanzaWriter(publicKeyEncoded);
-        final byte[] encrypted = getEncrypted(recipientStanzaWriter, ARMORED_WRITABLE_CONVERTER);
+        final byte[] encrypted = getEncrypted(CONTENT_BINARY, recipientStanzaWriter, ARMORED_WRITABLE_CONVERTER);
 
         final String privateKeyEncoded = keyPair.getPrivate().toString();
         final RecipientStanzaReader recipientStanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(privateKeyEncoded);
-        final byte[] decrypted = getDecrypted(recipientStanzaReader, encrypted, ARMORED_READABLE_CONVERTER);
+        final byte[] decrypted = getDecrypted(CONTENT_BINARY.length, recipientStanzaReader, encrypted, ARMORED_READABLE_CONVERTER);
 
         assertArrayEquals(CONTENT_BINARY, decrypted);
     }
@@ -110,13 +116,32 @@ class FrameworkTest {
 
         final String publicKeyEncoded = keyPair.getPublic().toString();
         final RecipientStanzaWriter recipientStanzaWriter = X25519RecipientStanzaWriterFactory.newRecipientStanzaWriter(publicKeyEncoded);
-        final byte[] encrypted = getEncrypted(recipientStanzaWriter, WRITABLE_CONVERTER);
+        final byte[] encrypted = getEncrypted(CONTENT_BINARY, recipientStanzaWriter, WRITABLE_CONVERTER);
 
         final String privateKeyEncoded = keyPair.getPrivate().toString();
         final RecipientStanzaReader recipientStanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(privateKeyEncoded);
-        final byte[] decrypted = getDecrypted(recipientStanzaReader, encrypted, READABLE_CONVERTER);
+        final byte[] decrypted = getDecrypted(CONTENT_BINARY.length, recipientStanzaReader, encrypted, READABLE_CONVERTER);
 
         assertArrayEquals(CONTENT_BINARY, decrypted);
+    }
+
+    @Test
+    void testX25519BinaryChunk() throws GeneralSecurityException, IOException {
+        final KeyPair keyPair = generateKeyPair();
+
+        final String publicKeyEncoded = keyPair.getPublic().toString();
+        final RecipientStanzaWriter recipientStanzaWriter = X25519RecipientStanzaWriterFactory.newRecipientStanzaWriter(publicKeyEncoded);
+
+        final byte[] contentBinary = new byte[PLAIN_CHUNK_SIZE];
+        Arrays.fill(contentBinary, PLAIN_BYTE);
+
+        final byte[] encrypted = getEncrypted(contentBinary, recipientStanzaWriter, WRITABLE_CONVERTER);
+
+        final String privateKeyEncoded = keyPair.getPrivate().toString();
+        final RecipientStanzaReader recipientStanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(privateKeyEncoded);
+        final byte[] decrypted = getDecrypted(PLAIN_CHUNK_SIZE, recipientStanzaReader, encrypted, READABLE_CONVERTER);
+
+        assertArrayEquals(contentBinary, decrypted);
     }
 
     private KeyPair generateKeyPair() throws NoSuchAlgorithmException {
@@ -125,12 +150,13 @@ class FrameworkTest {
     }
 
     private byte[] getEncrypted(
+            final byte[] inputBinary,
             final RecipientStanzaWriter recipientStanzaWriter,
             final Function<WritableByteChannel, WritableByteChannel> channelConverter
     ) throws GeneralSecurityException, IOException {
         final List<RecipientStanzaWriter> recipientStanzaWriters = Collections.singletonList(recipientStanzaWriter);
 
-        final ByteBuffer contentBuffer = ByteBuffer.wrap(CONTENT_BINARY);
+        final ByteBuffer contentBuffer = ByteBuffer.wrap(inputBinary);
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
@@ -139,13 +165,15 @@ class FrameworkTest {
         final EncryptingChannelFactory encryptingChannelFactory = new StandardEncryptingChannelFactory();
         final WritableByteChannel encryptingChannel = encryptingChannelFactory.newEncryptingChannel(convertedOutputChannel, recipientStanzaWriters);
 
-        encryptingChannel.write(contentBuffer);
+        final int encrypted = encryptingChannel.write(contentBuffer);
         encryptingChannel.close();
+        assertEquals(inputBinary.length, encrypted);
 
         return outputStream.toByteArray();
     }
 
     private byte[] getDecrypted(
+            final int decryptedLength,
             final RecipientStanzaReader recipientStanzaReader,
             final byte[] encrypted,
             final Function<ReadableByteChannel, ReadableByteChannel> channelConverter
@@ -159,8 +187,11 @@ class FrameworkTest {
         final DecryptingChannelFactory decryptingChannelFactory = new StandardDecryptingChannelFactory();
         final ReadableByteChannel decryptingChannel = decryptingChannelFactory.newDecryptingChannel(convertedInputChannel, recipientStanzaReaders);
 
-        final ByteBuffer contentBuffer = ByteBuffer.allocate(CONTENT_BINARY.length);
-        decryptingChannel.read(contentBuffer);
+        final ByteBuffer contentBuffer = ByteBuffer.allocate(decryptedLength);
+        while (contentBuffer.hasRemaining()) {
+            decryptingChannel.read(contentBuffer);
+        }
+
         decryptingChannel.close();
 
         return contentBuffer.array();
