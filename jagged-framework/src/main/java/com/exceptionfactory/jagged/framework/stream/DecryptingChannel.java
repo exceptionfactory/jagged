@@ -80,25 +80,37 @@ class DecryptingChannel implements ReadableByteChannel {
      * Read from decrypted buffer into provided output buffer and return bytes read
      *
      * @param outputBuffer Output Buffer into which decrypted bytes should be transferred
-     * @return Bytes read from decrypted buffer and transferred to output buffer
+     * @return Bytes read from decrypted buffer and transferred to output buffer or end-of-stream indicator
      * @throws IOException Thrown on failures to read from encrypted input channel or decryption failures
      */
     @Override
     public int read(final ByteBuffer outputBuffer) throws IOException {
         Objects.requireNonNull(outputBuffer, "Output Buffer required");
 
-        if (plainBuffer.remaining() == 0) {
-            try {
-                readChunk();
-                inputBuffer.clear();
-                readInputChannel();
-            } catch (final GeneralSecurityException e) {
-                final String message = String.format("Read chunk failed: counter %s", Arrays.toString(payloadIvParameterSpec.getIV()));
-                throw new PayloadException(message, e);
+        int read = 0;
+
+        while (outputBuffer.hasRemaining()) {
+            if (plainBuffer.remaining() == 0) {
+                try {
+                    readChunk();
+                    inputBuffer.clear();
+                    readInputChannel();
+                } catch (final GeneralSecurityException e) {
+                    final String message = String.format("Read chunk failed: counter %s", Arrays.toString(payloadIvParameterSpec.getIV()));
+                    throw new PayloadException(message, e);
+                }
+            }
+
+            final int plainBufferRead = readPlainBuffer(outputBuffer);
+            if (END_OF_FILE == plainBufferRead) {
+                read = END_OF_FILE;
+                break;
+            } else {
+                read += plainBufferRead;
             }
         }
 
-        return readPlainBuffer(outputBuffer);
+        return read;
     }
 
     /**

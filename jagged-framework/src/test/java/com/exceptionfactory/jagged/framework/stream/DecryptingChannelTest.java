@@ -51,6 +51,8 @@ import static org.mockito.Mockito.when;
 class DecryptingChannelTest {
     private static final byte[] INPUT = String.class.getSimpleName().getBytes(StandardCharsets.UTF_8);
 
+    private static final int HALF_BUFFER_SIZE = 128;
+
     private static final int BUFFER_SIZE = 256;
 
     private static final int ENCRYPTED_BUFFER_SIZE = 272;
@@ -64,13 +66,21 @@ class DecryptingChannelTest {
 
     private static final byte[] LAST_CHUNK_INITIALIZATION_VECTOR = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 
+    private static final byte[] SECOND_CHUNK_INITIALIZATION_VECTOR = new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1};
+
     private static final int INCREMENTED_INDEX = 10;
 
     private static final int LAST_INDEX = 11;
 
     private static final int COUNTER = 1;
 
+    private static final int END_OF_FILE = -1;
+
     private static final int ENCRYPTED_EMPTY_CHUNK_SIZE = 65568;
+
+    private static final int TWO_CHUNKS_PLAIN_LENGTH = 131072;
+
+    private static final int TWO_CHUNKS_ENCRYPTED_LENGTH = 131104;
 
     private static final CipherKey CIPHER_KEY = new CipherKey(SYMMETRIC_KEY);
 
@@ -164,15 +174,7 @@ class DecryptingChannelTest {
         final ReadableByteChannel encryptedChannel = Channels.newChannel(new ByteArrayInputStream(encryptedBytes));
 
         final DecryptingChannel decryptingChannel = new DecryptingChannel(encryptedChannel, recipientStanzaReaders, payloadKeyReader);
-
         final ByteBuffer outputBuffer = ByteBuffer.allocate(ChunkSize.ENCRYPTED.getSize());
-        final int decrypted = decryptingChannel.read(outputBuffer);
-        assertEquals(ChunkSize.PLAIN.getSize(), decrypted);
-        outputBuffer.flip();
-
-        final byte[] decryptedBytes = new byte[ChunkSize.PLAIN.getSize()];
-        outputBuffer.get(decryptedBytes);
-        assertArrayEquals(inputBytes, decryptedBytes);
 
         final PayloadException exception = assertThrows(PayloadException.class, () -> decryptingChannel.read(outputBuffer));
         assertInstanceOf(IllegalBlockSizeException.class, exception.getCause());
@@ -195,10 +197,48 @@ class DecryptingChannelTest {
         final DecryptingChannel decryptingChannel = new DecryptingChannel(encryptedChannel, recipientStanzaReaders, payloadKeyReader);
 
         final ByteBuffer outputBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+        outputBuffer.position(HALF_BUFFER_SIZE);
+        final int firstDecrypted = decryptingChannel.read(outputBuffer);
+        assertEquals(HALF_BUFFER_SIZE, firstDecrypted);
+
+        outputBuffer.position(0);
+        final int secondDecrypted = decryptingChannel.read(outputBuffer);
+        assertEquals(END_OF_FILE, secondDecrypted);
+
+        assertArrayEquals(inputBytes, outputBuffer.array());
+    }
+
+    @Test
+    void testReadMultipleChunks() throws GeneralSecurityException, IOException {
+        when(payloadKeyReader.getPayloadKey(any(), any())).thenReturn(CIPHER_KEY);
+
+        final ByteBuffer encryptedBuffer = ByteBuffer.allocate(TWO_CHUNKS_ENCRYPTED_LENGTH);
+
+        final IvParameterSpec firstChunkParameterSpec = new IvParameterSpec(new byte[LAST_CHUNK_INITIALIZATION_VECTOR.length]);
+        final ByteBufferEncryptor firstChunkEncryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(CIPHER_KEY, firstChunkParameterSpec);
+        final byte[] chunk = new byte[ChunkSize.PLAIN.getSize()];
+        final ByteBuffer chunkBuffer = ByteBuffer.wrap(chunk);
+        firstChunkEncryptor.encrypt(chunkBuffer, encryptedBuffer);
+        chunkBuffer.clear();
+
+        final IvParameterSpec lastChunkParameterSpec = new IvParameterSpec(SECOND_CHUNK_INITIALIZATION_VECTOR);
+        final ByteBufferEncryptor lastChunkEncryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(CIPHER_KEY, lastChunkParameterSpec);
+        lastChunkEncryptor.encrypt(chunkBuffer, encryptedBuffer);
+
+        final byte[] encryptedBytes = encryptedBuffer.array();
+        final ReadableByteChannel encryptedChannel = Channels.newChannel(new ByteArrayInputStream(encryptedBytes));
+        final DecryptingChannel decryptingChannel = new DecryptingChannel(encryptedChannel, recipientStanzaReaders, payloadKeyReader);
+
+        final ByteBuffer outputBuffer = ByteBuffer.allocate(TWO_CHUNKS_PLAIN_LENGTH);
         final int decrypted = decryptingChannel.read(outputBuffer);
 
-        assertEquals(BUFFER_SIZE, decrypted);
-        assertArrayEquals(inputBytes, outputBuffer.array());
+        assertEquals(outputBuffer.limit(), decrypted);
+        final byte[] chunksExpected = new byte[TWO_CHUNKS_PLAIN_LENGTH];
+        assertArrayEquals(chunksExpected, outputBuffer.array());
+
+        outputBuffer.clear();
+        final int read = decryptingChannel.read(outputBuffer);
+        assertEquals(END_OF_FILE, read);
     }
 
     private ReadableByteChannel getInputChannel() {
