@@ -75,10 +75,7 @@ class EncryptingChannelTest {
     @Test
     void testIsOpen() throws GeneralSecurityException, IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
-
-        final List<RecipientStanzaWriter> recipientStanzaWriters = Collections.singletonList(recipientStanzaWriter);
-        final EncryptingChannel encryptingChannel = new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
+        final EncryptingChannel encryptingChannel = getEncryptingChannel(outputStream);
 
         assertTrue(encryptingChannel.isOpen());
     }
@@ -86,11 +83,7 @@ class EncryptingChannelTest {
     @Test
     void testClose() throws GeneralSecurityException, IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
-
-        final List<RecipientStanzaWriter> recipientStanzaWriters = Collections.singletonList(recipientStanzaWriter);
-        when(payloadKeyWriter.writeFileHeader(any(), any())).thenReturn(PAYLOAD_KEY);
-        final EncryptingChannel encryptingChannel = new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
+        final EncryptingChannel encryptingChannel = getEncryptingChannel(outputStream);
 
         assertTrue(encryptingChannel.isOpen());
         encryptingChannel.close();
@@ -113,7 +106,8 @@ class EncryptingChannelTest {
         final EncryptingChannel encryptingChannel = new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
 
         final ByteBuffer sourceBuffer = ByteBuffer.wrap(SOURCE);
-        encryptingChannel.write(sourceBuffer);
+        final int written = encryptingChannel.write(sourceBuffer);
+        assertEquals(sourceBuffer.capacity(), written);
 
         assertThrows(PayloadException.class, encryptingChannel::close);
     }
@@ -121,14 +115,11 @@ class EncryptingChannelTest {
     @Test
     void testWrite() throws GeneralSecurityException, IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
-
-        final List<RecipientStanzaWriter> recipientStanzaWriters = Collections.singletonList(recipientStanzaWriter);
-        when(payloadKeyWriter.writeFileHeader(any(), any())).thenReturn(PAYLOAD_KEY);
-        final EncryptingChannel encryptingChannel = new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
+        final EncryptingChannel encryptingChannel = getEncryptingChannel(outputStream);
 
         final ByteBuffer sourceBuffer = ByteBuffer.wrap(SOURCE);
-        encryptingChannel.write(sourceBuffer);
+        final int written = encryptingChannel.write(sourceBuffer);
+        assertEquals(sourceBuffer.capacity(), written);
 
         encryptingChannel.close();
 
@@ -139,15 +130,12 @@ class EncryptingChannelTest {
     @Test
     void testWriteSingleChunk() throws GeneralSecurityException, IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
-
-        final List<RecipientStanzaWriter> recipientStanzaWriters = Collections.singletonList(recipientStanzaWriter);
-        when(payloadKeyWriter.writeFileHeader(any(), any())).thenReturn(PAYLOAD_KEY);
-        final EncryptingChannel encryptingChannel = new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
+        final EncryptingChannel encryptingChannel = getEncryptingChannel(outputStream);
 
         final byte[] chunk = new byte[ChunkSize.PLAIN.getSize()];
         final ByteBuffer sourceBuffer = ByteBuffer.wrap(chunk);
-        encryptingChannel.write(sourceBuffer);
+        final int written = encryptingChannel.write(sourceBuffer);
+        assertEquals(sourceBuffer.capacity(), written);
 
         encryptingChannel.close();
 
@@ -158,19 +146,42 @@ class EncryptingChannelTest {
     @Test
     void testWriteMultipleChunks() throws GeneralSecurityException, IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
-
-        final List<RecipientStanzaWriter> recipientStanzaWriters = Collections.singletonList(recipientStanzaWriter);
-        when(payloadKeyWriter.writeFileHeader(any(), any())).thenReturn(PAYLOAD_KEY);
-        final EncryptingChannel encryptingChannel = new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
+        final EncryptingChannel encryptingChannel = getEncryptingChannel(outputStream);
 
         final byte[] chunks = new byte[TWO_CHUNKS_LENGTH];
         final ByteBuffer sourceBuffer = ByteBuffer.wrap(chunks);
-        encryptingChannel.write(sourceBuffer);
+        final int written = encryptingChannel.write(sourceBuffer);
+        assertEquals(sourceBuffer.capacity(), written);
 
         encryptingChannel.close();
 
         final byte[] bytes = outputStream.toByteArray();
         assertEquals(TWO_CHUNKS_ENCRYPTED_LENGTH, bytes.length);
+    }
+
+    @Test
+    void testWriteMultipleChunksBufferSingleChunk() throws GeneralSecurityException, IOException {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final EncryptingChannel encryptingChannel = getEncryptingChannel(outputStream);
+
+        final byte[] chunks = new byte[TWO_CHUNKS_LENGTH];
+        final ByteBuffer sourceBuffer = ByteBuffer.wrap(chunks);
+        sourceBuffer.position(ChunkSize.PLAIN.getSize());
+        final int sourceBufferRemaining = sourceBuffer.remaining();
+
+        final int written = encryptingChannel.write(sourceBuffer);
+        assertEquals(sourceBufferRemaining, written);
+
+        encryptingChannel.close();
+
+        final byte[] bytes = outputStream.toByteArray();
+        assertEquals(ChunkSize.ENCRYPTED.getSize(), bytes.length);
+    }
+
+    private EncryptingChannel getEncryptingChannel(final ByteArrayOutputStream outputStream) throws GeneralSecurityException, IOException {
+        final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
+        final List<RecipientStanzaWriter> recipientStanzaWriters = Collections.singletonList(recipientStanzaWriter);
+        when(payloadKeyWriter.writeFileHeader(any(), any())).thenReturn(PAYLOAD_KEY);
+        return new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
     }
 }

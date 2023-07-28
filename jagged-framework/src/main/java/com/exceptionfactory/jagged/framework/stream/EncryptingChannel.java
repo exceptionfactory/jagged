@@ -78,6 +78,7 @@ class EncryptingChannel implements WritableByteChannel {
         Objects.requireNonNull(sourceBuffer, "Source Buffer required");
 
         final int sourceBufferLimit = sourceBuffer.limit();
+        final int sourceBufferStartPosition = sourceBuffer.position();
 
         while (sourceBuffer.hasRemaining()) {
             if (inputBuffer.remaining() == 0) {
@@ -95,7 +96,7 @@ class EncryptingChannel implements WritableByteChannel {
             sourceBuffer.limit(sourceBufferLimit);
         }
 
-        return sourceBufferLimit;
+        return sourceBuffer.position() - sourceBufferStartPosition;
     }
 
     /**
