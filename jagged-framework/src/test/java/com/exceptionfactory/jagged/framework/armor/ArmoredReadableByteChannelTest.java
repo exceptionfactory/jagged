@@ -51,6 +51,8 @@ class ArmoredReadableByteChannelTest {
 
     private static final String FOOTER_LENGTH_BODY = "QUJDREVGR0hJSktMTU5PUFFSU1RVVldY";
 
+    private static final int CHARACTER = 100;
+
     private static final int BUFFER_SIZE = 128;
 
     private static final int END_OF_FILE = -1;
@@ -97,14 +99,51 @@ class ArmoredReadableByteChannelTest {
 
         final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         try (ArmoredReadableByteChannel channel = new ArmoredReadableByteChannel(inputChannel)) {
+            assertReadSuccess(channel, buffer);
+        }
+    }
+
+    @Test
+    void testReadLineFeedBeforeHeader() throws IOException {
+        final ByteArrayOutputStream outputStream = getHeaderFooter(BODY.getBytes());
+        final byte[] armored = outputStream.toByteArray();
+
+        final ByteArrayOutputStream lineFeedOutputStream = new ByteArrayOutputStream();
+        lineFeedOutputStream.write(ArmoredSeparator.LINE_FEED.getCode());
+        lineFeedOutputStream.write(armored);
+
+        final ReadableByteChannel inputChannel = getChannel(lineFeedOutputStream);
+
+        final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+        try (ArmoredReadableByteChannel channel = new ArmoredReadableByteChannel(inputChannel)) {
+            assertReadSuccess(channel, buffer);
+        }
+    }
+
+    @Test
+    void testReadCharacterAfterFooter() throws IOException {
+        final ByteArrayOutputStream outputStream = getHeaderFooter(BODY.getBytes());
+        outputStream.write(CHARACTER);
+        final ReadableByteChannel inputChannel = getChannel(outputStream);
+
+        final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+        try (ArmoredReadableByteChannel channel = new ArmoredReadableByteChannel(inputChannel)) {
             assertTrue(channel.isOpen());
 
-            final int read = channel.read(buffer);
-            assertEquals(END_OF_FILE, read);
-            buffer.flip();
-            final byte[] decoded = new byte[buffer.remaining()];
-            buffer.get(decoded);
-            assertArrayEquals(BODY_DECODED, decoded);
+            final ArmoredDecodingException exception = assertThrows(ArmoredDecodingException.class, () -> channel.read(buffer));
+            assertTrue(exception.getMessage().contains(Integer.toString(CHARACTER)));
+        }
+    }
+
+    @Test
+    void testReadLineFeedAfterFooter() throws IOException {
+        final ByteArrayOutputStream outputStream = getHeaderFooter(BODY.getBytes());
+        outputStream.write(ArmoredSeparator.LINE_FEED.getCode());
+        final ReadableByteChannel inputChannel = getChannel(outputStream);
+
+        final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+        try (ArmoredReadableByteChannel channel = new ArmoredReadableByteChannel(inputChannel)) {
+            assertReadSuccess(channel, buffer);
         }
     }
 
@@ -165,6 +204,18 @@ class ArmoredReadableByteChannelTest {
             final byte[] expected = DECODER.decode(FOOTER_LENGTH_BODY);
             assertArrayEquals(expected, decoded);
         }
+    }
+
+    private void assertReadSuccess(final ReadableByteChannel channel, final ByteBuffer buffer) throws IOException {
+        assertTrue(channel.isOpen());
+
+        final int read = channel.read(buffer);
+        assertEquals(END_OF_FILE, read);
+        buffer.flip();
+
+        final byte[] decoded = new byte[buffer.remaining()];
+        buffer.get(decoded);
+        assertArrayEquals(BODY_DECODED, decoded);
     }
 
     private ReadableByteChannel getInputChannel(final byte[] header) throws IOException {

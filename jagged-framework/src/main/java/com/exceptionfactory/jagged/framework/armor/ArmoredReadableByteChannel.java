@@ -38,7 +38,9 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
 
     private static final int MAXIMUM_DECODED_LENGTH = 48;
 
-    private final ByteBuffer characterBuffer = ByteBuffer.allocate(1);
+    private static final int INPUT_BUFFER_CAPACITY = 65536;
+
+    private final ByteBuffer inputBuffer = ByteBuffer.allocate(INPUT_BUFFER_CAPACITY);
 
     private final ByteBuffer decodedBuffer = ByteBuffer.allocate(MAXIMUM_DECODED_LENGTH);
 
@@ -77,14 +79,20 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
         int read = 0;
 
         while (outputBuffer.hasRemaining()) {
-            if (decodedBuffer.hasRemaining()) {
-                outputBuffer.put(decodedBuffer.get());
-                read++;
-            } else if (footerFound) {
+            if (decodedBuffer.remaining() == 0) {
+                if (footerFound) {
+                    read = END_OF_FILE;
+                    break;
+                }
+                readLineDecoded();
+            }
+
+            final int decodedBufferRead = readDecodedBuffer(outputBuffer);
+            if (END_OF_FILE == decodedBufferRead) {
                 read = END_OF_FILE;
                 break;
             } else {
-                readLineDecoded();
+                read += decodedBufferRead;
             }
         }
 
@@ -112,17 +120,19 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
     }
 
     private void readHeader() throws IOException {
-        lineBuffer.flip();
-        // Skip whitespace prior to header
-        while (lineBuffer.remaining() == 0) {
-            readInputChannelLineBuffer();
-            if (isLineBufferBlank() && lineBuffer.limit() > 0) {
-                lineBuffer.clear();
-                lineBuffer.flip();
-            }
-        }
+        readInputBuffer();
 
-        if (lineBuffer.remaining() == ArmoredIndicator.HEADER.getLength()) {
+        // Skip whitespace prior to header
+        inputBuffer.mark();
+        byte character = inputBuffer.get();
+        while (Character.isWhitespace(character)) {
+            inputBuffer.mark();
+            character = inputBuffer.get();
+        }
+        inputBuffer.reset();
+
+        readLineBuffer();
+        if (lineBuffer.limit() == ArmoredIndicator.HEADER.getLength()) {
             final byte[] header = new byte[ArmoredIndicator.HEADER.getLength()];
             lineBuffer.get(header);
 
@@ -136,24 +146,39 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
         }
     }
 
-    private boolean isLineBufferBlank() {
-        boolean blank = true;
+    private int readDecodedBuffer(final ByteBuffer outputBuffer) {
+        int read = END_OF_FILE;
+        if (decodedBuffer.hasRemaining()) {
+            read++;
+        }
 
-        lineBuffer.mark();
-        while (lineBuffer.hasRemaining()) {
-            final byte character = lineBuffer.get();
-            if (!Character.isWhitespace(character)) {
-                blank = false;
+        final int decodedBufferLimit = decodedBuffer.limit();
+
+        while (decodedBuffer.hasRemaining()) {
+            if (outputBuffer.hasRemaining()) {
+                final int outputBufferRemaining = outputBuffer.remaining();
+                final int decodedBufferRemaining = decodedBuffer.remaining();
+                if (decodedBufferRemaining > outputBufferRemaining) {
+                    final int decodedBufferInputLimit = decodedBuffer.position() + outputBufferRemaining;
+                    decodedBuffer.limit(decodedBufferInputLimit);
+                }
+
+                final int decodedBufferStartPosition = decodedBuffer.position();
+
+                outputBuffer.put(decodedBuffer);
+                decodedBuffer.limit(decodedBufferLimit);
+
+                final int decodedBufferRead = decodedBuffer.position() - decodedBufferStartPosition;
+                read += decodedBufferRead;
+            } else {
                 break;
             }
         }
-        lineBuffer.reset();
-
-        return blank;
+        return read;
     }
 
     private void readLineDecoded() throws IOException {
-        readInputChannelLineBuffer();
+        readLineBuffer();
 
         if (lineBuffer.limit() == ArmoredIndicator.FOOTER.getLength()) {
             final byte[] footer = new byte[ArmoredIndicator.FOOTER.getLength()];
@@ -172,11 +197,14 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
         }
     }
 
-    private void readInputChannelLineBuffer() throws IOException {
+    private void readLineBuffer() throws IOException {
         lineBuffer.clear();
 
-        byte character = readInputByte();
-        while (character != END_OF_FILE) {
+        if (inputBuffer.remaining() == 0) {
+            readInputBuffer();
+        }
+        while (inputBuffer.hasRemaining()) {
+            final byte character = inputBuffer.get();
             if (ArmoredSeparator.LINE_FEED.getCode() == character) {
                 break;
             } else if (ArmoredSeparator.CARRIAGE_RETURN.getCode() != character) {
@@ -187,44 +215,34 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
                 }
             }
 
-            character = readInputByte();
+            if (inputBuffer.remaining() == 0) {
+                readInputBuffer();
+            }
         }
 
         lineBuffer.flip();
     }
 
     private void readEnd() throws IOException {
-        byte character = readInputByte();
-        while (Character.isWhitespace(character)) {
-            character = readInputByte();
-        }
-
-        if (END_OF_FILE != character) {
-            throw new ArmoredDecodingException(String.format("Character [%d] found after Footer", character));
+        while (inputBuffer.hasRemaining()) {
+            final byte character = inputBuffer.get();
+            if (!Character.isWhitespace(character)) {
+                throw new ArmoredDecodingException(String.format("Character [%d] found after Footer", character));
+            }
         }
     }
 
-    private byte readInputByte() throws IOException {
-        characterBuffer.clear();
+    private void readInputBuffer() throws IOException {
+        inputBuffer.clear();
 
-        boolean endFound = false;
-        while (characterBuffer.hasRemaining()) {
-            final int read = inputChannel.read(characterBuffer);
+        while (inputBuffer.hasRemaining()) {
+            final int read = inputChannel.read(inputBuffer);
             if (END_OF_FILE == read) {
-                endFound = true;
                 break;
             }
         }
 
-        final byte inputByte;
-        if (endFound) {
-            inputByte = END_OF_FILE;
-        } else {
-            characterBuffer.flip();
-            inputByte = characterBuffer.get();
-        }
-
-        return inputByte;
+        inputBuffer.flip();
     }
 
     private void decodeLineBuffer() throws ArmoredDecodingException {
