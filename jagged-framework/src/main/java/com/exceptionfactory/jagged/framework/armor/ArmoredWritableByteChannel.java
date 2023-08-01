@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * Writable Byte Channel supporting age encryption files with Base64 according to strict PEM encoding described in RFC 7468 Section 3
  */
-public class ArmoredWritableByteChannel implements WritableByteChannel {
+class ArmoredWritableByteChannel implements WritableByteChannel {
     private static final int HEADER_BUFFER_LENGTH = 36;
 
     private static final int FOOTER_BUFFER_LENGTH = 34;
@@ -47,7 +47,7 @@ public class ArmoredWritableByteChannel implements WritableByteChannel {
      * @param outputChannel Output Channel for encoding bytes
      * @throws IOException Throw on failures writing age header
      */
-    public ArmoredWritableByteChannel(final WritableByteChannel outputChannel) throws IOException {
+    ArmoredWritableByteChannel(final WritableByteChannel outputChannel) throws IOException {
         this.outputChannel = Objects.requireNonNull(outputChannel, "Output Channel required");
         writeHeader();
     }

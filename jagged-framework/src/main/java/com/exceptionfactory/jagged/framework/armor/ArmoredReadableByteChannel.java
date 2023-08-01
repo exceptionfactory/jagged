@@ -25,7 +25,7 @@ import java.util.Objects;
 /**
  * Readable Byte Channel supporting age encryption files encoded according to strict PEM encoding described in RFC 7468 Section 3
  */
-public class ArmoredReadableByteChannel implements ReadableByteChannel {
+class ArmoredReadableByteChannel implements ReadableByteChannel {
     /** Base64 Decoder supports padding characters */
     private static final Base64.Decoder DECODER = Base64.getDecoder();
 
@@ -58,7 +58,7 @@ public class ArmoredReadableByteChannel implements ReadableByteChannel {
      * @param inputChannel Input Channel containing armored age encryption with standard header and footer
      * @throws IOException Thrown on failures reading or validating required header
      */
-    public ArmoredReadableByteChannel(final ReadableByteChannel inputChannel) throws IOException {
+    ArmoredReadableByteChannel(final ReadableByteChannel inputChannel) throws IOException {
         this.inputChannel = Objects.requireNonNull(inputChannel, "Input Channel required");
         readHeader();
     }

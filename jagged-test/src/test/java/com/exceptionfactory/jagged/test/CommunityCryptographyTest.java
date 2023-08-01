@@ -17,8 +17,8 @@ package com.exceptionfactory.jagged.test;
 
 import com.exceptionfactory.jagged.DecryptingChannelFactory;
 import com.exceptionfactory.jagged.RecipientStanzaReader;
+import com.exceptionfactory.jagged.framework.armor.ArmoredDecryptingChannelFactory;
 import com.exceptionfactory.jagged.framework.stream.StandardDecryptingChannelFactory;
-import com.exceptionfactory.jagged.framework.armor.ArmoredReadableByteChannel;
 import com.exceptionfactory.jagged.scrypt.ScryptRecipientStanzaReaderFactory;
 import com.exceptionfactory.jagged.x25519.X25519RecipientStanzaReaderFactory;
 import org.junit.jupiter.api.DynamicTest;
@@ -88,7 +88,6 @@ class CommunityCryptographyTest {
         final InputStream inputStream = Files.newInputStream(testdataFilePath);
         final Map<String, String> properties = readProperties(inputStream);
 
-        final DecryptingChannelFactory decryptingChannelFactory = new StandardDecryptingChannelFactory();
         final RecipientStanzaReader recipientStanzaReader = getRecipientStanzaReader(properties);
         final Iterable<RecipientStanzaReader> recipientStanzaReaders = Collections.singletonList(recipientStanzaReader);
         final ReadableByteChannel inputChannel = Channels.newChannel(inputStream);
@@ -96,22 +95,17 @@ class CommunityCryptographyTest {
         final String expected = properties.get(CommunityCryptographyProperty.EXPECT.getProperty());
         final String armored = properties.get(CommunityCryptographyProperty.ARMORED.getProperty());
 
+        final DecryptingChannelFactory decryptingChannelFactory = ARMORED_YES.equals(armored) ? new ArmoredDecryptingChannelFactory() : new StandardDecryptingChannelFactory();
         if (CommunityCryptographyExpectation.SUCCESS.getLabel().contentEquals(expected)) {
-            final ReadableByteChannel encryptedChannel = getEncryptedChannel(inputChannel, armored);
-            final ReadableByteChannel decryptingChannel = decryptingChannelFactory.newDecryptingChannel(encryptedChannel, recipientStanzaReaders);
+            final ReadableByteChannel decryptingChannel = decryptingChannelFactory.newDecryptingChannel(inputChannel, recipientStanzaReaders);
             assertPayloadExpected(fileName, decryptingChannel, properties);
         } else {
             final Exception exception = assertThrows(Exception.class, () -> {
-                final ReadableByteChannel encryptedChannel = getEncryptedChannel(inputChannel, armored);
-                final ReadableByteChannel decryptingChannel = decryptingChannelFactory.newDecryptingChannel(encryptedChannel, recipientStanzaReaders);
+                final ReadableByteChannel decryptingChannel = decryptingChannelFactory.newDecryptingChannel(inputChannel, recipientStanzaReaders);
                 getDigestEncoded(decryptingChannel);
             }, fileName.toString());
             assertExceptionExpected(exception, expected);
         }
-    }
-
-    private ReadableByteChannel getEncryptedChannel(final ReadableByteChannel inputChannel, final String armored) throws IOException {
-        return ARMORED_YES.equals(armored) ? new ArmoredReadableByteChannel(inputChannel) : inputChannel;
     }
 
     private void assertExceptionExpected(final Exception exception, final String expected) {

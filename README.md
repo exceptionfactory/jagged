@@ -169,8 +169,8 @@ The `jagged-framework` module includes shared components for common cryptographi
 The `stream` package includes the `StandardDecryptingChannelFactory` and `StandardEncryptingChannelFactory` classes,
 which implement the corresponding public interfaces for streaming cipher operations.
 
-The `armor` packaged includes the `ArmoredReadableByteChannel` and `ArmoredWritableByteChannel` classes, supporting
-reading and writing ASCII armored files with standard PEM header and footer lines.
+The `armor` packaged includes the `ArmoredDecryptingChannelFactory` and `ArmoredEncryptingChannelFactory` classes,
+supporting reading and writing ASCII armored files with standard PEM header and footer lines.
 
 ## jagged-scrypt
 

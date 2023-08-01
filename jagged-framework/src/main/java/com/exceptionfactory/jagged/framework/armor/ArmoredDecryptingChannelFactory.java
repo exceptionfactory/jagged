@@ -13,27 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.framework.stream;
+package com.exceptionfactory.jagged.framework.armor;
 
-import com.exceptionfactory.jagged.DecryptingChannelFactory;
 import com.exceptionfactory.jagged.RecipientStanzaReader;
-import com.exceptionfactory.jagged.framework.format.PayloadKeyReader;
-import com.exceptionfactory.jagged.framework.format.StandardPayloadKeyReader;
+import com.exceptionfactory.jagged.framework.stream.StandardDecryptingChannelFactory;
 
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ReadableByteChannel;
 import java.security.GeneralSecurityException;
-import java.util.Objects;
 
 /**
- * Standard implementation of Decrypting Channel Factory supports reading encrypted channels
+ * ASCII Armored implementation of Decrypting Channel Factory supports reading encrypted channels with Base64 wrapping
  */
-public class StandardDecryptingChannelFactory implements DecryptingChannelFactory {
+public class ArmoredDecryptingChannelFactory extends StandardDecryptingChannelFactory {
     /**
-     * Create new channel that reads and decrypts from the supplied open input channel
+     * Create new channel that reads and decrypts from the supplied open input channel with ASCII Armored Base64 wrapping
      *
-     * @param inputChannel Input Channel source containing encrypted bytes
+     * @param inputChannel Input Channel source containing encrypted bytes with ASCII Armored Base64 wrapping
      * @param recipientStanzaReaders Recipient Stanza Readers capable of providing the Identity to read the File Key for decryption
      * @return Readable Byte Channel
      * @throws IOException Thrown on failures to read input channel
@@ -44,13 +40,6 @@ public class StandardDecryptingChannelFactory implements DecryptingChannelFactor
             final ReadableByteChannel inputChannel,
             final Iterable<RecipientStanzaReader> recipientStanzaReaders
     ) throws IOException, GeneralSecurityException {
-        Objects.requireNonNull(inputChannel, "Input Channel required");
-        Objects.requireNonNull(recipientStanzaReaders, "Recipient Stanza Readers required");
-        if (inputChannel.isOpen()) {
-            final PayloadKeyReader payloadKeyReader = new StandardPayloadKeyReader();
-            return new DecryptingChannel(inputChannel, recipientStanzaReaders, payloadKeyReader);
-        } else {
-            throw new ClosedChannelException();
-        }
+        return super.newDecryptingChannel(new ArmoredReadableByteChannel(inputChannel), recipientStanzaReaders);
     }
 }
