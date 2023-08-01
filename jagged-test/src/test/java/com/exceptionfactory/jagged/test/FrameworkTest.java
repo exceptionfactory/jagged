@@ -89,6 +89,25 @@ class FrameworkTest {
     }
 
     @Test
+    void testX25519ArmoredChunk() throws GeneralSecurityException, IOException {
+        final KeyPair keyPair = generateKeyPair();
+
+        final String publicKeyEncoded = keyPair.getPublic().toString();
+        final RecipientStanzaWriter recipientStanzaWriter = X25519RecipientStanzaWriterFactory.newRecipientStanzaWriter(publicKeyEncoded);
+
+        final byte[] contentBinary = new byte[PLAIN_CHUNK_SIZE];
+        Arrays.fill(contentBinary, PLAIN_BYTE);
+
+        final byte[] encrypted = getEncrypted(contentBinary, recipientStanzaWriter, new ArmoredEncryptingChannelFactory());
+
+        final String privateKeyEncoded = keyPair.getPrivate().toString();
+        final RecipientStanzaReader recipientStanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(privateKeyEncoded);
+        final byte[] decrypted = getDecrypted(PLAIN_CHUNK_SIZE, recipientStanzaReader, encrypted, new ArmoredDecryptingChannelFactory());
+
+        assertArrayEquals(contentBinary, decrypted);
+    }
+
+    @Test
     void testX25519Binary() throws GeneralSecurityException, IOException {
         final KeyPair keyPair = generateKeyPair();
 

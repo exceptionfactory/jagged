@@ -31,13 +31,23 @@ class ArmoredWritableByteChannel implements WritableByteChannel {
 
     private static final int MAXIMUM_SOURCE_LINE_LENGTH = 48;
 
+    private static final int MAXIMUM_ENCODED_LINE_LENGTH = 64;
+
+    private static final int CHUNK_LENGTH = 66560;
+
+    private static final int START_POSITION = 0;
+
     private static final byte LINE_FEED = (byte) ArmoredSeparator.LINE_FEED.getCode();
 
     private static final byte[] LINE_FEED_BYTES = new byte[]{LINE_FEED};
 
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
-    private final ByteBuffer lastLineBuffer = ByteBuffer.allocate(MAXIMUM_SOURCE_LINE_LENGTH);
+    private final ByteBuffer lineFeedBuffer = ByteBuffer.wrap(LINE_FEED_BYTES);
+
+    private final ByteBuffer lineBuffer = ByteBuffer.allocate(MAXIMUM_SOURCE_LINE_LENGTH);
+
+    private final ByteBuffer chunkBuffer = ByteBuffer.allocate(CHUNK_LENGTH);
 
     private final WritableByteChannel outputChannel;
 
@@ -63,20 +73,22 @@ class ArmoredWritableByteChannel implements WritableByteChannel {
     public int write(final ByteBuffer sourceBuffer) throws IOException {
         Objects.requireNonNull(sourceBuffer, "Source Buffer required");
         final int sourceBufferLimit = sourceBuffer.limit();
+        putLineBuffer(sourceBuffer);
 
-        int sourceBufferLimitPosition = sourceBuffer.position();
-        while (sourceBuffer.hasRemaining()) {
-            final int lastLineBufferRemaining = lastLineBuffer.remaining();
-            if (sourceBuffer.remaining() >= lastLineBufferRemaining) {
-                sourceBufferLimitPosition += lastLineBufferRemaining;
-                sourceBuffer.limit(sourceBufferLimitPosition);
-                lastLineBuffer.put(sourceBuffer);
-                sourceBuffer.limit(sourceBufferLimit);
+        if (lineBuffer.position() == 0) {
+            final int sourceBufferRemaining = sourceBuffer.remaining();
+            final int sourceBufferLineModulus = sourceBufferRemaining % MAXIMUM_SOURCE_LINE_LENGTH;
 
-                writeEncodedLineBuffer();
-            } else {
-                lastLineBuffer.put(sourceBuffer);
+            if (sourceBufferLineModulus > 0) {
+                final int sourceBufferLimitAdjusted = sourceBufferLimit - sourceBufferLineModulus;
+                sourceBuffer.limit(sourceBufferLimitAdjusted);
             }
+
+            final ByteBuffer encodedSourceBuffer = ENCODER.encode(sourceBuffer);
+            writeEncodedBuffer(encodedSourceBuffer);
+
+            sourceBuffer.limit(sourceBufferLimit);
+            putLineBuffer(sourceBuffer);
         }
 
         return sourceBufferLimit;
@@ -99,16 +111,11 @@ class ArmoredWritableByteChannel implements WritableByteChannel {
      */
     @Override
     public void close() throws IOException {
-        if (lastLineBuffer.position() > 0) {
-            writeEncodedLineBuffer();
+        if (lineBuffer.position() > 0) {
+            writeLineBuffer();
         }
 
-        final ByteBuffer footerBuffer = ByteBuffer.allocate(FOOTER_BUFFER_LENGTH);
-        footerBuffer.put(ArmoredIndicator.FOOTER.getIndicator());
-        footerBuffer.put(LINE_FEED);
-        footerBuffer.flip();
-
-        outputChannel.write(footerBuffer);
+        writeFooter();
         outputChannel.close();
     }
 
@@ -118,22 +125,81 @@ class ArmoredWritableByteChannel implements WritableByteChannel {
         headerBuffer.put(LINE_FEED);
         headerBuffer.flip();
 
-        outputChannel.write(headerBuffer);
+        writeBuffer(headerBuffer);
     }
 
-    private void writeEncodedLineBuffer() throws IOException {
-        lastLineBuffer.flip();
-        final ByteBuffer encodedBuffer = ENCODER.encode(lastLineBuffer);
-        lastLineBuffer.clear();
-        writeBuffer(encodedBuffer);
+    private void writeFooter() throws IOException {
+        final ByteBuffer footerBuffer = ByteBuffer.allocate(FOOTER_BUFFER_LENGTH);
+        footerBuffer.put(ArmoredIndicator.FOOTER.getIndicator());
+        footerBuffer.put(LINE_FEED);
+        footerBuffer.flip();
 
-        final ByteBuffer lineFeedBuffer = ByteBuffer.wrap(LINE_FEED_BYTES);
+        writeBuffer(footerBuffer);
+    }
+
+    private void writeEncodedBuffer(final ByteBuffer encodedBuffer) throws IOException {
+        final int encodedBufferLimit = encodedBuffer.limit();
+
+        while (encodedBuffer.hasRemaining()) {
+            while (chunkBuffer.hasRemaining()) {
+                final int limit = encodedBuffer.position() + MAXIMUM_ENCODED_LINE_LENGTH;
+                encodedBuffer.limit(limit);
+
+                chunkBuffer.put(encodedBuffer);
+                encodedBuffer.limit(encodedBufferLimit);
+
+                chunkBuffer.put(lineFeedBuffer);
+                lineFeedBuffer.position(START_POSITION);
+
+                if (encodedBuffer.remaining() == 0) {
+                    break;
+                }
+            }
+
+            chunkBuffer.flip();
+            writeBuffer(chunkBuffer);
+            chunkBuffer.clear();
+
+            encodedBuffer.limit(encodedBufferLimit);
+        }
+    }
+
+    private void writeLineBuffer() throws IOException {
+        lineBuffer.flip();
+
+        final ByteBuffer encodedLineBuffer = ENCODER.encode(lineBuffer);
+        writeBuffer(encodedLineBuffer);
+
         writeBuffer(lineFeedBuffer);
+        lineFeedBuffer.position(START_POSITION);
     }
 
     private void writeBuffer(final ByteBuffer buffer) throws IOException {
         while (buffer.hasRemaining()) {
             outputChannel.write(buffer);
+        }
+    }
+
+    private void putLineBuffer(final ByteBuffer sourceBuffer) throws IOException {
+        final int lineBufferRemaining = lineBuffer.remaining();
+
+        if (lineBufferRemaining > sourceBuffer.remaining()) {
+            lineBuffer.put(sourceBuffer);
+        } else if (lineBuffer.position() > START_POSITION) {
+            final int sourceBufferLimit = sourceBuffer.limit();
+
+            if (sourceBuffer.remaining() > lineBufferRemaining) {
+                final int sourceBufferLimitAdjusted = sourceBuffer.position() + lineBufferRemaining;
+                sourceBuffer.limit(sourceBufferLimitAdjusted);
+            }
+
+            lineBuffer.put(sourceBuffer);
+            sourceBuffer.limit(sourceBufferLimit);
+        }
+
+        if (lineBuffer.position() == MAXIMUM_SOURCE_LINE_LENGTH) {
+            writeLineBuffer();
+            lineBuffer.clear();
         }
     }
 }
