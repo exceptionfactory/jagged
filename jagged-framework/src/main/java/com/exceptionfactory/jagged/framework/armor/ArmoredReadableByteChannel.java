@@ -32,17 +32,26 @@ class ArmoredReadableByteChannel implements ReadableByteChannel {
     /** Base64 Encoder with padding characters */
     private static final Base64.Encoder ENCODER_WITH_PADDING = Base64.getEncoder();
 
+    /** End of file indicator */
     private static final byte END_OF_FILE = -1;
 
+    /** Maximum length of Base64 encoded line without carriage return or line feed endings */
     private static final int MAXIMUM_LINE_LENGTH = 64;
 
-    private static final int MAXIMUM_DECODED_LENGTH = 48;
+    /** Input Buffer containing up to 1024 encoded contiguous lines with line feed endings */
+    private static final int INPUT_BUFFER_CAPACITY = 66560;
 
-    private static final int INPUT_BUFFER_CAPACITY = 65536;
+    /** Encoded Buffer containing up to 1024 encoded contiguous lines without line endings */
+    private static final int ENCODED_BUFFER_CAPACITY = 65536;
+
+    /** Decoded Buffer containing up to 1024 decoded contiguous lines */
+    private static final int DECODED_BUFFER_CAPACITY = 49152;
 
     private final ByteBuffer inputBuffer = ByteBuffer.allocate(INPUT_BUFFER_CAPACITY);
 
-    private final ByteBuffer decodedBuffer = ByteBuffer.allocate(MAXIMUM_DECODED_LENGTH);
+    private final ByteBuffer encodedBuffer = ByteBuffer.allocate(ENCODED_BUFFER_CAPACITY);
+
+    private final ByteBuffer decodedBuffer = ByteBuffer.allocate(DECODED_BUFFER_CAPACITY);
 
     private final ByteBuffer lineBuffer = ByteBuffer.allocate(MAXIMUM_LINE_LENGTH);
 
@@ -79,14 +88,6 @@ class ArmoredReadableByteChannel implements ReadableByteChannel {
         int read = 0;
 
         while (outputBuffer.hasRemaining()) {
-            if (decodedBuffer.remaining() == 0) {
-                if (footerFound) {
-                    read = END_OF_FILE;
-                    break;
-                }
-                readLineDecoded();
-            }
-
             final int decodedBufferRead = readDecodedBuffer(outputBuffer);
             if (END_OF_FILE == decodedBufferRead) {
                 read = END_OF_FILE;
@@ -120,24 +121,15 @@ class ArmoredReadableByteChannel implements ReadableByteChannel {
     }
 
     private void readHeader() throws IOException {
-        readInputBuffer();
-
-        // Skip whitespace prior to header
-        inputBuffer.mark();
-        byte character = inputBuffer.get();
-        while (Character.isWhitespace(character)) {
-            inputBuffer.mark();
-            character = inputBuffer.get();
-        }
-        inputBuffer.reset();
-
+        readInputChannel();
+        readLeading();
         readLineBuffer();
         if (lineBuffer.limit() == ArmoredIndicator.HEADER.getLength()) {
             final byte[] header = new byte[ArmoredIndicator.HEADER.getLength()];
             lineBuffer.get(header);
 
             if (Arrays.equals(ArmoredIndicator.HEADER.getIndicator(), header)) {
-                readLineDecoded();
+                readEncodedBuffer();
             } else {
                 throw new ArmoredDecodingException("Header not matched");
             }
@@ -146,15 +138,34 @@ class ArmoredReadableByteChannel implements ReadableByteChannel {
         }
     }
 
-    private int readDecodedBuffer(final ByteBuffer outputBuffer) {
+    private void readLeading() {
+        inputBuffer.mark();
+        byte character = inputBuffer.get();
+        while (Character.isWhitespace(character)) {
+            inputBuffer.mark();
+            character = inputBuffer.get();
+        }
+        inputBuffer.reset();
+    }
+
+    private void readTrailing() throws IOException {
+        while (inputBuffer.hasRemaining()) {
+            final byte character = inputBuffer.get();
+            if (!Character.isWhitespace(character)) {
+                throw new ArmoredDecodingException(String.format("Character [%d] found after Footer", character));
+            }
+        }
+    }
+
+    private int readDecodedBuffer(final ByteBuffer outputBuffer) throws IOException {
         int read = END_OF_FILE;
         if (decodedBuffer.hasRemaining()) {
             read++;
         }
 
-        final int decodedBufferLimit = decodedBuffer.limit();
-
         while (decodedBuffer.hasRemaining()) {
+            final int decodedBufferLimit = decodedBuffer.limit();
+
             if (outputBuffer.hasRemaining()) {
                 final int outputBufferRemaining = outputBuffer.remaining();
                 final int decodedBufferRemaining = decodedBuffer.remaining();
@@ -170,39 +181,109 @@ class ArmoredReadableByteChannel implements ReadableByteChannel {
 
                 final int decodedBufferRead = decodedBuffer.position() - decodedBufferStartPosition;
                 read += decodedBufferRead;
+
+                if (decodedBuffer.remaining() == 0) {
+                    readEncodedBuffer();
+                }
             } else {
                 break;
             }
         }
+
+        if (decodedBuffer.remaining() == 0) {
+            read = END_OF_FILE;
+        }
+
         return read;
     }
 
-    private void readLineDecoded() throws IOException {
-        readLineBuffer();
+    private void readEncodedBuffer() throws IOException {
+        decodedBuffer.clear();
 
-        if (lineBuffer.limit() == ArmoredIndicator.FOOTER.getLength()) {
-            final byte[] footer = new byte[ArmoredIndicator.FOOTER.getLength()];
-            lineBuffer.get(footer);
-            if (Arrays.equals(ArmoredIndicator.FOOTER.getIndicator(), footer)) {
-                footerFound = true;
-                readEnd();
+        while (decodedBuffer.hasRemaining()) {
+            readInputBuffer();
+
+            if (encodedBuffer.hasRemaining()) {
+                final ByteBuffer decoded = getDecodedBuffer();
+                decodedBuffer.put(decoded);
+
+                readLastLineBuffer();
             } else {
-                lineBuffer.rewind();
-                decodeLineBuffer();
+                readLastLineBuffer();
+                break;
             }
-        } else if (lineBuffer.limit() == 0) {
-            throw new ArmoredDecodingException("Empty line found before Footer");
+        }
+
+        decodedBuffer.flip();
+    }
+
+    private void readInputBuffer() throws IOException {
+        encodedBuffer.clear();
+
+        while (encodedBuffer.hasRemaining()) {
+            readLineBuffer();
+
+            if (lineBuffer.limit() == MAXIMUM_LINE_LENGTH) {
+                if (lastEncodedLineFound) {
+                    final String message = String.format("Short line less than standard length [%d] found before last line", MAXIMUM_LINE_LENGTH);
+                    throw new ArmoredDecodingException(message);
+                }
+                encodedBuffer.put(lineBuffer);
+            } else if (lineBuffer.limit() == ArmoredIndicator.FOOTER.getLength()) {
+                readFooter();
+                break;
+            } else if (lineBuffer.limit() == 0) {
+                if (footerFound) {
+                    break;
+                }
+                throw new ArmoredDecodingException("Empty line found before Footer");
+            } else {
+                break;
+            }
+        }
+
+        encodedBuffer.flip();
+    }
+
+    private void readLastLineBuffer() throws ArmoredDecodingException {
+        // Decode line buffer when length is less than maximum length indicating last line before footer
+        if (lineBuffer.hasRemaining()) {
+            final byte[] encoded = new byte[lineBuffer.limit()];
+            lineBuffer.get(encoded);
+
+            final byte[] decoded = getDecoded(encoded);
+            final byte[] encodedWithPadding = ENCODER_WITH_PADDING.encode(decoded);
+
+            if (Arrays.equals(encodedWithPadding, encoded)) {
+                decodedBuffer.put(decoded);
+            } else {
+                throw new ArmoredDecodingException("Base64 canonical padding not found");
+            }
+
+            lastEncodedLineFound = true;
+        }
+    }
+
+    private void readFooter() throws IOException {
+        final byte[] footer = new byte[ArmoredIndicator.FOOTER.getLength()];
+        lineBuffer.get(footer);
+        if (Arrays.equals(ArmoredIndicator.FOOTER.getIndicator(), footer)) {
+            footerFound = true;
+            readTrailing();
         } else {
-            decodeLineBuffer();
+            lineBuffer.rewind();
         }
     }
 
     private void readLineBuffer() throws IOException {
-        lineBuffer.clear();
+        if (lineBuffer.remaining() == 0) {
+            lineBuffer.clear();
+        }
 
         if (inputBuffer.remaining() == 0) {
-            readInputBuffer();
+            readInputChannel();
         }
+
         while (inputBuffer.hasRemaining()) {
             final byte character = inputBuffer.get();
             if (ArmoredSeparator.LINE_FEED.getCode() == character) {
@@ -216,23 +297,14 @@ class ArmoredReadableByteChannel implements ReadableByteChannel {
             }
 
             if (inputBuffer.remaining() == 0) {
-                readInputBuffer();
+                readInputChannel();
             }
         }
 
         lineBuffer.flip();
     }
 
-    private void readEnd() throws IOException {
-        while (inputBuffer.hasRemaining()) {
-            final byte character = inputBuffer.get();
-            if (!Character.isWhitespace(character)) {
-                throw new ArmoredDecodingException(String.format("Character [%d] found after Footer", character));
-            }
-        }
-    }
-
-    private void readInputBuffer() throws IOException {
+    private void readInputChannel() throws IOException {
         inputBuffer.clear();
 
         while (inputBuffer.hasRemaining()) {
@@ -245,44 +317,19 @@ class ArmoredReadableByteChannel implements ReadableByteChannel {
         inputBuffer.flip();
     }
 
-    private void decodeLineBuffer() throws ArmoredDecodingException {
-        if (lineBuffer.limit() == MAXIMUM_LINE_LENGTH) {
-            if (lastEncodedLineFound) {
-                final String message = String.format("Short line less than standard length [%d] found before last line", MAXIMUM_LINE_LENGTH);
-                throw new ArmoredDecodingException(message);
-            }
-        } else {
-            lastEncodedLineFound = true;
-        }
-
-        decodedBuffer.clear();
+    private byte[] getDecoded(final byte[] encoded) throws ArmoredDecodingException {
         try {
-            final ByteBuffer decoded = getDecodedLineBuffer();
-            decodedBuffer.put(decoded);
+            return DECODER.decode(encoded);
         } catch (final IllegalArgumentException e) {
             throw new ArmoredDecodingException("Base64 line decoding failed", e);
         }
-        decodedBuffer.flip();
     }
 
-    private ByteBuffer getDecodedLineBuffer() throws ArmoredDecodingException {
-        final ByteBuffer decoded;
-        if (lastEncodedLineFound) {
-            final byte[] encoded = new byte[lineBuffer.limit()];
-            lineBuffer.get(encoded);
-
-            final byte[] decodedBytes = DECODER.decode(encoded);
-            final byte[] encodedWithPadding = ENCODER_WITH_PADDING.encode(decodedBytes);
-
-            if (Arrays.equals(encodedWithPadding, encoded)) {
-                decoded = ByteBuffer.wrap(decodedBytes);
-            } else {
-                throw new ArmoredDecodingException("Base64 canonical padding not found");
-            }
-        } else {
-            decoded = DECODER.decode(lineBuffer);
+    private ByteBuffer getDecodedBuffer() throws ArmoredDecodingException {
+        try {
+            return DECODER.decode(encodedBuffer);
+        } catch (final IllegalArgumentException e) {
+            throw new ArmoredDecodingException("Base64 line decoding failed", e);
         }
-
-        return decoded;
     }
 }
