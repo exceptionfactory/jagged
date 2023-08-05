@@ -215,6 +215,17 @@ Run the following Maven command to build the libraries:
 ./mvnw clean install
 ```
 
+## Code Quality
+
+Jagged uses the following build plugins and services to evaluate code quality:
+
+- [Apache Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/)
+- [Apache Maven PMD Plugin](https://maven.apache.org/plugins/maven-pmd-plugin/)
+- [Codecov](https://about.codecov.io/)
+- [GitHub CodeQL](https://codeql.github.com/)
+- [JaCoCo Maven Plugin](https://www.jacoco.org/jacoco/trunk/doc/maven.html)
+- [SpotBugs Maven Plugin](https://spotbugs.github.io/spotbugs-maven-plugin/)
+
 # Licensing
 
 Jagged is released under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
