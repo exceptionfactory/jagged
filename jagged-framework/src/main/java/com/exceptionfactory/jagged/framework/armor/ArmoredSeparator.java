@@ -25,13 +25,13 @@ enum ArmoredSeparator {
     /** Carriage Return Character */
     CARRIAGE_RETURN(13);
 
-    private final int code;
+    private final byte code;
 
     ArmoredSeparator(final int code) {
-        this.code = code;
+        this.code = (byte) code;
     }
 
-    int getCode() {
+    byte getCode() {
         return code;
     }
 }

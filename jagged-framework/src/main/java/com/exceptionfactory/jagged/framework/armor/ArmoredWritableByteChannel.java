@@ -37,7 +37,7 @@ class ArmoredWritableByteChannel implements WritableByteChannel {
 
     private static final int START_POSITION = 0;
 
-    private static final byte LINE_FEED = (byte) ArmoredSeparator.LINE_FEED.getCode();
+    private static final byte LINE_FEED = ArmoredSeparator.LINE_FEED.getCode();
 
     private static final byte[] LINE_FEED_BYTES = new byte[]{LINE_FEED};
 

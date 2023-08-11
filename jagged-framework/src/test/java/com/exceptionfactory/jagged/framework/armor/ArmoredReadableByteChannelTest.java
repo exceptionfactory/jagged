@@ -25,7 +25,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -51,7 +51,7 @@ class ArmoredReadableByteChannelTest {
 
     private static final String FOOTER_LENGTH_BODY = "QUJDREVGR0hJSktMTU5PUFFSU1RVVldY";
 
-    private static final int CHARACTER = 100;
+    private static final byte CHARACTER = 100;
 
     private static final int BUFFER_SIZE = 128;
 
@@ -59,13 +59,13 @@ class ArmoredReadableByteChannelTest {
 
     private static final Base64.Decoder DECODER = Base64.getDecoder();
 
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-
     private static final int LONG_LINE_LENGTH = 65;
 
     private static final int MAXIMUM_LINE_LENGTH = 64;
 
     private static final String PADDING_KEYWORD = "padding";
+
+    private static final int BLOCK_LINES = 1024;
 
     @Test
     void testHeaderInvalid() throws IOException {
@@ -157,7 +157,7 @@ class ArmoredReadableByteChannelTest {
     @Test
     void testReadLineLengthExceeded() throws IOException {
         final byte[] line = new byte[LONG_LINE_LENGTH];
-        SECURE_RANDOM.nextBytes(line);
+        Arrays.fill(line, CHARACTER);
         final ReadableByteChannel inputChannel = getHeaderFooterInputChannel(line);
 
         final ArmoredDecodingException exception = assertThrows(ArmoredDecodingException.class, () -> new ArmoredReadableByteChannel(inputChannel));
@@ -176,6 +176,50 @@ class ArmoredReadableByteChannelTest {
     @Test
     void testReadEncodingInvalid() throws IOException {
         final ReadableByteChannel inputChannel = getHeaderFooterInputChannel(BODY_INVALID);
+
+        assertThrows(ArmoredDecodingException.class, () -> new ArmoredReadableByteChannel(inputChannel));
+    }
+
+    @Test
+    void testReadShortLineCarriageReturnMissingLineFeedInvalid() throws IOException {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        outputStream.write(BODY_WITHOUT_PADDING);
+        outputStream.write(ArmoredSeparator.CARRIAGE_RETURN.getCode());
+        outputStream.write(ArmoredSeparator.CARRIAGE_RETURN.getCode());
+
+        final byte[] body = outputStream.toByteArray();
+        final ReadableByteChannel inputChannel = getHeaderFooterInputChannel(body);
+
+        final ArmoredDecodingException exception = assertThrows(ArmoredDecodingException.class, () -> new ArmoredReadableByteChannel(inputChannel));
+        assertTrue(exception.getMessage().contains(Byte.toString(ArmoredSeparator.LINE_FEED.getCode())));
+    }
+
+    @Test
+    void testReadCarriageReturnMissingLineFeedInvalid() throws IOException {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final byte[] line = new byte[MAXIMUM_LINE_LENGTH];
+        outputStream.write(line);
+        outputStream.write(ArmoredSeparator.CARRIAGE_RETURN.getCode());
+        outputStream.write(ArmoredSeparator.CARRIAGE_RETURN.getCode());
+
+        final byte[] body = outputStream.toByteArray();
+        final ReadableByteChannel inputChannel = getHeaderFooterInputChannel(body);
+
+        final ArmoredDecodingException exception = assertThrows(ArmoredDecodingException.class, () -> new ArmoredReadableByteChannel(inputChannel));
+        assertTrue(exception.getMessage().contains(Byte.toString(ArmoredSeparator.LINE_FEED.getCode())));
+    }
+
+    @Test
+    void testReadBlockEncodingInvalid() throws IOException {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        for (int i = 0; i < BLOCK_LINES; i++) {
+            final byte[] line = new byte[MAXIMUM_LINE_LENGTH];
+            outputStream.write(line);
+            outputStream.write(LINE_FEED_BODY);
+        }
+
+        final byte[] block = outputStream.toByteArray();
+        final ReadableByteChannel inputChannel = getHeaderFooterInputChannel(block);
 
         assertThrows(ArmoredDecodingException.class, () -> new ArmoredReadableByteChannel(inputChannel));
     }
