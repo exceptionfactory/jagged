@@ -19,15 +19,15 @@ Java implementation of age encryption
 ## Java Cryptography Architecture
 
 Jagged uses the
-[Java Cryptography Architecture](https://docs.oracle.com/en/java/javase/11/security/java-cryptography-architecture-jca-reference-guide.html)
+[Java Cryptography Architecture](https://docs.oracle.com/en/java/javase/17/security/java-cryptography-architecture-jca-reference-guide.html)
 framework for the following algorithms:
 
-- `ChaCha20-Poly1305` with [javax.crypto.Cipher](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html)
-- `HmacSHA256` with [javax.crypto.Mac](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Mac.html)
-- `PBKDF2WithHmacSHA256` with [javax.crypto.SecretKeyFactory](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/SecretKeyFactory.html)
-- `X25519` with [javax.crypto.KeyAgreement](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/KeyAgreement.html)
-- `X25519` with [java.security.KeyFactory](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyFactory.html)
-- `X25519` with [java.security.KeyPairGenerator](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyPairGenerator.html)
+- `ChaCha20-Poly1305` with [javax.crypto.Cipher](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/Cipher.html)
+- `HmacSHA256` with [javax.crypto.Mac](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/Mac.html)
+- `PBKDF2WithHmacSHA256` with [javax.crypto.SecretKeyFactory](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/SecretKeyFactory.html)
+- `X25519` with [javax.crypto.KeyAgreement](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/KeyAgreement.html)
+- `X25519` with [java.security.KeyFactory](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyFactory.html)
+- `X25519` with [java.security.KeyPairGenerator](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyPairGenerator.html)
 
 [JEP 324](https://openjdk.org/jeps/324) introduced X25519 Key Agreement in Java 11. 
 [JEP 329](https://openjdk.org/jeps/329) added ChaCha20-Poly1305 in Java 11.
@@ -35,7 +35,7 @@ framework for the following algorithms:
 Jagged does not require additional dependencies when running on Java 11 or higher.
 
 Jagged on Java 8 requires an additional
-[Security Provider](https://docs.oracle.com/javase/8/docs/api/java/security/Provider.html)
+[Security Provider](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/Provider.html)
 to support X25519 and ChaCha20-Poly1305.
 
 ## Bouncy Castle Security Provider
@@ -131,7 +131,7 @@ The `jagged-api` module contains the core public interfaces for encryption and d
 contains interfaces and classes in the `com.exceptionfactory.jagged` package, which provide integration and extension
 points for other components.
 
-The `FileKey` class implements [java.crypto.SecretKey](https://docs.oracle.com/javase/8/docs/api/javax/crypto/SecretKey.html)
+The `FileKey` class implements [java.crypto.SecretKey](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/SecretKey.html)
 and supports the primary contract for age identities and recipients.
 
 The `RecipientStanza` interface follows the pattern of the age [Stanza](https://pkg.go.dev/filippo.io/age#Stanza),
@@ -144,12 +144,12 @@ The `RecipientStanzaWriter` interface follows the age [Recipient](https://pkg.go
 abstraction, responsible for wrapping a `FileKey` and returning a collection of `RecipientStanza` objects.
 
 The `EncryptingChannelFactory` interface wraps a provided
-[WritableByteChannel](https://docs.oracle.com/javase/8/docs/api/java/nio/channels/WritableByteChannel.html) and returns
+[WritableByteChannel](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/channels/WritableByteChannel.html) and returns
 a `WritableByteChannel` that supports streaming encryption to one or more recipients based on supplied
 `RecipientStanzaWriter` instances.
 
 The `DecryptingChannelFactory` interface wraps a provided
-[ReadableByteChannel](https://docs.oracle.com/javase/8/docs/api/java/nio/channels/ReadableByteChannel.html) and returns
+[ReadableByteChannel](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/channels/ReadableByteChannel.html) and returns
 a `ReadableByteChannel` that supports streaming decryption for a matched identity based on supplied
 `RecipientStanzaReader` instances.
 
@@ -158,7 +158,7 @@ a `ReadableByteChannel` that supports streaming decryption for a matched identit
 The `jagged-bech32` module contains an implementation of the Bech32 encoding specification defined according to
 [Bitcoin Improvement Proposal 0173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki). Bech32 encoding
 supports a standard representation of X25519 private and public keys. The `Bech32` class follows the pattern of
-[java.util.Base64](https://docs.oracle.com/javase/8/docs/api/java/util/Base64.html) and encloses `Bech32.Decoder` and
+[java.util.Base64](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Base64.html) and encloses `Bech32.Decoder` and
 `Bech32.Encoder` interfaces. Bech32 encoding consists of a Human-Readable Part prefix, a separator, and data part that
 ends with a checksum.
 
@@ -191,7 +191,7 @@ key agreement functions use the Java Cryptography Architecture framework. Key en
 `jagged-bech32` library.
 
 The `X25519KeyPairGenerator` class implements
-[java.security.KeyPairGenerator](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/security/KeyPairGenerator.html)
+[java.security.KeyPairGenerator](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyPairGenerator.html)
 and returns public and private key pairs encoded using Bech32.
 
 The `X25519RecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using a private key encoded using
@@ -225,6 +225,126 @@ Jagged uses the following build plugins and services to evaluate code quality:
 - [GitHub CodeQL](https://codeql.github.com/)
 - [JaCoCo Maven Plugin](https://www.jacoco.org/jacoco/trunk/doc/maven.html)
 - [SpotBugs Maven Plugin](https://spotbugs.github.io/spotbugs-maven-plugin/)
+
+# Integrating
+
+Jagged supports streaming encryption and decryption using
+[Java NIO](https://docs.oracle.com/en/java/javase/17/core/java-nio.html) buffers and channels. Java NIO supports
+efficient file read and write operations, minimizing memory impact using instances of
+[java.nio.ByteBuffer](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/ByteBuffer.html) to process
+bytes. The
+[java.nio.channel.Channels](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/channels/Channels.html)
+class provides several methods supporting interoperation with Java IO streams.
+
+The [X25519](https://github.com/C2SP/C2SP/blob/main/age.md#the-x25519-recipient-type) recipient type with
+[binary](https://github.com/C2SP/C2SP/blob/main/age.md#encrypted-file-format) formatting provides the
+optimal solution for integrating age encryption. X25519 public and private keys encoded using Bech32 avoid the cost of
+password-based key derivation, and binary formatting for encrypted files does not have the overhead of armored Base64
+encoding and decoding.
+
+## X25519 Key Pair Generation
+
+Jagged supports public and private keys produced using the [age-keygen](https://filippo.io/age/age-keygen.1) command and
+also provides key pair generation using the `X25519KeyPairGenerator` class. The class implements
+[KeyPairGenerator](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyPairGenerator.html) and
+supports standard methods for generating
+[KeyPair](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyPair.html) instances. Both
+[PublicKey](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/PublicKey.html) and
+[PrivateKey](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/PrivateKey.html) implementations
+return Bech32 encoded representations following the age specification.
+
+```
+final KeyPairGenerator keyPairGenerator = new X25519KeyPairGenerator();
+final KeyPair keyPair = keyPairGenerator.generateKeyPair();
+final PublicKey publicKey = keyPair.getPublic();
+System.out.printf("Public key: %s", publicKey);
+```
+
+## Binary File Encryption with X25519
+
+Encryption operations require one or X25519 public keys. Jagged provides the `X25519RecipientStanzaWriterFactory` class
+for creating instances of `RecpientStanzaWriter` to support encryption operations. The factory class accepts a standard
+Java String containing a Bech32 encoded public key starting with `age1` and also supports other implementations of
+[CharSequence](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html) to provide more
+control over encoded keys.
+
+The
+[java.nio.file.Path](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Path.html) class
+represents file locations and enables creation of
+[java.nio.Channel](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/channels/Channel.html) objects
+for reading input files and writing encrypted output files.
+
+```
+void encrypt(
+    final CharSequence publicKey,
+    final Path inputPath,
+    final Path outputPath
+) throws GeneralSecurityException, IOException {
+    final RecipientStanzaWriter stanzaWriter = X25519RecipientStanzaWriterFactory.newRecipientStanzaWriter(publicKey);
+    final EncryptingChannelFactory encryptingChannelFactory = new StandardEncryptingChannelFactory();
+
+    try (
+        final ReadableByteChannel inputChannel = Files.newByteChannel(inputPath);
+        final WritableByteChannel encryptingChannel = encryptingChannelFactory.newEncryptingChannel(
+            Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE),
+            Collections.singletonList(stanzaWriter)
+        );
+    ) {
+        copy(inputChannel, encryptingChannel);
+    }
+}
+```
+
+## Binary File Decryption with X25519
+
+Decryption operations require a private key corresponding to a recipient from the age file header. Jagged provides the
+`X25519RecipientStanzaReaderFactory` class for creating instances of `RecipientStanzaReader` to support decryption
+operations. The factory class accepts a Bech32 encoded private key starting with `AGE-SECRET-KEY-1` represented as a
+Java String or sequence of characters.
+
+```
+void decrypt(
+    final CharSequence privateKey,
+    final Path inputPath,
+    final Path outputPath
+) throws GeneralSecurityException, IOException {
+    final RecipientStanzaReader stanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(privateKey);
+    final DecryptingChannelFactory decryptingChannelFactory = new StandardDecryptingChannelFactory();
+
+    try (
+        final WritableByteChannel outputChannel = Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        final ReadableByteChannel decryptingChannel = decryptingChannelFactory.newDecryptingChannel(
+            Files.newByteChannel(inputPath),
+            Collections.singletonList(stanzaReader)
+        );
+    ) {
+        copy(decryptingChannel, outputChannel);
+    }
+}
+```
+
+## Channel Processing
+
+The age specification defines the encrypted [binary payload](https://github.com/C2SP/C2SP/blob/main/age.md#payload) as
+consisting of chunks containing 64 kilobytes. Allocating a `ByteBuffer` with a capacity of `65536` enables integrating
+components to process chunks with an optimal number of method invocations. Transferring bytes from a
+[ReadableByteChannel](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/channels/ReadableByteChannel.html)
+to a
+[WritableByteChannel](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/channels/WritableByteChannel.html)
+requires iterative processing to avoid partial reads or writes.
+
+```
+void copy(final ReadableByteChannel inputChannel, final WritableByteChannel outputChannel) throws IOException {
+    final ByteBuffer buffer = ByteBuffer.allocate(65536);
+    while (inputChannel.read(buffer) != -1) {
+        buffer.flip();
+        while (buffer.hasRemaining()) {
+            outputChannel.write(buffer);
+        }
+        buffer.clear();
+    }
+}
+```
 
 # Licensing
 
