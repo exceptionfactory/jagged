@@ -262,11 +262,11 @@ System.out.printf("Public key: %s", publicKey);
 
 ## Binary File Encryption with X25519
 
-Encryption operations require one or X25519 public keys. Jagged provides the `X25519RecipientStanzaWriterFactory` class
-for creating instances of `RecpientStanzaWriter` to support encryption operations. The factory class accepts a standard
-Java String containing a Bech32 encoded public key starting with `age1` and also supports other implementations of
-[CharSequence](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html) to provide more
-control over encoded keys.
+Encryption operations require one or more X25519 public keys. Jagged provides the `X25519RecipientStanzaWriterFactory`
+class for creating instances of `RecpientStanzaWriter` to support encryption operations. The factory class accepts a
+standard Java String containing a Bech32 encoded public key starting with `age1` and also supports other implementations
+of [CharSequence](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html) to provide
+more control over encoded keys.
 
 The
 [java.nio.file.Path](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Path.html) class
@@ -281,11 +281,11 @@ void encrypt(
     final Path outputPath
 ) throws GeneralSecurityException, IOException {
     final RecipientStanzaWriter stanzaWriter = X25519RecipientStanzaWriterFactory.newRecipientStanzaWriter(publicKey);
-    final EncryptingChannelFactory encryptingChannelFactory = new StandardEncryptingChannelFactory();
+    final EncryptingChannelFactory channelFactory = new StandardEncryptingChannelFactory();
 
     try (
         final ReadableByteChannel inputChannel = Files.newByteChannel(inputPath);
-        final WritableByteChannel encryptingChannel = encryptingChannelFactory.newEncryptingChannel(
+        final WritableByteChannel encryptingChannel = channelFactory.newEncryptingChannel(
             Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE),
             Collections.singletonList(stanzaWriter)
         );
@@ -309,11 +309,13 @@ void decrypt(
     final Path outputPath
 ) throws GeneralSecurityException, IOException {
     final RecipientStanzaReader stanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(privateKey);
-    final DecryptingChannelFactory decryptingChannelFactory = new StandardDecryptingChannelFactory();
+    final DecryptingChannelFactory channelFactory = new StandardDecryptingChannelFactory();
 
     try (
-        final WritableByteChannel outputChannel = Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        final ReadableByteChannel decryptingChannel = decryptingChannelFactory.newDecryptingChannel(
+        final WritableByteChannel outputChannel = Files.newByteChannel(
+            outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE
+        );
+        final ReadableByteChannel decryptingChannel = channelFactory.newDecryptingChannel(
             Files.newByteChannel(inputPath),
             Collections.singletonList(stanzaReader)
         );
@@ -334,7 +336,10 @@ to a
 requires iterative processing to avoid partial reads or writes.
 
 ```
-void copy(final ReadableByteChannel inputChannel, final WritableByteChannel outputChannel) throws IOException {
+void copy(
+    final ReadableByteChannel inputChannel,
+    final WritableByteChannel outputChannel
+) throws IOException {
     final ByteBuffer buffer = ByteBuffer.allocate(65536);
     while (inputChannel.read(buffer) != -1) {
         buffer.flip();
