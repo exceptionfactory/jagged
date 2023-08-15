@@ -275,23 +275,20 @@ represents file locations and enables creation of
 for reading input files and writing encrypted output files.
 
 ```
-void encrypt(
-    final CharSequence publicKey,
-    final Path inputPath,
-    final Path outputPath
-) throws GeneralSecurityException, IOException {
-    final RecipientStanzaWriter stanzaWriter = X25519RecipientStanzaWriterFactory.newRecipientStanzaWriter(publicKey);
-    final EncryptingChannelFactory channelFactory = new StandardEncryptingChannelFactory();
+final CharSequence publicKey = getPublicKey();
+final RecipientStanzaWriter stanzaWriter = X25519RecipientStanzaWriterFactory.newRecipientStanzaWriter(publicKey);
+final EncryptingChannelFactory channelFactory = new StandardEncryptingChannelFactory();
 
-    try (
-        final ReadableByteChannel inputChannel = Files.newByteChannel(inputPath);
-        final WritableByteChannel encryptingChannel = channelFactory.newEncryptingChannel(
-            Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE),
-            Collections.singletonList(stanzaWriter)
-        );
-    ) {
-        copy(inputChannel, encryptingChannel);
-    }
+final Path inputPath = getInputPath();
+final Path outputPath = getOutputPath();
+try (
+    final ReadableByteChannel inputChannel = Files.newByteChannel(inputPath);
+    final WritableByteChannel encryptingChannel = channelFactory.newEncryptingChannel(
+        Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE),
+        Collections.singletonList(stanzaWriter)
+    );
+) {
+    copy(inputChannel, encryptingChannel);
 }
 ```
 
@@ -303,25 +300,22 @@ operations. The factory class accepts a Bech32 encoded private key starting with
 Java String or sequence of characters.
 
 ```
-void decrypt(
-    final CharSequence privateKey,
-    final Path inputPath,
-    final Path outputPath
-) throws GeneralSecurityException, IOException {
-    final RecipientStanzaReader stanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(privateKey);
-    final DecryptingChannelFactory channelFactory = new StandardDecryptingChannelFactory();
+final CharSequence privateKey = getPrivateKey();
+final RecipientStanzaReader stanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(privateKey);
+final DecryptingChannelFactory channelFactory = new StandardDecryptingChannelFactory();
 
-    try (
-        final WritableByteChannel outputChannel = Files.newByteChannel(
-            outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE
-        );
-        final ReadableByteChannel decryptingChannel = channelFactory.newDecryptingChannel(
-            Files.newByteChannel(inputPath),
-            Collections.singletonList(stanzaReader)
-        );
-    ) {
-        copy(decryptingChannel, outputChannel);
-    }
+final Path inputPath = getInputPath();
+final Path outputPath = getOutputPath();
+try (
+    final WritableByteChannel outputChannel = Files.newByteChannel(
+        outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE
+    );
+    final ReadableByteChannel decryptingChannel = channelFactory.newDecryptingChannel(
+        Files.newByteChannel(inputPath),
+        Collections.singletonList(stanzaReader)
+    );
+) {
+    copy(decryptingChannel, outputChannel);
 }
 ```
 
