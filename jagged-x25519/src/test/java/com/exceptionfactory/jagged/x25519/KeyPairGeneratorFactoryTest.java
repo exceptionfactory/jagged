@@ -13,37 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.scrypt;
+package com.exceptionfactory.jagged.x25519;
 
-import com.exceptionfactory.jagged.RecipientStanzaWriter;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class ScryptRecipientStanzaWriterFactoryTest {
-    private static final String ALGORITHM_FILTER = "Cipher.ChaCha20-Poly1305";
-
-    private static final byte[] PASSPHRASE = String.class.getName().getBytes(StandardCharsets.UTF_8);
-
-    private static final int WORK_FACTOR = 14;
+class KeyPairGeneratorFactoryTest {
+    private static final String ALGORITHM_FILTER = String.format("KeyPairGenerator.%s", RecipientIndicator.KEY_ALGORITHM.getIndicator());
 
     @Test
-    void testNewRecipientStanzaWriter() {
-        final RecipientStanzaWriter recipientStanzaWriter = ScryptRecipientStanzaWriterFactory.newRecipientStanzaWriter(PASSPHRASE, WORK_FACTOR);
+    void testGetKeyPairGenerator() throws NoSuchAlgorithmException {
+        final KeyPairGeneratorFactory keyPairGeneratorFactory = new KeyPairGeneratorFactory();
+        final KeyPairGenerator keyPairGenerator = keyPairGeneratorFactory.getKeyPairGenerator();
 
-        assertNotNull(recipientStanzaWriter);
+        assertNotNull(keyPairGenerator);
     }
 
     @Test
-    void testNewRecipientStanzaWriterWithProvider() {
+    void testGetKeyPairGeneratorWithProvider() throws NoSuchAlgorithmException {
         final Provider provider = getProvider();
-        final RecipientStanzaWriter recipientStanzaWriter = ScryptRecipientStanzaWriterFactory.newRecipientStanzaWriter(PASSPHRASE, WORK_FACTOR, provider);
+        final KeyPairGeneratorFactory keyPairGeneratorFactory = new KeyPairGeneratorFactory(provider);
+        final KeyPairGenerator keyPairGenerator = keyPairGeneratorFactory.getKeyPairGenerator();
 
-        assertNotNull(recipientStanzaWriter);
+        assertNotNull(keyPairGenerator);
     }
 
     private Provider getProvider() {

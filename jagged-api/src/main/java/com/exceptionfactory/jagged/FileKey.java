@@ -16,6 +16,7 @@
 package com.exceptionfactory.jagged;
 
 import javax.crypto.SecretKey;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Objects;
@@ -104,6 +105,36 @@ public final class FileKey implements SecretKey {
     @Override
     public boolean isDestroyed() {
         return destroyed.get();
+    }
+
+    /**
+     * File Key equals based on array comparison of encoded key
+     *
+     * @param object Object to be compared
+     * @return Equals status
+     */
+    @Override
+    public boolean equals(final Object object) {
+        final boolean equals;
+
+        if (object instanceof FileKey) {
+            final FileKey otherFileKey = (FileKey) object;
+            equals = MessageDigest.isEqual(key, otherFileKey.key);
+        } else {
+            equals = false;
+        }
+
+        return equals;
+    }
+
+    /**
+     * File Key hash code based on encoded key
+     *
+     * @return Hash code
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(key);
     }
 
     private static byte[] getSecureRandomKey() {

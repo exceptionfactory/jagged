@@ -15,20 +15,21 @@
  */
 package com.exceptionfactory.jagged.framework.crypto;
 
-import javax.crypto.spec.IvParameterSpec;
+import com.exceptionfactory.jagged.FileKey;
+
+import java.security.GeneralSecurityException;
 
 /**
- * Initialization Vector Parameter Specification for File Key encryption and decryption consisting of 12 zero bytes
+ * File Key Encryptor abstracts cipher operations for encrypting a File Key
  */
-final class FileKeyIvParameterSpec extends IvParameterSpec {
-    private static final int INITIALIZATION_VECTOR_LENGTH = 12;
-
-    private static final byte[] STANDARD_INITIALIZATION_VECTOR = new byte[INITIALIZATION_VECTOR_LENGTH];
-
+public interface FileKeyEncryptor {
     /**
-     * File Key Initialization Vector Parameter Specification with array of 12 bytes
+     * Get Encrypted File Key from File Key
+     *
+     * @param fileKey File Key
+     * @param cipherKey Cipher Key for encrypting File Key
+     * @return Encrypted File Key
+     * @throws GeneralSecurityException Thrown on failure of encryption operations
      */
-    FileKeyIvParameterSpec() {
-        super(STANDARD_INITIALIZATION_VECTOR);
-    }
+    EncryptedFileKey getEncryptedFileKey(FileKey fileKey, CipherKey cipherKey) throws GeneralSecurityException;
 }

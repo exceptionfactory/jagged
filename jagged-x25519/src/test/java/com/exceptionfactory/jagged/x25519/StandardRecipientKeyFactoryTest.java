@@ -44,7 +44,8 @@ class StandardRecipientKeyFactoryTest {
 
     @BeforeEach
     void setFactory() throws GeneralSecurityException {
-        factory = new StandardRecipientKeyFactory();
+        final KeyPairGeneratorFactory keyPairGeneratorFactory = new KeyPairGeneratorFactory();
+        factory = new StandardRecipientKeyFactory(keyPairGeneratorFactory);
     }
 
     @Test

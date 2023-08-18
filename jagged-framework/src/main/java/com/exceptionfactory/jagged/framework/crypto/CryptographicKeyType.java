@@ -22,6 +22,9 @@ enum CryptographicKeyType {
     /** Extracted intermediate key for subsequent expansion */
     EXTRACTED_KEY(32),
 
+    /** Encrypted File Key */
+    ENCRYPTED_FILE_KEY(32),
+
     /** Header Key */
     HEADER_KEY(32),
 

@@ -16,7 +16,10 @@
 package com.exceptionfactory.jagged.scrypt;
 
 import com.exceptionfactory.jagged.RecipientStanzaWriter;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyEncryptor;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyEncryptorFactory;
 
+import java.security.Provider;
 import java.util.Objects;
 
 /**
@@ -35,9 +38,28 @@ public final class ScryptRecipientStanzaWriterFactory {
      * @return scrypt Recipient Stanza Writer
      */
     public static RecipientStanzaWriter newRecipientStanzaWriter(final byte[] passphrase, final int workFactor) {
+        final FileKeyEncryptorFactory fileKeyEncryptorFactory = new FileKeyEncryptorFactory();
+        return newRecipientStanzaWriter(passphrase, workFactor, fileKeyEncryptorFactory);
+    }
+
+    /**
+     * Create new scrypt Recipient Stanza Writer using a passphrase byte array and work factor with specified Security Provider
+     *
+     * @param passphrase Passphrase byte array
+     * @param workFactor Work factor to derive scrypt N parameter
+     * @param provider Security Provider for algorithm implementation resolution
+     * @return scrypt Recipient Stanza Writer
+     */
+    public static RecipientStanzaWriter newRecipientStanzaWriter(final byte[] passphrase, final int workFactor, final Provider provider) {
+        final FileKeyEncryptorFactory fileKeyEncryptorFactory = new FileKeyEncryptorFactory(provider);
+        return newRecipientStanzaWriter(passphrase, workFactor, fileKeyEncryptorFactory);
+    }
+
+    private static RecipientStanzaWriter newRecipientStanzaWriter(final byte[] passphrase, final int workFactor, final FileKeyEncryptorFactory fileKeyEncryptorFactory) {
         Objects.requireNonNull(passphrase, "Passphrase required");
 
+        final FileKeyEncryptor fileKeyEncryptor = fileKeyEncryptorFactory.newFileKeyEncryptor();
         final DerivedWrapKeyProducer derivedWrapKeyProducer = new ScryptDerivedWrapKeyProducer(passphrase);
-        return new ScryptRecipientStanzaWriter(derivedWrapKeyProducer, workFactor);
+        return new ScryptRecipientStanzaWriter(derivedWrapKeyProducer, workFactor, fileKeyEncryptor);
     }
 }

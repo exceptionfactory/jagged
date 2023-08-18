@@ -21,11 +21,28 @@ import com.exceptionfactory.jagged.framework.stream.StandardEncryptingChannelFac
 import java.io.IOException;
 import java.nio.channels.WritableByteChannel;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
 
 /**
  * ASCII Armored implementation of Encrypting Channel Factory supports writing encrypted channels with Base64 wrapping
  */
 public class ArmoredEncryptingChannelFactory extends StandardEncryptingChannelFactory {
+    /**
+     * Armored Encrypting Channel Factory constructor using default Security Provider configuration
+     */
+    public ArmoredEncryptingChannelFactory() {
+        super();
+    }
+
+    /**
+     * Armored Encrypting Channel Factory constructor using specified Security Provider
+     *
+     * @param provider Security Provider supporting ChaCha20-Poly1305
+     */
+    public ArmoredEncryptingChannelFactory(final Provider provider) {
+        super(provider);
+    }
+
     /**
      * Create new channel that encrypts and writes to the supplied output channel with ASCII Armored Base64 wrapping
      *

@@ -17,6 +17,8 @@ package com.exceptionfactory.jagged.framework.stream;
 
 import com.exceptionfactory.jagged.EncryptingChannelFactory;
 import com.exceptionfactory.jagged.RecipientStanzaWriter;
+import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherFactory;
+import com.exceptionfactory.jagged.framework.crypto.StandardByteBufferCipherFactory;
 import com.exceptionfactory.jagged.framework.format.PayloadKeyWriter;
 import com.exceptionfactory.jagged.framework.format.StandardPayloadKeyWriter;
 
@@ -24,12 +26,32 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.WritableByteChannel;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
 import java.util.Objects;
 
 /**
  * Standard implementation of Encrypting Channel Factory supports writing encrypted channels
  */
 public class StandardEncryptingChannelFactory implements EncryptingChannelFactory {
+    private final ByteBufferCipherFactory byteBufferCipherFactory;
+
+    /**
+     * Standard Encrypting Channel Factory constructor using default Security Provider configuration
+     */
+    public StandardEncryptingChannelFactory() {
+        byteBufferCipherFactory = new StandardByteBufferCipherFactory();
+    }
+
+    /**
+     * Standard Encrypting Channel Factory constructor using specified Security Provider
+     *
+     * @param provider Security Provider supporting ChaCha20-Poly1305
+     */
+    public StandardEncryptingChannelFactory(final Provider provider) {
+        Objects.requireNonNull(provider, "Provider required");
+        byteBufferCipherFactory = new StandardByteBufferCipherFactory(provider);
+    }
+
     /**
      * Create new channel that encrypts and writes to the supplied output channel
      *
@@ -49,7 +71,7 @@ public class StandardEncryptingChannelFactory implements EncryptingChannelFactor
 
         if (outputChannel.isOpen()) {
             final PayloadKeyWriter payloadKeyWriter = new StandardPayloadKeyWriter();
-            return new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
+            return new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter, byteBufferCipherFactory);
         } else {
             throw new ClosedChannelException();
         }

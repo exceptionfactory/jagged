@@ -17,6 +17,8 @@ package com.exceptionfactory.jagged.x25519;
 
 import com.exceptionfactory.jagged.FileKey;
 import com.exceptionfactory.jagged.RecipientStanza;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyEncryptor;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyEncryptorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,11 +55,15 @@ class X25519RecipientStanzaWriterTest {
 
     @BeforeEach
     void setWriter() throws GeneralSecurityException {
-        final RecipientKeyFactory recipientKeyFactory = new StandardRecipientKeyFactory();
+        final KeyPairGeneratorFactory keyPairGeneratorFactory = new KeyPairGeneratorFactory();
+        final RecipientKeyFactory recipientKeyFactory = new StandardRecipientKeyFactory(keyPairGeneratorFactory);
         final PublicKey recipientPublicKey = recipientKeyFactory.getPublicKey(PUBLIC_KEY);
         final SharedWrapKeyProducer sharedWrapKeyProducer = new X25519SharedWrapKeyProducer(recipientPublicKey);
+        final FileKeyEncryptorFactory fileKeyEncryptorFactory = new FileKeyEncryptorFactory();
+        final FileKeyEncryptor fileKeyEncryptor = fileKeyEncryptorFactory.newFileKeyEncryptor();
+        final KeyAgreementFactory keyAgreementFactory = new KeyAgreementFactory();
 
-        writer = new X25519RecipientStanzaWriter(recipientPublicKey, recipientKeyFactory, sharedWrapKeyProducer);
+        writer = new X25519RecipientStanzaWriter(recipientPublicKey, recipientKeyFactory, sharedWrapKeyProducer, fileKeyEncryptor, keyAgreementFactory);
     }
 
     @Test

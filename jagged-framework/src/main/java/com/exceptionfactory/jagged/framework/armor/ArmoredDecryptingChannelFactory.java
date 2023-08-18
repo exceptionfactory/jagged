@@ -21,11 +21,28 @@ import com.exceptionfactory.jagged.framework.stream.StandardDecryptingChannelFac
 import java.io.IOException;
 import java.nio.channels.ReadableByteChannel;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
 
 /**
  * ASCII Armored implementation of Decrypting Channel Factory supports reading encrypted channels with Base64 wrapping
  */
 public class ArmoredDecryptingChannelFactory extends StandardDecryptingChannelFactory {
+    /**
+     * Armored Decrypting Channel Factory constructor using default Security Provider configuration
+     */
+    public ArmoredDecryptingChannelFactory() {
+        super();
+    }
+
+    /**
+     * Armored Decrypting Channel Factory constructor using specified Security Provider
+     *
+     * @param provider Security Provider supporting ChaCha20-Poly1305
+     */
+    public ArmoredDecryptingChannelFactory(final Provider provider) {
+        super(provider);
+    }
+
     /**
      * Create new channel that reads and decrypts from the supplied open input channel with ASCII Armored Base64 wrapping
      *

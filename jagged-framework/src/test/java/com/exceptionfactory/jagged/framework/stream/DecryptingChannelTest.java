@@ -17,7 +17,8 @@ package com.exceptionfactory.jagged.framework.stream;
 
 import com.exceptionfactory.jagged.PayloadException;
 import com.exceptionfactory.jagged.RecipientStanzaReader;
-import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherOperationFactory;
+import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherFactory;
+import com.exceptionfactory.jagged.framework.crypto.StandardByteBufferCipherFactory;
 import com.exceptionfactory.jagged.framework.crypto.ByteBufferEncryptor;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
 import com.exceptionfactory.jagged.framework.format.PayloadKeyReader;
@@ -84,6 +85,8 @@ class DecryptingChannelTest {
 
     private static final CipherKey CIPHER_KEY = new CipherKey(SYMMETRIC_KEY);
 
+    private final ByteBufferCipherFactory byteBufferCipherFactory = new StandardByteBufferCipherFactory();
+
     @Mock
     private RecipientStanzaReader recipientStanzaReader;
 
@@ -101,7 +104,7 @@ class DecryptingChannelTest {
     void testIsOpen() throws IOException, GeneralSecurityException {
         final ReadableByteChannel inputChannel = getInputChannel();
 
-        final DecryptingChannel decryptingChannel = new DecryptingChannel(inputChannel, recipientStanzaReaders, payloadKeyReader);
+        final DecryptingChannel decryptingChannel = getDecryptingChannel(inputChannel);
 
         assertTrue(decryptingChannel.isOpen());
     }
@@ -111,7 +114,7 @@ class DecryptingChannelTest {
         final ReadableByteChannel inputChannel = getInputChannel();
 
         when(payloadKeyReader.getPayloadKey(any(), any())).thenReturn(CIPHER_KEY);
-        final DecryptingChannel decryptingChannel = new DecryptingChannel(inputChannel, recipientStanzaReaders, payloadKeyReader);
+        final DecryptingChannel decryptingChannel = getDecryptingChannel(inputChannel);
 
         decryptingChannel.close();
         assertFalse(inputChannel.isOpen());
@@ -121,7 +124,7 @@ class DecryptingChannelTest {
     void testConstructorPayloadNotFound() {
         final ReadableByteChannel inputChannel = getInputChannel();
 
-        assertThrows(PayloadException.class, () -> new DecryptingChannel(inputChannel, recipientStanzaReaders, new GetRemainingBufferPayloadKeyReader()));
+        assertThrows(PayloadException.class, () -> new DecryptingChannel(inputChannel, recipientStanzaReaders, new GetRemainingBufferPayloadKeyReader(), byteBufferCipherFactory));
     }
 
     @Test
@@ -130,7 +133,7 @@ class DecryptingChannelTest {
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(chunkBytes);
         final ReadableByteChannel inputChannel = Channels.newChannel(inputStream);
 
-        final DecryptingChannel decryptingChannel = new DecryptingChannel(inputChannel, recipientStanzaReaders, payloadKeyReader);
+        final DecryptingChannel decryptingChannel = getDecryptingChannel(inputChannel);
 
         assertTrue(decryptingChannel.isOpen());
     }
@@ -142,7 +145,7 @@ class DecryptingChannelTest {
         final ReadableByteChannel inputChannel = Channels.newChannel(inputStream);
 
         when(payloadKeyReader.getPayloadKey(any(), any())).thenReturn(CIPHER_KEY);
-        final DecryptingChannel decryptingChannel = new DecryptingChannel(inputChannel, recipientStanzaReaders, payloadKeyReader);
+        final DecryptingChannel decryptingChannel = getDecryptingChannel(inputChannel);
 
         final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
         assertThrows(PayloadException.class, () -> decryptingChannel.read(buffer));
@@ -154,7 +157,7 @@ class DecryptingChannelTest {
 
         final byte[] firstInitializationVector = new byte[LAST_CHUNK_INITIALIZATION_VECTOR.length];
         final IvParameterSpec firstParameterSpec = new IvParameterSpec(firstInitializationVector);
-        final ByteBufferEncryptor encryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(CIPHER_KEY, firstParameterSpec);
+        final ByteBufferEncryptor encryptor = byteBufferCipherFactory.newByteBufferEncryptor(CIPHER_KEY, firstParameterSpec);
 
         final byte[] inputBytes = new byte[ChunkSize.PLAIN.getSize()];
         final ByteBuffer inputBuffer = ByteBuffer.wrap(inputBytes);
@@ -166,14 +169,14 @@ class DecryptingChannelTest {
         lastInitializationVector[LAST_INDEX] = COUNTER;
 
         final IvParameterSpec lastParameterSpec = new IvParameterSpec(lastInitializationVector);
-        final ByteBufferEncryptor lastEncryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(CIPHER_KEY, lastParameterSpec);
+        final ByteBufferEncryptor lastEncryptor = byteBufferCipherFactory.newByteBufferEncryptor(CIPHER_KEY, lastParameterSpec);
         final ByteBuffer emptyInputBuffer = ByteBuffer.allocate(0);
         lastEncryptor.encrypt(emptyInputBuffer, encryptedBuffer);
 
         final byte[] encryptedBytes = encryptedBuffer.array();
         final ReadableByteChannel encryptedChannel = Channels.newChannel(new ByteArrayInputStream(encryptedBytes));
 
-        final DecryptingChannel decryptingChannel = new DecryptingChannel(encryptedChannel, recipientStanzaReaders, payloadKeyReader);
+        final DecryptingChannel decryptingChannel = getDecryptingChannel(encryptedChannel);
         final ByteBuffer outputBuffer = ByteBuffer.allocate(ChunkSize.ENCRYPTED.getSize());
 
         final PayloadException exception = assertThrows(PayloadException.class, () -> decryptingChannel.read(outputBuffer));
@@ -185,7 +188,7 @@ class DecryptingChannelTest {
         when(payloadKeyReader.getPayloadKey(any(), any())).thenReturn(CIPHER_KEY);
 
         final IvParameterSpec parameterSpec = new IvParameterSpec(LAST_CHUNK_INITIALIZATION_VECTOR);
-        final ByteBufferEncryptor encryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(CIPHER_KEY, parameterSpec);
+        final ByteBufferEncryptor encryptor = byteBufferCipherFactory.newByteBufferEncryptor(CIPHER_KEY, parameterSpec);
         final byte[] inputBytes = new byte[BUFFER_SIZE];
         final ByteBuffer inputBuffer = ByteBuffer.wrap(inputBytes);
         final ByteBuffer encryptedBuffer = ByteBuffer.allocate(ENCRYPTED_BUFFER_SIZE);
@@ -194,7 +197,7 @@ class DecryptingChannelTest {
         final byte[] encryptedBytes = encryptedBuffer.array();
         final ReadableByteChannel encryptedChannel = Channels.newChannel(new ByteArrayInputStream(encryptedBytes));
 
-        final DecryptingChannel decryptingChannel = new DecryptingChannel(encryptedChannel, recipientStanzaReaders, payloadKeyReader);
+        final DecryptingChannel decryptingChannel = getDecryptingChannel(encryptedChannel);
 
         final ByteBuffer outputBuffer = ByteBuffer.allocate(BUFFER_SIZE);
         outputBuffer.position(HALF_BUFFER_SIZE);
@@ -215,19 +218,19 @@ class DecryptingChannelTest {
         final ByteBuffer encryptedBuffer = ByteBuffer.allocate(TWO_CHUNKS_ENCRYPTED_LENGTH);
 
         final IvParameterSpec firstChunkParameterSpec = new IvParameterSpec(new byte[LAST_CHUNK_INITIALIZATION_VECTOR.length]);
-        final ByteBufferEncryptor firstChunkEncryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(CIPHER_KEY, firstChunkParameterSpec);
+        final ByteBufferEncryptor firstChunkEncryptor = byteBufferCipherFactory.newByteBufferEncryptor(CIPHER_KEY, firstChunkParameterSpec);
         final byte[] chunk = new byte[ChunkSize.PLAIN.getSize()];
         final ByteBuffer chunkBuffer = ByteBuffer.wrap(chunk);
         firstChunkEncryptor.encrypt(chunkBuffer, encryptedBuffer);
         chunkBuffer.clear();
 
         final IvParameterSpec lastChunkParameterSpec = new IvParameterSpec(SECOND_CHUNK_INITIALIZATION_VECTOR);
-        final ByteBufferEncryptor lastChunkEncryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(CIPHER_KEY, lastChunkParameterSpec);
+        final ByteBufferEncryptor lastChunkEncryptor = byteBufferCipherFactory.newByteBufferEncryptor(CIPHER_KEY, lastChunkParameterSpec);
         lastChunkEncryptor.encrypt(chunkBuffer, encryptedBuffer);
 
         final byte[] encryptedBytes = encryptedBuffer.array();
         final ReadableByteChannel encryptedChannel = Channels.newChannel(new ByteArrayInputStream(encryptedBytes));
-        final DecryptingChannel decryptingChannel = new DecryptingChannel(encryptedChannel, recipientStanzaReaders, payloadKeyReader);
+        final DecryptingChannel decryptingChannel = getDecryptingChannel(encryptedChannel);
 
         final ByteBuffer outputBuffer = ByteBuffer.allocate(TWO_CHUNKS_PLAIN_LENGTH);
         final int decrypted = decryptingChannel.read(outputBuffer);
@@ -244,6 +247,10 @@ class DecryptingChannelTest {
     private ReadableByteChannel getInputChannel() {
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(INPUT);
         return Channels.newChannel(inputStream);
+    }
+
+    private DecryptingChannel getDecryptingChannel(final ReadableByteChannel encryptedChannel) throws GeneralSecurityException, IOException {
+        return new DecryptingChannel(encryptedChannel, recipientStanzaReaders, payloadKeyReader, byteBufferCipherFactory);
     }
 
     private static class GetRemainingBufferPayloadKeyReader implements PayloadKeyReader {

@@ -19,6 +19,8 @@ import com.exceptionfactory.jagged.RecipientStanzaReader;
 import org.junit.jupiter.api.Test;
 
 import java.security.GeneralSecurityException;
+import java.security.Provider;
+import java.security.Security;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class X25519RecipientStanzaReaderFactoryTest {
+    private static final String ALGORITHM_FILTER = String.format("KeyAgreement.%s", RecipientIndicator.KEY_ALGORITHM.getIndicator());
+
     private static final String INVALID_HRP = "abcdef";
 
     private static final String INVALID_ENCODED = String.format("%s1qpzry9x8gf2tvdw0s3jn54khce6mua7lmqqqxw", INVALID_HRP);
@@ -48,5 +52,18 @@ class X25519RecipientStanzaReaderFactoryTest {
         final RecipientStanzaReader recipientStanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(VALID);
 
         assertNotNull(recipientStanzaReader);
+    }
+
+    @Test
+    void testNewRecipientStanzaReaderWithProvider() throws GeneralSecurityException {
+        final Provider provider = getProvider();
+        final RecipientStanzaReader recipientStanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(VALID, provider);
+
+        assertNotNull(recipientStanzaReader);
+    }
+
+    private Provider getProvider() {
+        final Provider[] providers = Security.getProviders(ALGORITHM_FILTER);
+        return providers[0];
     }
 }

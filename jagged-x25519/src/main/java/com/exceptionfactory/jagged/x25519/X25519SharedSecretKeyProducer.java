@@ -36,11 +36,12 @@ class X25519SharedSecretKeyProducer implements SharedSecretKeyProducer {
      * X25519 Shared Secret Key Producer with Private Key for initialization
      *
      * @param privateKey X25519 Private Key
+     * @param keyAgreementFactory Key Agreement Factory
      * @throws GeneralSecurityException Thrown on failure to initialize Key Agreement operations
      */
-    X25519SharedSecretKeyProducer(final PrivateKey privateKey) throws GeneralSecurityException {
+    X25519SharedSecretKeyProducer(final PrivateKey privateKey, final KeyAgreementFactory keyAgreementFactory) throws GeneralSecurityException {
         Objects.requireNonNull(privateKey, "Private Key required");
-        keyAgreement = getInitializedKeyAgreement(privateKey);
+        keyAgreement = keyAgreementFactory.getInitializedKeyAgreement(privateKey);
     }
 
     /**
@@ -56,11 +57,5 @@ class X25519SharedSecretKeyProducer implements SharedSecretKeyProducer {
         keyAgreement.doPhase(publicKey, LAST_PHASE);
         final byte[] secretKey = keyAgreement.generateSecret();
         return new SharedSecretKey(secretKey);
-    }
-
-    private static KeyAgreement getInitializedKeyAgreement(final PrivateKey privateKey) throws GeneralSecurityException {
-        final KeyAgreement initializedKeyAgreement = KeyAgreement.getInstance(RecipientIndicator.KEY_ALGORITHM.getIndicator());
-        initializedKeyAgreement.init(privateKey);
-        return initializedKeyAgreement;
     }
 }

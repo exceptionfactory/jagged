@@ -19,17 +19,21 @@ import org.junit.jupiter.api.Test;
 
 import javax.crypto.spec.IvParameterSpec;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
+import java.security.Security;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class ByteBufferCipherOperationFactoryTest {
+class StandardByteBufferCipherFactoryTest {
+    private static final String ALGORITHM_FILTER = String.format("Cipher.%s", CryptographicAlgorithm.CHACHA20_POLY1305.getAlgorithm());
 
     @Test
     void testNewByteBufferDecryptor() throws GeneralSecurityException {
         final IvParameterSpec parameterSpec = new IvParameterSpec(CipherFactoryTest.INITIALIZATION_VECTOR);
         final CipherKey cipherKey = new CipherKey(CipherKeyTest.SYMMETRIC_KEY);
 
-        final ByteBufferDecryptor decryptor = ByteBufferCipherOperationFactory.newByteBufferDecryptor(cipherKey, parameterSpec);
+        final StandardByteBufferCipherFactory factory = new StandardByteBufferCipherFactory();
+        final ByteBufferDecryptor decryptor = factory.newByteBufferDecryptor(cipherKey, parameterSpec);
 
         assertNotNull(decryptor);
     }
@@ -39,8 +43,26 @@ class ByteBufferCipherOperationFactoryTest {
         final IvParameterSpec parameterSpec = new IvParameterSpec(CipherFactoryTest.INITIALIZATION_VECTOR);
         final CipherKey cipherKey = new CipherKey(CipherKeyTest.SYMMETRIC_KEY);
 
-        final ByteBufferEncryptor encryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(cipherKey, parameterSpec);
+        final StandardByteBufferCipherFactory factory = new StandardByteBufferCipherFactory();
+        final ByteBufferEncryptor encryptor = factory.newByteBufferEncryptor(cipherKey, parameterSpec);
 
         assertNotNull(encryptor);
+    }
+
+    @Test
+    void testNewByteBufferEncryptorWithProvider() throws GeneralSecurityException {
+        final IvParameterSpec parameterSpec = new IvParameterSpec(CipherFactoryTest.INITIALIZATION_VECTOR);
+        final CipherKey cipherKey = new CipherKey(CipherKeyTest.SYMMETRIC_KEY);
+
+        final Provider provider = getProvider();
+        final StandardByteBufferCipherFactory factory = new StandardByteBufferCipherFactory(provider);
+        final ByteBufferEncryptor encryptor = factory.newByteBufferEncryptor(cipherKey, parameterSpec);
+
+        assertNotNull(encryptor);
+    }
+
+    private Provider getProvider() {
+        final Provider[] providers = Security.getProviders(ALGORITHM_FILTER);
+        return providers[0];
     }
 }

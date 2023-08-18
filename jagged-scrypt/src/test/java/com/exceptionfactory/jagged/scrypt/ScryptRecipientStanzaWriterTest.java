@@ -17,6 +17,8 @@ package com.exceptionfactory.jagged.scrypt;
 
 import com.exceptionfactory.jagged.FileKey;
 import com.exceptionfactory.jagged.RecipientStanza;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyEncryptor;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyEncryptorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +53,9 @@ class ScryptRecipientStanzaWriterTest {
     @BeforeEach
     void setWriter() {
         final ScryptDerivedWrapKeyProducer derivedWrapKeyProducer = new ScryptDerivedWrapKeyProducer(PASSPHRASE);
-        writer = new ScryptRecipientStanzaWriter(derivedWrapKeyProducer, MINIMUM_WORK_FACTOR);
+        final FileKeyEncryptorFactory fileKeyEncryptorFactory = new FileKeyEncryptorFactory();
+        final FileKeyEncryptor fileKeyEncryptor = fileKeyEncryptorFactory.newFileKeyEncryptor();
+        writer = new ScryptRecipientStanzaWriter(derivedWrapKeyProducer, MINIMUM_WORK_FACTOR, fileKeyEncryptor);
     }
 
     @Test

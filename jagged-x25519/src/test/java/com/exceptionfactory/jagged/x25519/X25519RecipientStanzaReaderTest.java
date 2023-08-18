@@ -20,6 +20,8 @@ import com.exceptionfactory.jagged.RecipientStanza;
 import com.exceptionfactory.jagged.UnsupportedRecipientStanzaException;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
 import com.exceptionfactory.jagged.framework.codec.CanonicalBase64;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyDecryptor;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyDecryptorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,7 +77,9 @@ class X25519RecipientStanzaReaderTest {
 
     @BeforeEach
     void setReader() {
-        reader = new X25519RecipientStanzaReader(recipientKeyFactory, sharedSecretKeyProducer, sharedWrapKeyProducer);
+        final FileKeyDecryptorFactory fileKeyDecryptorFactory = new FileKeyDecryptorFactory();
+        final FileKeyDecryptor fileKeyDecryptor = fileKeyDecryptorFactory.newFileKeyDecryptor();
+        reader = new X25519RecipientStanzaReader(recipientKeyFactory, sharedSecretKeyProducer, sharedWrapKeyProducer, fileKeyDecryptor);
     }
 
     @Test

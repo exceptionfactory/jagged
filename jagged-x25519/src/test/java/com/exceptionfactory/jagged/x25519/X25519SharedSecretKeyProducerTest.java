@@ -33,10 +33,12 @@ class X25519SharedSecretKeyProducerTest {
         final KeyPair senderKeyPair = keyPairGenerator.generateKeyPair();
         final KeyPair recipientKeyPair = keyPairGenerator.generateKeyPair();
 
-        final X25519SharedSecretKeyProducer senderProducer = new X25519SharedSecretKeyProducer(senderKeyPair.getPrivate());
+        final KeyAgreementFactory keyAgreementFactory = new KeyAgreementFactory();
+
+        final X25519SharedSecretKeyProducer senderProducer = new X25519SharedSecretKeyProducer(senderKeyPair.getPrivate(), keyAgreementFactory);
         final SharedSecretKey senderSharedSecretKey = senderProducer.getSharedSecretKey(recipientKeyPair.getPublic());
 
-        final X25519SharedSecretKeyProducer recipientProducer = new X25519SharedSecretKeyProducer(recipientKeyPair.getPrivate());
+        final X25519SharedSecretKeyProducer recipientProducer = new X25519SharedSecretKeyProducer(recipientKeyPair.getPrivate(), keyAgreementFactory);
         final SharedSecretKey recipientSharedSecretKey = recipientProducer.getSharedSecretKey(senderKeyPair.getPublic());
 
         assertArrayEquals(senderSharedSecretKey.getEncoded(), recipientSharedSecretKey.getEncoded());

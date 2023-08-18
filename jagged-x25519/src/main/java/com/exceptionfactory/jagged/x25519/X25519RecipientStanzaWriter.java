@@ -18,14 +18,12 @@ package com.exceptionfactory.jagged.x25519;
 import com.exceptionfactory.jagged.FileKey;
 import com.exceptionfactory.jagged.RecipientStanza;
 import com.exceptionfactory.jagged.RecipientStanzaWriter;
-import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherOperationFactory;
-import com.exceptionfactory.jagged.framework.crypto.ByteBufferEncryptor;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
-import com.exceptionfactory.jagged.framework.crypto.FileKeyIvParameterSpec;
+import com.exceptionfactory.jagged.framework.crypto.EncryptedFileKey;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyEncryptor;
 import com.exceptionfactory.jagged.framework.crypto.SharedSecretKey;
 import com.exceptionfactory.jagged.framework.codec.CanonicalBase64;
 
-import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -51,17 +49,31 @@ class X25519RecipientStanzaWriter implements RecipientStanzaWriter {
 
     private final SharedWrapKeyProducer sharedWrapKeyProducer;
 
+    private final FileKeyEncryptor fileKeyEncryptor;
+
+    private final KeyAgreementFactory keyAgreementFactory;
+
     /**
      * X25519 Recipient Stanza Writer constructor with required Recipient Public Key and collaborating components
      *
      * @param recipientPublicKey Recipient Public Key for the intended receiver of encrypted files
      * @param recipientKeyFactory Recipient Key Factory for producing Key objects
      * @param sharedWrapKeyProducer Wrap Key Producer for deriving encryption key from ephemeral share and Recipient Public Key
+     * @param fileKeyEncryptor File Key Decryptor to read File Key encrypted using ChaCha20-Poly1305
+     * @param keyAgreementFactory Key Agreement Factory for X25519
      */
-    X25519RecipientStanzaWriter(final PublicKey recipientPublicKey, final RecipientKeyFactory recipientKeyFactory, final SharedWrapKeyProducer sharedWrapKeyProducer) {
+    X25519RecipientStanzaWriter(
+            final PublicKey recipientPublicKey,
+            final RecipientKeyFactory recipientKeyFactory,
+            final SharedWrapKeyProducer sharedWrapKeyProducer,
+            final FileKeyEncryptor fileKeyEncryptor,
+            final KeyAgreementFactory keyAgreementFactory
+    ) {
         this.recipientPublicKey = Objects.requireNonNull(recipientPublicKey, "Recipient Public Key required");
         this.recipientKeyFactory = Objects.requireNonNull(recipientKeyFactory, "Recipient Key Factory required");
         this.sharedWrapKeyProducer = Objects.requireNonNull(sharedWrapKeyProducer, "Wrap Key Producer required");
+        this.fileKeyEncryptor = Objects.requireNonNull(fileKeyEncryptor, "File Key Encryptor required");
+        this.keyAgreementFactory = Objects.requireNonNull(keyAgreementFactory, "Key Agreement Factory required");
     }
 
     /**
@@ -78,17 +90,18 @@ class X25519RecipientStanzaWriter implements RecipientStanzaWriter {
         final SharedSecretKeyProducer sharedSecretKeyProducer = getSharedSecretKeyProducer();
         final SharedSecretKey ephemeralSharedSecretKey = getEphemeralSharedSecretKey(sharedSecretKeyProducer);
         final CipherKey wrapKey = getWrapKey(sharedSecretKeyProducer, ephemeralSharedSecretKey);
-        final byte[] encryptedFileKey = getEncryptedFileKey(fileKey, wrapKey);
+        final EncryptedFileKey encryptedFileKey = fileKeyEncryptor.getEncryptedFileKey(fileKey, wrapKey);
+        final byte[] encryptedFileKeyEncoded = encryptedFileKey.getEncoded();
 
         final String ephemeralShareEncoded = ENCODER.encodeToString(ephemeralSharedSecretKey.getEncoded());
-        final RecipientStanza recipientStanza = new X25519RecipientStanza(ephemeralShareEncoded, encryptedFileKey);
+        final RecipientStanza recipientStanza = new X25519RecipientStanza(ephemeralShareEncoded, encryptedFileKeyEncoded);
         return Collections.singletonList(recipientStanza);
     }
 
     private SharedSecretKeyProducer getSharedSecretKeyProducer() throws GeneralSecurityException {
         final byte[] ephemeralPrivateKeyEncoded = getEphemeralPrivateKeyEncoded();
         final PrivateKey ephemeralPrivateKey = recipientKeyFactory.getPrivateKey(ephemeralPrivateKeyEncoded);
-        return new X25519SharedSecretKeyProducer(ephemeralPrivateKey);
+        return new X25519SharedSecretKeyProducer(ephemeralPrivateKey, keyAgreementFactory);
     }
 
     private byte[] getEphemeralPrivateKeyEncoded() {
@@ -100,16 +113,6 @@ class X25519RecipientStanzaWriter implements RecipientStanzaWriter {
     private SharedSecretKey getEphemeralSharedSecretKey(final SharedSecretKeyProducer sharedSecretKeyProducer) throws GeneralSecurityException {
         final PublicKey basePointPublicKey = recipientKeyFactory.getPublicKey(BASE_POINT_PUBLIC_KEY.getEncoded());
         return sharedSecretKeyProducer.getSharedSecretKey(basePointPublicKey);
-    }
-
-    private byte[] getEncryptedFileKey(final FileKey fileKey, final CipherKey wrapKey) throws GeneralSecurityException {
-        final FileKeyIvParameterSpec parameterSpec = new FileKeyIvParameterSpec();
-        final ByteBufferEncryptor byteBufferEncryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(wrapKey, parameterSpec);
-
-        final ByteBuffer fileKeyBuffer = ByteBuffer.wrap(fileKey.getEncoded());
-        final ByteBuffer encryptedFileKeyBuffer = ByteBuffer.allocate(EPHEMERAL_PRIVATE_KEY_LENGTH);
-        byteBufferEncryptor.encrypt(fileKeyBuffer, encryptedFileKeyBuffer);
-        return encryptedFileKeyBuffer.array();
     }
 
     private CipherKey getWrapKey(final SharedSecretKeyProducer sharedSecretKeyProducer, final SharedSecretKey ephemeralSharedSecretKey) throws GeneralSecurityException {

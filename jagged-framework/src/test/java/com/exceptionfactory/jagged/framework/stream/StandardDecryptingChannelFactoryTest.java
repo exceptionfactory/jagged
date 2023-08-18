@@ -28,12 +28,16 @@ import java.nio.channels.Channels;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ReadableByteChannel;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
+import java.security.Security;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-class StandardDecryptionChannelFactoryTest {
+class StandardDecryptingChannelFactoryTest {
+    private static final String ALGORITHM_FILTER = "Cipher.ChaCha20-Poly1305";
+
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[]{};
 
     @Mock
@@ -61,7 +65,22 @@ class StandardDecryptionChannelFactoryTest {
         assertThrows(GeneralSecurityException.class, () -> factory.newDecryptingChannel(inputChannel, Collections.singletonList(recipientStanzaReader)));
     }
 
+    @Test
+    void testNewDecryptingChannelWithProviderReadException() {
+        final ReadableByteChannel inputChannel = getInputChannel();
+
+        final Provider provider = getProvider();
+        final StandardDecryptingChannelFactory channelFactory = new StandardDecryptingChannelFactory(provider);
+
+        assertThrows(GeneralSecurityException.class, () -> channelFactory.newDecryptingChannel(inputChannel, Collections.singletonList(recipientStanzaReader)));
+    }
+
     private ReadableByteChannel getInputChannel() {
         return Channels.newChannel(new ByteArrayInputStream(EMPTY_BYTE_ARRAY));
+    }
+
+    private Provider getProvider() {
+        final Provider[] providers = Security.getProviders(ALGORITHM_FILTER);
+        return providers[0];
     }
 }

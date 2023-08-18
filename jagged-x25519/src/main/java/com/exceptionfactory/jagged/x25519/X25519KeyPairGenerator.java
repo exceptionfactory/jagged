@@ -25,8 +25,10 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * X25519 Key Pair Generator produces Public and Private Keys encoded using Bech32 for use with age encryption
@@ -47,11 +49,25 @@ public class X25519KeyPairGenerator extends KeyPairGenerator {
     /**
      * X25519 Key Pair Generator constructor creates a Key Pair Generator using available Security Providers
      *
-     * @throws NoSuchAlgorithmException Thrown on KeyPairGenerator.getInstance() failures
+     * @throws NoSuchAlgorithmException Thrown on Key Pair Generator initialization failures
      */
     public X25519KeyPairGenerator() throws NoSuchAlgorithmException {
         super(ALGORITHM);
-        this.keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
+        final KeyPairGeneratorFactory keyPairGeneratorFactory = new KeyPairGeneratorFactory();
+        this.keyPairGenerator = keyPairGeneratorFactory.getKeyPairGenerator();
+    }
+
+    /**
+     * X25519 Key Pair Generator constructor creates a Key Pair Generator using specified Security Provider
+     *
+     * @param provider Security Provider
+     * @throws NoSuchAlgorithmException Thrown on KeyPairGenerator.getInstance() failures
+     */
+    public X25519KeyPairGenerator(final Provider provider) throws NoSuchAlgorithmException {
+        super(ALGORITHM);
+        Objects.requireNonNull(provider, "Provider required");
+        final KeyPairGeneratorFactory keyPairGeneratorFactory = new KeyPairGeneratorFactory(provider);
+        this.keyPairGenerator = keyPairGeneratorFactory.getKeyPairGenerator();
     }
 
     /**

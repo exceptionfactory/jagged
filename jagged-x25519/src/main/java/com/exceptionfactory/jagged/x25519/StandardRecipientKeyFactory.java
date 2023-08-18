@@ -20,8 +20,8 @@ import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -44,6 +44,8 @@ class StandardRecipientKeyFactory implements RecipientKeyFactory {
 
     private static final int PRIVATE_KEY_DER_HEADER_LENGTH = 16;
 
+    private final KeyFactory keyFactory;
+
     private final int publicKeyEncodedLength;
 
     private final byte[] publicKeyHeader;
@@ -54,10 +56,15 @@ class StandardRecipientKeyFactory implements RecipientKeyFactory {
      * Standard Recipient Key Factory constructor generates a random Key Pair to derive Public and Private Key Headers
      * based on the current Java Security Provider
      *
+     * @param keyPairGeneratorFactory Key Pair Generator Factory with configured Security Provider
      * @throws GeneralSecurityException Thrown on failures generating a random Key Pair
      */
-    StandardRecipientKeyFactory() throws GeneralSecurityException {
-        final KeyPairGenerator keyPairGenerator = getKeyPairGenerator();
+    StandardRecipientKeyFactory(final KeyPairGeneratorFactory keyPairGeneratorFactory) throws GeneralSecurityException {
+        final KeyPairGenerator keyPairGenerator = keyPairGeneratorFactory.getKeyPairGenerator();
+
+        final Provider provider = keyPairGenerator.getProvider();
+        keyFactory = KeyFactory.getInstance(RecipientIndicator.KEY_ALGORITHM.getIndicator(), provider);
+
         final KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
         final PrivateKey privateKey = keyPair.getPrivate();
@@ -83,7 +90,6 @@ class StandardRecipientKeyFactory implements RecipientKeyFactory {
         final int encodedLength = publicKeyEncoded.length;
         if (COORDINATE_LENGTH == encodedLength) {
             final X509EncodedKeySpec publicKeySpec = getPublicKeySpec(publicKeyEncoded);
-            final KeyFactory keyFactory = getKeyFactory();
             return keyFactory.generatePublic(publicKeySpec);
         } else {
             final String message = String.format("Public key length [%d] not required length [%d]", encodedLength, COORDINATE_LENGTH);
@@ -104,7 +110,6 @@ class StandardRecipientKeyFactory implements RecipientKeyFactory {
         final int encodedLength = privateKeyEncoded.length;
         if (COORDINATE_LENGTH == encodedLength) {
             final PKCS8EncodedKeySpec privateKeySpec = getPrivateKeySpec(privateKeyEncoded);
-            final KeyFactory keyFactory = getKeyFactory();
             return keyFactory.generatePrivate(privateKeySpec);
         } else {
             final String message = String.format("Private key length [%d] not required length [%d]", encodedLength, COORDINATE_LENGTH);
@@ -125,15 +130,6 @@ class StandardRecipientKeyFactory implements RecipientKeyFactory {
         System.arraycopy(publicKeyEncoded, 0, keySpec, publicKeyHeader.length, publicKeyEncoded.length);
         return new X509EncodedKeySpec(keySpec);
     }
-
-    private KeyFactory getKeyFactory() throws NoSuchAlgorithmException {
-        return KeyFactory.getInstance(RecipientIndicator.KEY_ALGORITHM.getIndicator());
-    }
-
-    private KeyPairGenerator getKeyPairGenerator() throws NoSuchAlgorithmException {
-        return KeyPairGenerator.getInstance(RecipientIndicator.KEY_ALGORITHM.getIndicator());
-    }
-
     private static byte[] getPrivateKeyHeader(final PrivateKey privateKey) {
         final byte[] privateKeyEncoded = privateKey.getEncoded();
         final byte[] privateKeyHeader = Arrays.copyOfRange(privateKeyEncoded, 0, PRIVATE_KEY_DER_HEADER_LENGTH);

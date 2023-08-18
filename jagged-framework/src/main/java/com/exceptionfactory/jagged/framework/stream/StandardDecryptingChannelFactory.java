@@ -17,6 +17,8 @@ package com.exceptionfactory.jagged.framework.stream;
 
 import com.exceptionfactory.jagged.DecryptingChannelFactory;
 import com.exceptionfactory.jagged.RecipientStanzaReader;
+import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherFactory;
+import com.exceptionfactory.jagged.framework.crypto.StandardByteBufferCipherFactory;
 import com.exceptionfactory.jagged.framework.format.PayloadKeyReader;
 import com.exceptionfactory.jagged.framework.format.StandardPayloadKeyReader;
 
@@ -24,12 +26,32 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ReadableByteChannel;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
 import java.util.Objects;
 
 /**
  * Standard implementation of Decrypting Channel Factory supports reading encrypted channels
  */
 public class StandardDecryptingChannelFactory implements DecryptingChannelFactory {
+    private final ByteBufferCipherFactory byteBufferCipherFactory;
+
+    /**
+     * Standard Decrypting Channel Factory constructor using default Security Provider configuration
+     */
+    public StandardDecryptingChannelFactory() {
+        byteBufferCipherFactory = new StandardByteBufferCipherFactory();
+    }
+
+    /**
+     * Standard Decrypting Channel Factory constructor using specified Security Provider
+     *
+     * @param provider Security Provider supporting ChaCha20-Poly1305
+     */
+    public StandardDecryptingChannelFactory(final Provider provider) {
+        Objects.requireNonNull(provider, "Provider required");
+        byteBufferCipherFactory = new StandardByteBufferCipherFactory(provider);
+    }
+
     /**
      * Create new channel that reads and decrypts from the supplied open input channel
      *
@@ -48,7 +70,7 @@ public class StandardDecryptingChannelFactory implements DecryptingChannelFactor
         Objects.requireNonNull(recipientStanzaReaders, "Recipient Stanza Readers required");
         if (inputChannel.isOpen()) {
             final PayloadKeyReader payloadKeyReader = new StandardPayloadKeyReader();
-            return new DecryptingChannel(inputChannel, recipientStanzaReaders, payloadKeyReader);
+            return new DecryptingChannel(inputChannel, recipientStanzaReaders, payloadKeyReader, byteBufferCipherFactory);
         } else {
             throw new ClosedChannelException();
         }

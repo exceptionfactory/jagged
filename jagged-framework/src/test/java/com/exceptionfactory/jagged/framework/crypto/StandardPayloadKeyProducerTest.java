@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.security.GeneralSecurityException;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class StandardPayloadKeyProducerTest {
     static final byte[] FILE_KEY = new byte[]{
@@ -50,5 +51,17 @@ class StandardPayloadKeyProducerTest {
         final CipherKey payloadKey = producer.getPayloadKey(fileKey, payloadNonce);
 
         assertArrayEquals(PAYLOAD_KEY, payloadKey.getEncoded());
+    }
+
+    @Test
+    void testGetPayloadKeyRandomKey() throws GeneralSecurityException {
+        final StandardPayloadKeyProducer producer = new StandardPayloadKeyProducer();
+
+        final FileKey fileKey = new FileKey(FILE_KEY);
+        final PayloadNonceKey payloadNonce = new PayloadNonceKey();
+
+        final CipherKey payloadKey = producer.getPayloadKey(fileKey, payloadNonce);
+
+        assertNotNull(payloadKey);
     }
 }

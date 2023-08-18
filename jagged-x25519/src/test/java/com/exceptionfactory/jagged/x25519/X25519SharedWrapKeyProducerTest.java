@@ -51,7 +51,8 @@ class X25519SharedWrapKeyProducerTest {
 
     @BeforeEach
     void setProducer() throws GeneralSecurityException {
-        recipientKeyFactory = new StandardRecipientKeyFactory();
+        final KeyPairGeneratorFactory keyPairGeneratorFactory = new KeyPairGeneratorFactory();
+        recipientKeyFactory = new StandardRecipientKeyFactory(keyPairGeneratorFactory);
         final byte[] recipientPublicKeyEncoded = DECODER.decode(RECIPIENT_PUBLIC_KEY_ENCODED.getBytes(StandardCharsets.US_ASCII));
         final PublicKey recipientPublicKey = recipientKeyFactory.getPublicKey(recipientPublicKeyEncoded);
         producer = new X25519SharedWrapKeyProducer(recipientPublicKey);

@@ -17,13 +17,30 @@ package com.exceptionfactory.jagged.framework.crypto;
 
 import javax.crypto.spec.IvParameterSpec;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
+import java.util.Objects;
 
 /**
- * Byte Buffer Cipher Operation Factory provides instances of Byte Buffer Decryptor and Encryptor objects
+ * Standard implementation of Byte Buffer Cipher Factory provides instances of Byte Buffer Decryptor and Encryptor objects
  */
-public final class ByteBufferCipherOperationFactory {
-    private ByteBufferCipherOperationFactory() {
+public final class StandardByteBufferCipherFactory implements ByteBufferCipherFactory {
+    private final CipherFactory cipherFactory;
 
+    /**
+     * Standard Byte Buffer Cipher Factory constructor using default Security Provider configuration
+     */
+    public StandardByteBufferCipherFactory() {
+        cipherFactory = new CipherFactory();
+    }
+
+    /**
+     * Standard Byte Buffer Cipher Factory constructor using specified Security Provider configuration
+     *
+     * @param provider Security Provider supporting ChaCha20-Poly1305
+     */
+    public StandardByteBufferCipherFactory(final Provider provider) {
+        Objects.requireNonNull(provider, "Provider required");
+        cipherFactory = new CipherFactory(provider);
     }
 
     /**
@@ -34,8 +51,9 @@ public final class ByteBufferCipherOperationFactory {
      * @return Byte Buffer Decryptor
      * @throws GeneralSecurityException Thrown on decryptor initialization failures
      */
-    public static ByteBufferDecryptor newByteBufferDecryptor(final CipherKey cipherKey, final IvParameterSpec parameterSpec) throws GeneralSecurityException {
-        return new StandardByteBufferDecryptor(cipherKey, parameterSpec);
+    @Override
+    public ByteBufferDecryptor newByteBufferDecryptor(final CipherKey cipherKey, final IvParameterSpec parameterSpec) throws GeneralSecurityException {
+        return new StandardByteBufferDecryptor(cipherFactory, cipherKey, parameterSpec);
     }
 
     /**
@@ -46,7 +64,8 @@ public final class ByteBufferCipherOperationFactory {
      * @return Byte Buffer Encryptor
      * @throws GeneralSecurityException Thrown on encryptor initialization failures
      */
-    public static ByteBufferEncryptor newByteBufferEncryptor(final CipherKey cipherKey, final IvParameterSpec parameterSpec) throws GeneralSecurityException {
-        return new StandardByteBufferEncryptor(cipherKey, parameterSpec);
+    @Override
+    public ByteBufferEncryptor newByteBufferEncryptor(final CipherKey cipherKey, final IvParameterSpec parameterSpec) throws GeneralSecurityException {
+        return new StandardByteBufferEncryptor(cipherFactory, cipherKey, parameterSpec);
     }
 }

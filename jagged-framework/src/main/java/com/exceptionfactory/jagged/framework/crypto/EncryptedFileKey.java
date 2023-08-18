@@ -15,20 +15,16 @@
  */
 package com.exceptionfactory.jagged.framework.crypto;
 
-import javax.crypto.spec.IvParameterSpec;
-
 /**
- * Initialization Vector Parameter Specification for File Key encryption and decryption consisting of 12 zero bytes
+ * File Key extension of Cryptographic Algorithm Key encrypted with ChaCha20-Poly1305
  */
-final class FileKeyIvParameterSpec extends IvParameterSpec {
-    private static final int INITIALIZATION_VECTOR_LENGTH = 12;
-
-    private static final byte[] STANDARD_INITIALIZATION_VECTOR = new byte[INITIALIZATION_VECTOR_LENGTH];
-
+public final class EncryptedFileKey extends CryptographicAlgorithmKey {
     /**
-     * File Key Initialization Vector Parameter Specification with array of 12 bytes
+     * Encrypted File Key constructor with required key byte array
+     *
+     * @param key Encrypted Key consisting of 32 bytes
      */
-    FileKeyIvParameterSpec() {
-        super(STANDARD_INITIALIZATION_VECTOR);
+    public EncryptedFileKey(final byte[] key) {
+        super(key, CryptographicKeyType.ENCRYPTED_FILE_KEY, CryptographicAlgorithm.CHACHA20_POLY1305);
     }
 }

@@ -17,7 +17,7 @@ package com.exceptionfactory.jagged.framework.stream;
 
 import com.exceptionfactory.jagged.PayloadException;
 import com.exceptionfactory.jagged.RecipientStanzaReader;
-import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherOperationFactory;
+import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherFactory;
 import com.exceptionfactory.jagged.framework.crypto.ByteBufferDecryptor;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
 import com.exceptionfactory.jagged.framework.crypto.PayloadIvParameterSpec;
@@ -49,21 +49,26 @@ class DecryptingChannel implements ReadableByteChannel {
 
     private final CipherKey payloadKey;
 
+    private final ByteBufferCipherFactory byteBufferCipherFactory;
+
     /**
      * Decrypting Channel constructor reads the File Header from the encrypted input Channel using the Recipient Stanza Reader
      *
      * @param inputChannel Input Channel containing encrypted age binary
      * @param recipientStanzaReaders Recipient Stanza Readers required to read File Key
      * @param payloadKeyReader Payload Key Reader
+     * @param byteBufferCipherFactory Byte Buffer Cipher Factory for performing encryption operations
      * @throws IOException Thrown on failures to read initial encrypted payload after processing File Header
      * @throws GeneralSecurityException Thrown on failures to read File Key or construct Payload Key with supplied Recipient Stanza Reader
      */
     DecryptingChannel(
             final ReadableByteChannel inputChannel,
             final Iterable<RecipientStanzaReader> recipientStanzaReaders,
-            final PayloadKeyReader payloadKeyReader
+            final PayloadKeyReader payloadKeyReader,
+            final ByteBufferCipherFactory byteBufferCipherFactory
     ) throws IOException, GeneralSecurityException {
         this.inputChannel = Objects.requireNonNull(inputChannel, "Input Channel required");
+        this.byteBufferCipherFactory = Objects.requireNonNull(byteBufferCipherFactory, "Byte Buffer Cipher Factory required");
         readInputChannel();
         payloadKey = payloadKeyReader.getPayloadKey(inputBuffer, recipientStanzaReaders);
 
@@ -201,7 +206,7 @@ class DecryptingChannel implements ReadableByteChannel {
         if (inputBuffer.hasRemaining()) {
             plainBuffer.clear();
 
-            final ByteBufferDecryptor byteBufferDecryptor = ByteBufferCipherOperationFactory.newByteBufferDecryptor(payloadKey, payloadIvParameterSpec);
+            final ByteBufferDecryptor byteBufferDecryptor = byteBufferCipherFactory.newByteBufferDecryptor(payloadKey, payloadIvParameterSpec);
             byteBufferDecryptor.decrypt(inputBuffer, plainBuffer);
 
             if (plainBuffer.position() == 0 && payloadIvParameterSpec.isNotFirstChunk()) {

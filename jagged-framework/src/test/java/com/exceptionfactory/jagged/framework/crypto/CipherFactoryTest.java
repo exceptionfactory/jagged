@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
+import java.security.Security;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,12 +33,15 @@ class CipherFactoryTest {
             1, 2, 3, 4, 5, 6
     };
 
+    private static final String PROVIDER_FILTER = String.format("Cipher.%s", CryptographicAlgorithm.CHACHA20_POLY1305.getAlgorithm());
+
     @Test
     void testGetInitializedCipherEncryptMode() throws GeneralSecurityException {
         final IvParameterSpec parameterSpec = new IvParameterSpec(INITIALIZATION_VECTOR);
         final CipherKey cipherKey = new CipherKey(CipherKeyTest.SYMMETRIC_KEY);
 
-        final Cipher cipher = CipherFactory.getInitializedCipher(CipherFactory.CipherMode.ENCRYPT, cipherKey, parameterSpec);
+        final CipherFactory cipherFactory = new CipherFactory();
+        final Cipher cipher = cipherFactory.getInitializedCipher(CipherFactory.CipherMode.ENCRYPT, cipherKey, parameterSpec);
 
         assertNotNull(cipher);
         assertEquals(CryptographicAlgorithm.CHACHA20_POLY1305.getAlgorithm(), cipher.getAlgorithm());
@@ -48,14 +53,34 @@ class CipherFactoryTest {
         final IvParameterSpec parameterSpec = new IvParameterSpec(INITIALIZATION_VECTOR);
         final CipherKey cipherKey = new CipherKey(CipherKeyTest.SYMMETRIC_KEY);
 
-        final Cipher cipher = CipherFactory.getInitializedCipher(CipherFactory.CipherMode.DECRYPT, cipherKey, parameterSpec);
+        final CipherFactory cipherFactory = new CipherFactory();
+        final Cipher cipher = cipherFactory.getInitializedCipher(CipherFactory.CipherMode.DECRYPT, cipherKey, parameterSpec);
 
         assertCipherEquals(cipher);
+    }
+
+    @Test
+    void testGetInitializedCipherProvider() throws GeneralSecurityException {
+        final IvParameterSpec parameterSpec = new IvParameterSpec(INITIALIZATION_VECTOR);
+        final CipherKey cipherKey = new CipherKey(CipherKeyTest.SYMMETRIC_KEY);
+
+        final Provider provider = getProvider();
+        final CipherFactory cipherFactory = new CipherFactory(provider);
+        final Cipher cipher = cipherFactory.getInitializedCipher(CipherFactory.CipherMode.ENCRYPT, cipherKey, parameterSpec);
+
+        assertNotNull(cipher);
+        assertEquals(CryptographicAlgorithm.CHACHA20_POLY1305.getAlgorithm(), cipher.getAlgorithm());
+        assertArrayEquals(INITIALIZATION_VECTOR, cipher.getIV());
     }
 
     private void assertCipherEquals(final Cipher cipher) {
         assertNotNull(cipher);
         assertEquals(CryptographicAlgorithm.CHACHA20_POLY1305.getAlgorithm(), cipher.getAlgorithm());
         assertArrayEquals(INITIALIZATION_VECTOR, cipher.getIV());
+    }
+
+    private Provider getProvider() {
+        final Provider[] providers = Security.getProviders(PROVIDER_FILTER);
+        return providers[0];
     }
 }

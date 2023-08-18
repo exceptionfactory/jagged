@@ -18,6 +18,8 @@ package com.exceptionfactory.jagged.scrypt;
 import com.exceptionfactory.jagged.FileKey;
 import com.exceptionfactory.jagged.RecipientStanza;
 import com.exceptionfactory.jagged.UnsupportedRecipientStanzaException;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyDecryptor;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyDecryptorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,7 +73,8 @@ class ScryptRecipientStanzaReaderTest {
 
     @BeforeEach
     void setReader() {
-        reader = new ScryptRecipientStanzaReader(derivedWrapKeyProducer);
+        final FileKeyDecryptorFactory fileKeyDecryptorFactory = new FileKeyDecryptorFactory();
+        reader = new ScryptRecipientStanzaReader(derivedWrapKeyProducer, fileKeyDecryptorFactory.newFileKeyDecryptor());
     }
 
     @Test
@@ -188,7 +191,9 @@ class ScryptRecipientStanzaReaderTest {
         when(recipientStanza.getArguments()).thenReturn(Arrays.asList(ENCODED_SALT, WORK_FACTOR));
         when(recipientStanza.getBody()).thenReturn(ENCRYPTED_BODY);
 
-        final ScryptRecipientStanzaReader stanzaReader = new ScryptRecipientStanzaReader(new ScryptDerivedWrapKeyProducer(PASSPHRASE));
+        final FileKeyDecryptorFactory fileKeyDecryptorFactory = new FileKeyDecryptorFactory();
+        final FileKeyDecryptor fileKeyDecryptor = fileKeyDecryptorFactory.newFileKeyDecryptor();
+        final ScryptRecipientStanzaReader stanzaReader = new ScryptRecipientStanzaReader(new ScryptDerivedWrapKeyProducer(PASSPHRASE), fileKeyDecryptor);
         final FileKey fileKey = stanzaReader.getFileKey(stanzas);
 
         assertNotNull(fileKey);

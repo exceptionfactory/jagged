@@ -17,7 +17,9 @@ package com.exceptionfactory.jagged.framework.stream;
 
 import com.exceptionfactory.jagged.PayloadException;
 import com.exceptionfactory.jagged.RecipientStanzaWriter;
+import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherFactory;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
+import com.exceptionfactory.jagged.framework.crypto.StandardByteBufferCipherFactory;
 import com.exceptionfactory.jagged.framework.format.PayloadKeyWriter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -103,7 +105,9 @@ class EncryptingChannelTest {
         final CipherKey payloadKey = mock(CipherKey.class);
         lenient().when(payloadKey.getEncoded()).thenReturn(INVALID_KEY);
         when(payloadKeyWriter.writeFileHeader(any(), any())).thenReturn(payloadKey);
-        final EncryptingChannel encryptingChannel = new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
+
+        final ByteBufferCipherFactory byteBufferCipherFactory = new StandardByteBufferCipherFactory();
+        final EncryptingChannel encryptingChannel = new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter, byteBufferCipherFactory);
 
         final ByteBuffer sourceBuffer = ByteBuffer.wrap(SOURCE);
         final int written = encryptingChannel.write(sourceBuffer);
@@ -182,6 +186,7 @@ class EncryptingChannelTest {
         final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
         final List<RecipientStanzaWriter> recipientStanzaWriters = Collections.singletonList(recipientStanzaWriter);
         when(payloadKeyWriter.writeFileHeader(any(), any())).thenReturn(PAYLOAD_KEY);
-        return new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter);
+        final ByteBufferCipherFactory byteBufferCipherFactory = new StandardByteBufferCipherFactory();
+        return new EncryptingChannel(outputChannel, recipientStanzaWriters, payloadKeyWriter, byteBufferCipherFactory);
     }
 }

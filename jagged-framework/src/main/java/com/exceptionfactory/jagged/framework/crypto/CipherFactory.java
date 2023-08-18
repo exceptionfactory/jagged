@@ -16,16 +16,33 @@
 package com.exceptionfactory.jagged.framework.crypto;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
 import java.util.Objects;
 
 /**
  * Factory abstraction for initialized instances of javax.crypto.Cipher with ChaCha20-Poly1305
  */
 final class CipherFactory {
-    private CipherFactory() {
+    private final Provider provider;
 
+    /**
+     * Cipher Factory default constructor uses the system default Security Provider configuration
+     */
+    CipherFactory() {
+        provider = null;
+    }
+
+    /**
+     * Cipher Factory constructor with support for custom Security Provider
+     *
+     * @param provider Security Provider supporting ChaCha20-Poly1305
+     */
+    CipherFactory(final Provider provider) {
+        this.provider = Objects.requireNonNull(provider, "Provider required");
     }
 
     /**
@@ -37,13 +54,23 @@ final class CipherFactory {
      * @return Initialized Cipher
      * @throws GeneralSecurityException Thrown on Cipher initialization failures
      */
-    static Cipher getInitializedCipher(final CipherMode cipherMode, final CipherKey cipherKey, final IvParameterSpec parameterSpec) throws GeneralSecurityException {
+    Cipher getInitializedCipher(final CipherMode cipherMode, final CipherKey cipherKey, final IvParameterSpec parameterSpec) throws GeneralSecurityException {
         Objects.requireNonNull(cipherMode, "Cipher Mode required");
         Objects.requireNonNull(cipherKey, "Cipher Symmetric Key required");
         Objects.requireNonNull(parameterSpec, "Parameter Specification required");
 
-        final Cipher cipher = Cipher.getInstance(CryptographicAlgorithm.CHACHA20_POLY1305.getAlgorithm());
+        final Cipher cipher = getCipher();
         cipher.init(cipherMode.mode, cipherKey, parameterSpec);
+        return cipher;
+    }
+
+    private Cipher getCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        final Cipher cipher;
+        if (provider == null) {
+            cipher = Cipher.getInstance(CryptographicAlgorithm.CHACHA20_POLY1305.getAlgorithm());
+        } else {
+            cipher = Cipher.getInstance(CryptographicAlgorithm.CHACHA20_POLY1305.getAlgorithm(), provider);
+        }
         return cipher;
     }
 

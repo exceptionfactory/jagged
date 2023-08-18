@@ -21,11 +21,15 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.Provider;
+import java.security.Security;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ScryptRecipientStanzaReaderFactoryTest {
+    private static final String ALGORITHM_FILTER = "Cipher.ChaCha20-Poly1305";
+
     private static final byte[] PASSPHRASE = String.class.getName().getBytes(StandardCharsets.UTF_8);
 
     @Test
@@ -38,5 +42,17 @@ class ScryptRecipientStanzaReaderFactoryTest {
     @Test
     void testNewRecipientStanzaReaderNullPassphrase() {
         assertThrows(UnsupportedRecipientStanzaException.class, () -> ScryptRecipientStanzaReaderFactory.newRecipientStanzaReader(null));
+    }
+
+    @Test
+    void testNewRecipientStanzaReaderWithProvider() throws GeneralSecurityException {
+        final RecipientStanzaReader recipientStanzaReader = ScryptRecipientStanzaReaderFactory.newRecipientStanzaReader(PASSPHRASE, getProvider());
+
+        assertNotNull(recipientStanzaReader);
+    }
+
+    private Provider getProvider() {
+        final Provider[] providers = Security.getProviders(ALGORITHM_FILTER);
+        return providers[0];
     }
 }

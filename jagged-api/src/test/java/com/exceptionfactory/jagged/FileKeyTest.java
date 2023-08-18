@@ -18,7 +18,9 @@ package com.exceptionfactory.jagged;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,6 +56,25 @@ class FileKeyTest {
         assertFalse(fileKey.isDestroyed());
         fileKey.destroy();
         assertTrue(fileKey.isDestroyed());
+    }
+
+    @Test
+    void testFileKeyEquals() {
+        final FileKey fileKey = new FileKey(FILE_KEY);
+
+        final FileKey otherFileKey = new FileKey(FILE_KEY);
+
+        assertEquals(fileKey, otherFileKey);
+        assertNotEquals(fileKey, null);
+    }
+
+    @Test
+    void testFileKeyHashCode() {
+        final FileKey fileKey = new FileKey(FILE_KEY);
+
+        final FileKey otherFileKey = new FileKey(FILE_KEY);
+
+        assertEquals(fileKey.hashCode(), otherFileKey.hashCode());
     }
 
     @Test

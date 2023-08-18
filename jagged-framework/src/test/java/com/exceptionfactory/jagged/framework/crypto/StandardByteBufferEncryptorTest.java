@@ -34,7 +34,8 @@ class StandardByteBufferEncryptorTest {
         final CipherKey cipherKey = new CipherKey(CipherKeyTest.SYMMETRIC_KEY);
         final IvParameterSpec parameterSpec = new IvParameterSpec(CipherFactoryTest.INITIALIZATION_VECTOR);
 
-        final StandardByteBufferEncryptor encryptor = new StandardByteBufferEncryptor(cipherKey, parameterSpec);
+        final CipherFactory cipherFactory = new CipherFactory();
+        final StandardByteBufferEncryptor encryptor = new StandardByteBufferEncryptor(cipherFactory, cipherKey, parameterSpec);
 
         final ByteBuffer inputBuffer = ByteBuffer.wrap(INPUT);
         final ByteBuffer outputBuffer = ByteBuffer.allocate(EXPECTED_OUTPUT.length);

@@ -19,14 +19,12 @@ import com.exceptionfactory.jagged.FileKey;
 import com.exceptionfactory.jagged.RecipientStanza;
 import com.exceptionfactory.jagged.RecipientStanzaReader;
 import com.exceptionfactory.jagged.UnsupportedRecipientStanzaException;
-import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherOperationFactory;
-import com.exceptionfactory.jagged.framework.crypto.ByteBufferDecryptor;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
-import com.exceptionfactory.jagged.framework.crypto.FileKeyIvParameterSpec;
+import com.exceptionfactory.jagged.framework.crypto.EncryptedFileKey;
+import com.exceptionfactory.jagged.framework.crypto.FileKeyDecryptor;
 import com.exceptionfactory.jagged.framework.crypto.SharedSecretKey;
 import com.exceptionfactory.jagged.framework.codec.CanonicalBase64;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
@@ -45,8 +43,6 @@ class X25519RecipientStanzaReader implements RecipientStanzaReader {
 
     private static final int ENCRYPTED_FILE_KEY_LENGTH = 32;
 
-    private static final int FILE_KEY_LENGTH = 16;
-
     private static final CanonicalBase64.Decoder BASE64_DECODER = CanonicalBase64.getDecoder();
 
     private final RecipientKeyFactory recipientKeyFactory;
@@ -55,17 +51,26 @@ class X25519RecipientStanzaReader implements RecipientStanzaReader {
 
     private final SharedWrapKeyProducer sharedWrapKeyProducer;
 
+    private final FileKeyDecryptor fileKeyDecryptor;
+
     /**
      * X25519 Recipient Stanza Reader constructor with Shared Secret Producer initialized with Private Key and Wrap Key Producer
      *
      * @param recipientKeyFactory Recipient Key Factory produces Public Key objects from encoded bytes
      * @param sharedSecretKeyProducer Shared Secret Producer initialized with Private Key
      * @param sharedWrapKeyProducer Wrap Key Producer to derive key for decrypting File Key
+     * @param fileKeyDecryptor File Key Decryptor to read File Key encrypted using ChaCha20-Poly1305
      */
-    X25519RecipientStanzaReader(final RecipientKeyFactory recipientKeyFactory, final SharedSecretKeyProducer sharedSecretKeyProducer, final SharedWrapKeyProducer sharedWrapKeyProducer) {
+    X25519RecipientStanzaReader(
+            final RecipientKeyFactory recipientKeyFactory,
+            final SharedSecretKeyProducer sharedSecretKeyProducer,
+            final SharedWrapKeyProducer sharedWrapKeyProducer,
+            final FileKeyDecryptor fileKeyDecryptor
+    ) {
         this.recipientKeyFactory = Objects.requireNonNull(recipientKeyFactory, "Recipient Key Factory required");
         this.sharedSecretKeyProducer = Objects.requireNonNull(sharedSecretKeyProducer, "Shared Secret Key Provider required");
         this.sharedWrapKeyProducer = Objects.requireNonNull(sharedWrapKeyProducer, "Wrap Key Producer required");
+        this.fileKeyDecryptor = Objects.requireNonNull(fileKeyDecryptor, "File Key Decryptor required");
     }
 
     /**
@@ -108,25 +113,15 @@ class X25519RecipientStanzaReader implements RecipientStanzaReader {
         final SharedSecretKey sharedSecretKey = sharedSecretKeyProducer.getSharedSecretKey(ephemeralPublicKey);
         final CipherKey wrapKey = sharedWrapKeyProducer.getWrapKey(sharedSecretKey, ephemeralPublicKey);
 
-        final byte[] encryptedFileKey = recipientStanza.getBody();
-        final int encryptedFileKeyLength = encryptedFileKey.length;
+        final byte[] encryptedFileKeyEncoded = recipientStanza.getBody();
+        final int encryptedFileKeyLength = encryptedFileKeyEncoded.length;
         if (encryptedFileKeyLength == ENCRYPTED_FILE_KEY_LENGTH) {
-            return getFileKey(encryptedFileKey, wrapKey);
+            final EncryptedFileKey encryptedFileKey = new EncryptedFileKey(encryptedFileKeyEncoded);
+            return fileKeyDecryptor.getFileKey(encryptedFileKey, wrapKey);
         } else {
             final String message = String.format("Recipient Stanza Body length [%d] not required length [%d]", encryptedFileKeyLength, ENCRYPTED_FILE_KEY_LENGTH);
             throw new UnsupportedRecipientStanzaException(message);
         }
-    }
-
-    private FileKey getFileKey(final byte[] encryptedFileKey, final CipherKey wrapKey) throws GeneralSecurityException {
-        final ByteBuffer encryptedFileKeyBuffer = ByteBuffer.wrap(encryptedFileKey);
-        final FileKeyIvParameterSpec parameterSpec = new FileKeyIvParameterSpec();
-        final ByteBufferDecryptor byteBufferDecryptor = ByteBufferCipherOperationFactory.newByteBufferDecryptor(wrapKey, parameterSpec);
-
-        final ByteBuffer fileKeyBuffer = ByteBuffer.allocate(FILE_KEY_LENGTH);
-        byteBufferDecryptor.decrypt(encryptedFileKeyBuffer, fileKeyBuffer);
-        final byte[] fileKey = fileKeyBuffer.array();
-        return new FileKey(fileKey);
     }
 
     private byte[] getEphemeralShare(final Iterator<String> recipientStanzaArguments) throws UnsupportedRecipientStanzaException {

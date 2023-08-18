@@ -30,14 +30,16 @@ final class StandardByteBufferDecryptor implements ByteBufferDecryptor {
     /**
      * Standard Byte Buffer Decryptor constructor with required arguments
      *
+     * @param cipherFactory Cipher Factory for constructing initialized Cipher instances
      * @param cipherKey Cipher Key required
      * @param parameterSpec Initialization Vector parameter specification required
      * @throws GeneralSecurityException Thrown on Cipher initialization failures
      */
-    StandardByteBufferDecryptor(final CipherKey cipherKey, final IvParameterSpec parameterSpec) throws GeneralSecurityException {
+    StandardByteBufferDecryptor(final CipherFactory cipherFactory, final CipherKey cipherKey, final IvParameterSpec parameterSpec) throws GeneralSecurityException {
+        Objects.requireNonNull(cipherFactory, "Cipher Factory required");
         Objects.requireNonNull(cipherKey, "Cipher Key required");
         Objects.requireNonNull(parameterSpec, "Parameter Specification required");
-        this.cipher = CipherFactory.getInitializedCipher(CipherFactory.CipherMode.DECRYPT, cipherKey, parameterSpec);
+        this.cipher = cipherFactory.getInitializedCipher(CipherFactory.CipherMode.DECRYPT, cipherKey, parameterSpec);
     }
 
     /**

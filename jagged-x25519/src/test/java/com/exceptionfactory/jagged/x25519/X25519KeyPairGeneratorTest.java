@@ -20,13 +20,17 @@ import org.junit.jupiter.api.Test;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.PublicKey;
+import java.security.Security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class X25519KeyPairGeneratorTest {
+    private static final String ALGORITHM_FILTER = String.format("KeyPairGenerator.%s", RecipientIndicator.KEY_ALGORITHM.getIndicator());
+
     private static final int PUBLIC_KEY_LENGTH = 62;
 
     private static final int PRIVATE_KEY_LENGTH = 74;
@@ -37,6 +41,20 @@ class X25519KeyPairGeneratorTest {
 
         final KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
+        assertKeyPairExpected(keyPair);
+    }
+
+    @Test
+    void testGenerateKeyPairWithProvider() throws NoSuchAlgorithmException {
+        final Provider provider = getProvider();
+        final X25519KeyPairGenerator keyPairGenerator = new X25519KeyPairGenerator(provider);
+
+        final KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+        assertKeyPairExpected(keyPair);
+    }
+
+    private void assertKeyPairExpected(final KeyPair keyPair) {
         assertNotNull(keyPair);
 
         final PublicKey publicKey = keyPair.getPublic();
@@ -52,5 +70,10 @@ class X25519KeyPairGeneratorTest {
         assertEquals(PRIVATE_KEY_LENGTH, privateKey.getEncoded().length);
         final String privateKeyEncoded = privateKey.toString();
         assertTrue(privateKeyEncoded.startsWith(IdentityIndicator.PRIVATE_KEY_HUMAN_READABLE_PART.getIndicator()));
+    }
+
+    private Provider getProvider() {
+        final Provider[] providers = Security.getProviders(ALGORITHM_FILTER);
+        return providers[0];
     }
 }

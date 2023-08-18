@@ -17,7 +17,7 @@ package com.exceptionfactory.jagged.framework.stream;
 
 import com.exceptionfactory.jagged.PayloadException;
 import com.exceptionfactory.jagged.RecipientStanzaWriter;
-import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherOperationFactory;
+import com.exceptionfactory.jagged.framework.crypto.ByteBufferCipherFactory;
 import com.exceptionfactory.jagged.framework.crypto.ByteBufferEncryptor;
 import com.exceptionfactory.jagged.framework.crypto.CipherKey;
 import com.exceptionfactory.jagged.framework.crypto.PayloadIvParameterSpec;
@@ -44,23 +44,28 @@ class EncryptingChannel implements WritableByteChannel {
 
     private final CipherKey payloadKey;
 
+    private final ByteBufferCipherFactory byteBufferCipherFactory;
+
     /**
      * Encrypting Channel constructor writes the File Header using Recipient Stanzas Writers then derives the Payload Key
      *
      * @param outputChannel Output Channel for encrypted header and payload
      * @param recipientStanzaWriters Recipient Stanza Writers for encrypting the File Key
      * @param payloadKeyWriter Payload Key Writer for serializing File Header and deriving Payload Key
+     * @param byteBufferCipherFactory Byte Buffer Cipher Factory for performing encryption operations
      * @throws GeneralSecurityException Thrown on Payload Key derivation or Recipient Stanza processing failures
      * @throws IOException Thrown on failures serializing to Output Channel
      */
     EncryptingChannel(
             final WritableByteChannel outputChannel,
             final Iterable<RecipientStanzaWriter> recipientStanzaWriters,
-            final PayloadKeyWriter payloadKeyWriter
-    ) throws GeneralSecurityException, IOException {
+            final PayloadKeyWriter payloadKeyWriter,
+            final ByteBufferCipherFactory byteBufferCipherFactory
+            ) throws GeneralSecurityException, IOException {
         this.outputChannel = Objects.requireNonNull(outputChannel, "Output Channel required");
         Objects.requireNonNull(recipientStanzaWriters, "Recipient Stanza Writers required");
         Objects.requireNonNull(payloadKeyWriter, "Payload Key Writer required");
+        this.byteBufferCipherFactory = Objects.requireNonNull(byteBufferCipherFactory, "Byte Buffer Cipher Factory required");
 
         this.payloadKey = payloadKeyWriter.writeFileHeader(outputBuffer, recipientStanzaWriters);
         flushOutputBuffer();
@@ -129,7 +134,7 @@ class EncryptingChannel implements WritableByteChannel {
         inputBuffer.flip();
 
         try {
-            final ByteBufferEncryptor byteBufferEncryptor = ByteBufferCipherOperationFactory.newByteBufferEncryptor(payloadKey, payloadIvParameterSpec);
+            final ByteBufferEncryptor byteBufferEncryptor = byteBufferCipherFactory.newByteBufferEncryptor(payloadKey, payloadIvParameterSpec);
             byteBufferEncryptor.encrypt(inputBuffer, outputBuffer);
         } catch (final GeneralSecurityException e) {
             final String message = String.format("Write chunk failed: counter %s", Arrays.toString(payloadIvParameterSpec.getIV()));

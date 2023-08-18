@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.framework.stream;
+package com.exceptionfactory.jagged.framework.armor;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
-import java.nio.channels.ClosedChannelException;
 import java.nio.channels.WritableByteChannel;
 import java.security.GeneralSecurityException;
 import java.security.Provider;
@@ -29,25 +27,19 @@ import java.security.Security;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class StandardEncryptingChannelFactoryTest {
+class ArmoredEncryptingChannelFactoryTest {
     private static final String ALGORITHM_FILTER = "Cipher.ChaCha20-Poly1305";
-
-    private StandardEncryptingChannelFactory factory;
-
-    @BeforeEach
-    void setFactory() {
-        factory = new StandardEncryptingChannelFactory();
-    }
 
     @Test
     void testNewEncryptingChannel() throws GeneralSecurityException, IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
 
-        final WritableByteChannel encryptingChannel = factory.newEncryptingChannel(outputChannel, Collections.emptyList());
-        assertNotNull(encryptingChannel);
+        final ArmoredEncryptingChannelFactory factory = new ArmoredEncryptingChannelFactory();
+        try (WritableByteChannel encryptingChannel = factory.newEncryptingChannel(outputChannel, Collections.emptyList())) {
+            assertNotNull(encryptingChannel);
+        }
     }
 
     @Test
@@ -56,18 +48,10 @@ class StandardEncryptingChannelFactoryTest {
         final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
 
         final Provider provider = getProvider();
-        final StandardEncryptingChannelFactory channelFactory = new StandardEncryptingChannelFactory(provider);
-        final WritableByteChannel encryptingChannel = channelFactory.newEncryptingChannel(outputChannel, Collections.emptyList());
-        assertNotNull(encryptingChannel);
-    }
-
-    @Test
-    void testNewEncryptingChannelClosed() throws IOException {
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        final WritableByteChannel outputChannel = Channels.newChannel(outputStream);
-        outputChannel.close();
-
-        assertThrows(ClosedChannelException.class, () -> factory.newEncryptingChannel(outputChannel, Collections.emptyList()));
+        final ArmoredEncryptingChannelFactory factory = new ArmoredEncryptingChannelFactory(provider);
+        try (WritableByteChannel encryptingChannel = factory.newEncryptingChannel(outputChannel, Collections.emptyList())) {
+            assertNotNull(encryptingChannel);
+        }
     }
 
     private Provider getProvider() {
