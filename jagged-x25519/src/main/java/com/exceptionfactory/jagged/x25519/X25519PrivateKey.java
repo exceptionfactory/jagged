@@ -17,12 +17,18 @@ package com.exceptionfactory.jagged.x25519;
 
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * X25519 Private Key containing Bech32 encoded key bytes
  */
 class X25519PrivateKey implements PrivateKey {
+    private static final byte ZERO = 0;
+
+    private final AtomicBoolean destroyed = new AtomicBoolean();
+
     private final byte[] encoded;
 
     /**
@@ -72,5 +78,24 @@ class X25519PrivateKey implements PrivateKey {
     @Override
     public String toString() {
         return new String(encoded, StandardCharsets.US_ASCII);
+    }
+
+    /**
+     * Destroy Key so that it cannot be used for subsequent operations
+     */
+    @Override
+    public void destroy() {
+        Arrays.fill(encoded, ZERO);
+        destroyed.set(true);
+    }
+
+    /**
+     * Return destroyed status
+     *
+     * @return Key destroyed status
+     */
+    @Override
+    public boolean isDestroyed() {
+        return destroyed.get();
     }
 }
