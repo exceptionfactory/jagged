@@ -46,7 +46,8 @@ class CipherKeyTest {
 
     @Test
     void testDestroy() {
-        final CipherKey cipherKey = new CipherKey(SYMMETRIC_KEY);
+        final byte[] cloned = SYMMETRIC_KEY.clone();
+        final CipherKey cipherKey = new CipherKey(cloned);
 
         assertFalse(cipherKey.isDestroyed());
         cipherKey.destroy();
