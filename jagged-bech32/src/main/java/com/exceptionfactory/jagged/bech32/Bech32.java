@@ -17,7 +17,7 @@ package com.exceptionfactory.jagged.bech32;
 
 /**
  * Bech32 encoding and decoding implementation of Bitcoin Improvement Proposal 0173 for Segregated Witness addresses.
- * The format consists a Base32 alphabet with checksums for error detection.
+ * The format consists of a Base32 alphabet with checksums for error detection.
  * Bech32 addresses consist of human-readable part, a separator, and a data part that contains a checksum.
  */
 public final class Bech32 {

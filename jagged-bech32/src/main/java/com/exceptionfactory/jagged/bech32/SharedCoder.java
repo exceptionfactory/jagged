@@ -92,7 +92,7 @@ class SharedCoder {
     /**
      * Get Human-Readable Part expanded to bytes as described in BIP 0173
      *
-     * @param humanReadablePart Human-Readble Part sequence of characters
+     * @param humanReadablePart Human-Readable Part sequence of characters
      * @return Expanded bytes derived from high bits and low bits with a separator
      */
     protected byte[] getHumanReadablePartExpanded(final CharSequence humanReadablePart) {
