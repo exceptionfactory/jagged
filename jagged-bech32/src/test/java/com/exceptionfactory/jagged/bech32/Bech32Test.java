@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -164,7 +165,7 @@ class Bech32Test {
 
         final CharSequence encoded = encoder.encode(humanReadablePart, EMPTY_DATA);
 
-        assertEquals(expected, encoded);
+        assertEncodedExpected(expected, encoded);
     }
 
     @Test
@@ -175,11 +176,11 @@ class Bech32Test {
 
         final CharSequence encoded = encoder.encode(humanReadablePart, data);
 
-        assertEquals(addressEncoded, encoded);
+        assertEncodedExpected(addressEncoded, encoded);
 
         final Bech32Address decoded = decoder.decode(encoded);
 
-        assertEquals(humanReadablePart, decoded.getHumanReadablePart());
+        assertEncodedExpected(humanReadablePart, decoded.getHumanReadablePart());
         assertArrayEquals(data, decoded.getData());
     }
 
@@ -190,7 +191,7 @@ class Bech32Test {
 
         final CharSequence encoded = encoder.encode(humanReadablePart, EMPTY_DATA);
 
-        assertEquals(expected, encoded);
+        assertEncodedExpected(expected, encoded);
     }
 
     @Test
@@ -200,7 +201,7 @@ class Bech32Test {
 
         final CharSequence encoded = encoder.encode(humanReadablePart, EMPTY_DATA);
 
-        assertEquals(expected, encoded);
+        assertEncodedExpected(expected, encoded);
     }
 
     @Test
@@ -229,12 +230,17 @@ class Bech32Test {
         assertHumanReadablePartEquals(encoded, decoded);
 
         final CharSequence encodedSequence = encoder.encode(decoded.getHumanReadablePart(), decoded.getData());
-        assertEquals(encoded, encodedSequence);
+        assertEncodedExpected(encoded, encodedSequence);
     }
 
     void assertHumanReadablePartEquals(final String encoded, final Bech32Address decoded) {
         final int separatorIndex = encoded.lastIndexOf(SEPARATOR);
         final String humanReadablePart = encoded.substring(0, separatorIndex);
         assertEquals(humanReadablePart, decoded.getHumanReadablePart());
+    }
+
+    void assertEncodedExpected(final String expected, final CharSequence encoded) {
+        assertNotEquals(expected, encoded);
+        assertEquals(expected, encoded.toString());
     }
 }

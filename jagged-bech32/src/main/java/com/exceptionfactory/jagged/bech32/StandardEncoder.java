@@ -15,7 +15,9 @@
  */
 package com.exceptionfactory.jagged.bech32;
 
+import java.io.CharArrayWriter;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.util.Objects;
 
 /**
@@ -36,27 +38,37 @@ class StandardEncoder extends SharedCoder implements Bech32.Encoder {
         Objects.requireNonNull(data, "Data required");
 
         final boolean upperCaseRequired = isUpperCaseRequired(humanReadablePart);
-        final StringBuilder builder = new StringBuilder();
-        builder.append(validatedHumanReadablePart);
-        builder.append(PART_SEPARATOR);
+
+        final CharArrayWriter writer = new CharArrayWriter();
+        writer.append(validatedHumanReadablePart);
+        writer.append(PART_SEPARATOR);
         final byte[] dataConverted = getDataConverted(data, ConversionMode.ENCODING);
-        appendEncoded(builder, dataConverted);
+        appendEncoded(writer, dataConverted);
 
         final byte[] checksum = getChecksum(validatedHumanReadablePart, dataConverted);
-        appendEncoded(builder, checksum);
+        appendEncoded(writer, checksum);
 
-        return getEncoded(builder, upperCaseRequired);
+        return getEncoded(writer, upperCaseRequired);
     }
 
-    private String getEncoded(final StringBuilder builder, final boolean upperCaseRequired) {
-        final String lowerCaseEncoded = builder.toString();
-        final String encoded;
+    private CharSequence getEncoded(final CharArrayWriter writer, final boolean upperCaseRequired) {
+        final CharBuffer lowerCaseEncoded = CharBuffer.wrap(writer.toCharArray());
+        final CharSequence encoded;
         if (upperCaseRequired) {
-            encoded = lowerCaseEncoded.toUpperCase();
+            encoded = getUpperCase(lowerCaseEncoded);
         } else {
             encoded = lowerCaseEncoded;
         }
         return encoded;
+    }
+
+    private CharSequence getUpperCase(final CharBuffer buffer) {
+        final char[] characters = buffer.array();
+        for (int i = 0; i < characters.length; i++) {
+            final char character = characters[i];
+            characters[i] = Character.toUpperCase(character);
+        }
+        return buffer;
     }
 
     private boolean isUpperCaseRequired(final CharSequence humanReadablePart) {
@@ -73,10 +85,10 @@ class StandardEncoder extends SharedCoder implements Bech32.Encoder {
         return upperCaseRequired;
     }
 
-    private void appendEncoded(final StringBuilder builder, final byte[] values) {
+    private void appendEncoded(final CharArrayWriter writer, final byte[] values) {
         for (final byte value : values) {
             final char valueEncoded = BEC32_CHARACTER_SET.charAt(value);
-            builder.append(valueEncoded);
+            writer.append(valueEncoded);
         }
     }
 
