@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CommunityCryptographyTest {
 
-    private static final String TESTDATA_PATH = "/CCTV/CCTV-main/age/testdata/";
+    private static final String TESTDATA_PATH = "/CCTV/CCTV-9b749e98ba92ffbf0c2504669680f22acdf19f4f/age/testdata/";
 
     private static final String PROPERTY_VALUE_SEPARATOR = ": ";
 

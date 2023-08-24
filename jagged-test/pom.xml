@@ -53,7 +53,7 @@
                             <goal>wget</goal>
                         </goals>
                         <configuration>
-                            <url>https://codeload.github.com/C2SP/CCTV/zip/refs/heads/main</url>
+                            <url>https://codeload.github.com/C2SP/CCTV/zip/9b749e98ba92ffbf0c2504669680f22acdf19f4f</url>
                             <outputFileName>CCTV.zip</outputFileName>
                             <outputDirectory>${project.build.outputDirectory}/CCTV</outputDirectory>
                             <unpack>true</unpack>
