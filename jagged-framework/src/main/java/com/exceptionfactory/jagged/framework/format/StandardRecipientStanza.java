@@ -17,7 +17,6 @@ package com.exceptionfactory.jagged.framework.format;
 
 import com.exceptionfactory.jagged.RecipientStanza;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +49,6 @@ class StandardRecipientStanza implements RecipientStanza {
 
     @Override
     public byte[] getBody() {
-        return Arrays.copyOf(body, body.length);
+        return body.clone();
     }
 }

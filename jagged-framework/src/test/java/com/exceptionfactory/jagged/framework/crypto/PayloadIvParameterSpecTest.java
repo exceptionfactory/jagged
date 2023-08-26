@@ -17,8 +17,6 @@ package com.exceptionfactory.jagged.framework.crypto;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -57,7 +55,7 @@ class PayloadIvParameterSpecTest {
         parameterSpec.setLastChunkFlag();
         final byte[] initializationVector = parameterSpec.getIV();
 
-        final byte[] expectedInitializationVector = Arrays.copyOf(firstInitializationVector, firstInitializationVector.length);
+        final byte[] expectedInitializationVector = firstInitializationVector.clone();
         expectedInitializationVector[LAST_CHUNK_FLAG_INDEX] = LAST_CHUNK_FLAG;
 
         assertArrayEquals(expectedInitializationVector, initializationVector);
@@ -76,7 +74,7 @@ class PayloadIvParameterSpecTest {
         assertTrue(parameterSpec.isNotFirstChunk());
         final byte[] lastInitializationVector = parameterSpec.getIV();
 
-        final byte[] expectedInitializationVector = Arrays.copyOf(firstInitializationVector, firstInitializationVector.length);
+        final byte[] expectedInitializationVector = firstInitializationVector.clone();
         expectedInitializationVector[INCREMENT_COUNTER_INDEX] = INCREMENT_COUNTER;
         assertArrayEquals(expectedInitializationVector, lastInitializationVector);
     }

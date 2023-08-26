@@ -17,7 +17,6 @@ package com.exceptionfactory.jagged.framework.format;
 
 import com.exceptionfactory.jagged.RecipientStanza;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -40,6 +39,6 @@ class StandardFileHeader implements FileHeader {
 
     @Override
     public byte[] getMessageAuthenticationCode() {
-        return Arrays.copyOf(messageAuthenticationCode, messageAuthenticationCode.length);
+        return messageAuthenticationCode.clone();
     }
 }

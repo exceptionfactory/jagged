@@ -15,7 +15,6 @@
  */
 package com.exceptionfactory.jagged.bech32;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -54,6 +53,6 @@ class StandardBech32Address implements Bech32Address {
      */
     @Override
     public byte[] getData() {
-        return Arrays.copyOf(data, data.length);
+        return data.clone();
     }
 }
