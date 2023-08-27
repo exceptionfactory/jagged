@@ -32,8 +32,8 @@ public interface PayloadKeyReader {
      * @param buffer File Header buffer
      * @param recipientStanzaReaders Recipient Stanza Readers
      * @return Payload Key
-     * @throws IOException Thrown on failures to read File Header
      * @throws GeneralSecurityException Thrown on failures to derive Payload Key
+     * @throws IOException Thrown on failures to read File Header
      */
-    CipherKey getPayloadKey(ByteBuffer buffer, Iterable<RecipientStanzaReader> recipientStanzaReaders) throws IOException, GeneralSecurityException;
+    CipherKey getPayloadKey(ByteBuffer buffer, Iterable<RecipientStanzaReader> recipientStanzaReaders) throws GeneralSecurityException, IOException;
 }

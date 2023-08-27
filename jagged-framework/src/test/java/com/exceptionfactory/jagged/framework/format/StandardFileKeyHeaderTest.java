@@ -111,7 +111,7 @@ class StandardFileKeyHeaderTest {
         assertThrows(SignatureException.class, () -> reader.readFileKey(buffer, recipientStanzaReader));
     }
 
-    private ByteBuffer getHeaderBuffer() throws IOException, GeneralSecurityException {
+    private ByteBuffer getHeaderBuffer() throws GeneralSecurityException, IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeVersion(outputStream);
         writeRecipientTypeArgument(outputStream);
@@ -139,7 +139,7 @@ class StandardFileKeyHeaderTest {
         outputStream.write(SectionSeparator.LINE_FEED.getCode());
     }
 
-    private void writeMessageAuthenticationCode(final ByteArrayOutputStream outputStream) throws IOException, GeneralSecurityException {
+    private void writeMessageAuthenticationCode(final ByteArrayOutputStream outputStream) throws GeneralSecurityException, IOException {
         outputStream.write(SectionIndicator.END.getIndicator());
 
         final byte[] header = outputStream.toByteArray();

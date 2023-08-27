@@ -53,7 +53,7 @@ public class StandardPayloadKeyReader implements PayloadKeyReader {
      *
      * @param fileKeyReader File Key Reader
      */
-    protected StandardPayloadKeyReader(final FileKeyReader fileKeyReader) {
+    StandardPayloadKeyReader(final FileKeyReader fileKeyReader) {
         this.fileKeyReader = fileKeyReader;
     }
 
@@ -63,11 +63,11 @@ public class StandardPayloadKeyReader implements PayloadKeyReader {
      * @param buffer File Header buffer
      * @param recipientStanzaReaders Recipient Stanza Readers
      * @return Payload Key
-     * @throws IOException Thrown on failures to read File Header
      * @throws GeneralSecurityException Thrown on failures to derive Payload Key
+     * @throws IOException Thrown on failures to read File Header
      */
     @Override
-    public CipherKey getPayloadKey(final ByteBuffer buffer, final Iterable<RecipientStanzaReader> recipientStanzaReaders) throws IOException, GeneralSecurityException {
+    public CipherKey getPayloadKey(final ByteBuffer buffer, final Iterable<RecipientStanzaReader> recipientStanzaReaders) throws GeneralSecurityException, IOException {
         Objects.requireNonNull(buffer, "Buffer required");
         Objects.requireNonNull(recipientStanzaReaders, "Recipient Stanza Readers required");
 
@@ -79,7 +79,7 @@ public class StandardPayloadKeyReader implements PayloadKeyReader {
         return payloadKey;
     }
 
-    private FileKey readFileKey(final ByteBuffer buffer, final Iterable<RecipientStanzaReader> recipientStanzaReaders) throws IOException, GeneralSecurityException {
+    private FileKey readFileKey(final ByteBuffer buffer, final Iterable<RecipientStanzaReader> recipientStanzaReaders) throws GeneralSecurityException, IOException {
         final List<GeneralSecurityException> exceptions = new ArrayList<>();
 
         FileKey fileKey = null;

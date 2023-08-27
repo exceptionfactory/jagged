@@ -101,7 +101,7 @@ class DecryptingChannelTest {
     }
 
     @Test
-    void testIsOpen() throws IOException, GeneralSecurityException {
+    void testIsOpen() throws GeneralSecurityException, IOException {
         final ReadableByteChannel inputChannel = getInputChannel();
 
         final DecryptingChannel decryptingChannel = getDecryptingChannel(inputChannel);
@@ -110,7 +110,7 @@ class DecryptingChannelTest {
     }
 
     @Test
-    void testClose() throws IOException, GeneralSecurityException {
+    void testClose() throws GeneralSecurityException, IOException {
         final ReadableByteChannel inputChannel = getInputChannel();
 
         when(payloadKeyReader.getPayloadKey(any(), any())).thenReturn(CIPHER_KEY);

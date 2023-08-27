@@ -58,15 +58,15 @@ class DecryptingChannel implements ReadableByteChannel {
      * @param recipientStanzaReaders Recipient Stanza Readers required to read File Key
      * @param payloadKeyReader Payload Key Reader
      * @param byteBufferCipherFactory Byte Buffer Cipher Factory for performing encryption operations
-     * @throws IOException Thrown on failures to read initial encrypted payload after processing File Header
      * @throws GeneralSecurityException Thrown on failures to read File Key or construct Payload Key with supplied Recipient Stanza Reader
+     * @throws IOException Thrown on failures to read initial encrypted payload after processing File Header
      */
     DecryptingChannel(
             final ReadableByteChannel inputChannel,
             final Iterable<RecipientStanzaReader> recipientStanzaReaders,
             final PayloadKeyReader payloadKeyReader,
             final ByteBufferCipherFactory byteBufferCipherFactory
-    ) throws IOException, GeneralSecurityException {
+    ) throws GeneralSecurityException, IOException {
         this.inputChannel = Objects.requireNonNull(inputChannel, "Input Channel required");
         this.byteBufferCipherFactory = Objects.requireNonNull(byteBufferCipherFactory, "Byte Buffer Cipher Factory required");
         readInputChannel();

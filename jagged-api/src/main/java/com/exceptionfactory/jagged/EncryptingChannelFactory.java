@@ -29,8 +29,11 @@ public interface EncryptingChannelFactory {
      * @param outputChannel Output Channel destination for encrypted bytes
      * @param recipientStanzaWriters One or more Recipient Stanza Writers for intended recipients
      * @return Writable Byte Channel for encrypted bytes
-     * @throws IOException Thrown on failures to write Channel or Recipient Stanzas
      * @throws GeneralSecurityException Thrown on failures writing recipients or performing cipher operations
+     * @throws IOException Thrown on failures to write Channel or Recipient Stanzas
      */
-    WritableByteChannel newEncryptingChannel(WritableByteChannel outputChannel, Iterable<RecipientStanzaWriter> recipientStanzaWriters) throws IOException, GeneralSecurityException;
+    WritableByteChannel newEncryptingChannel(
+            WritableByteChannel outputChannel,
+            Iterable<RecipientStanzaWriter> recipientStanzaWriters
+    ) throws GeneralSecurityException, IOException;
 }

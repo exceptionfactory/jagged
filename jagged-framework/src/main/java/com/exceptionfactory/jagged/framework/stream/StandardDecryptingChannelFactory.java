@@ -58,14 +58,14 @@ public class StandardDecryptingChannelFactory implements DecryptingChannelFactor
      * @param inputChannel Input Channel source containing encrypted bytes
      * @param recipientStanzaReaders Recipient Stanza Readers capable of providing the Identity to read the File Key for decryption
      * @return Readable Byte Channel
-     * @throws IOException Thrown on failures to read input channel
      * @throws GeneralSecurityException Thrown on recipient processing or cipher operation failures
+     * @throws IOException Thrown on failures to read input channel
      */
     @Override
     public ReadableByteChannel newDecryptingChannel(
             final ReadableByteChannel inputChannel,
             final Iterable<RecipientStanzaReader> recipientStanzaReaders
-    ) throws IOException, GeneralSecurityException {
+    ) throws GeneralSecurityException, IOException {
         Objects.requireNonNull(inputChannel, "Input Channel required");
         Objects.requireNonNull(recipientStanzaReaders, "Recipient Stanza Readers required");
         if (inputChannel.isOpen()) {

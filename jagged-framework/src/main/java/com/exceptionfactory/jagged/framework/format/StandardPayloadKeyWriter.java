@@ -46,11 +46,11 @@ public class StandardPayloadKeyWriter implements PayloadKeyWriter {
      * @param buffer Byte Buffer with sufficient capacity for serialized File Header should support at least 128 bytes
      * @param recipientStanzaWriters Recipient Stanza Writers
      * @return Derived Payload Cipher Key for encryption operations
-     * @throws IOException Thrown on serialization failures
      * @throws GeneralSecurityException Thrown on cipher operation failures
+     * @throws IOException Thrown on serialization failures
      */
     @Override
-    public CipherKey writeFileHeader(final ByteBuffer buffer, final Iterable<RecipientStanzaWriter> recipientStanzaWriters) throws IOException, GeneralSecurityException {
+    public CipherKey writeFileHeader(final ByteBuffer buffer, final Iterable<RecipientStanzaWriter> recipientStanzaWriters) throws GeneralSecurityException, IOException {
         Objects.requireNonNull(buffer, "Buffer required");
         Objects.requireNonNull(recipientStanzaWriters, "Recipient Stanza Writers required");
 

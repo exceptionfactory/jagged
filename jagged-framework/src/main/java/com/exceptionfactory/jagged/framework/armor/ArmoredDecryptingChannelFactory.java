@@ -49,14 +49,14 @@ public class ArmoredDecryptingChannelFactory extends StandardDecryptingChannelFa
      * @param inputChannel Input Channel source containing encrypted bytes with ASCII Armored Base64 wrapping
      * @param recipientStanzaReaders Recipient Stanza Readers capable of providing the Identity to read the File Key for decryption
      * @return Readable Byte Channel
-     * @throws IOException Thrown on failures to read input channel
      * @throws GeneralSecurityException Thrown on recipient processing or cipher operation failures
+     * @throws IOException Thrown on failures to read input channel
      */
     @Override
     public ReadableByteChannel newDecryptingChannel(
             final ReadableByteChannel inputChannel,
             final Iterable<RecipientStanzaReader> recipientStanzaReaders
-    ) throws IOException, GeneralSecurityException {
+    ) throws GeneralSecurityException, IOException {
         return super.newDecryptingChannel(new ArmoredReadableByteChannel(inputChannel), recipientStanzaReaders);
     }
 }

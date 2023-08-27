@@ -32,8 +32,8 @@ interface FileKeyReader {
      * @param buffer File Header buffer
      * @param recipientStanzaReader Recipient Stanza Reader
      * @return File Key
-     * @throws IOException Thrown on failures to read File Header
      * @throws GeneralSecurityException Thrown on failures to read File Key or verify File Header
+     * @throws IOException Thrown on failures to read File Header
      */
-    FileKey readFileKey(ByteBuffer buffer, RecipientStanzaReader recipientStanzaReader) throws IOException, GeneralSecurityException;
+    FileKey readFileKey(ByteBuffer buffer, RecipientStanzaReader recipientStanzaReader) throws GeneralSecurityException, IOException;
 }

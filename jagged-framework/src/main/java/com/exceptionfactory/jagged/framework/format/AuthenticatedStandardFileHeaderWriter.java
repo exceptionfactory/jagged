@@ -49,9 +49,10 @@ class AuthenticatedStandardFileHeaderWriter extends StandardFileHeaderWriter {
      * @param recipientStanzas Recipient Stanzas
      * @return Serialized File Header with Message Authentication Code after Footer
      * @throws IOException Thrown on failures writing serialized Recipient Stanzas
+     * @throws GeneralSecurityException Thrown on failures performing cryptographic operations
      */
     @Override
-    public ByteBuffer writeRecipientStanzas(final Iterable<RecipientStanza> recipientStanzas) throws IOException, GeneralSecurityException {
+    public ByteBuffer writeRecipientStanzas(final Iterable<RecipientStanza> recipientStanzas) throws GeneralSecurityException, IOException {
         Objects.requireNonNull(recipientStanzas, "Recipient Stanzas required");
         final ByteBuffer serialized = super.writeRecipientStanzas(recipientStanzas);
 

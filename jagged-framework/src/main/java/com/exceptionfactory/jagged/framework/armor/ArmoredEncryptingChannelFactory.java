@@ -49,14 +49,14 @@ public class ArmoredEncryptingChannelFactory extends StandardEncryptingChannelFa
      * @param outputChannel Output Channel destination for encrypted bytes
      * @param recipientStanzaWriters One or more Recipient Stanza Writers for intended recipients
      * @return Writable Byte Channel with ASCII Armored Base64 wrapping
+     * @throws GeneralSecurityException Thrown on recipient writing or cipher operation failures
      * @throws IOException Thrown on failures to write Channel or Recipient Stanzas
-      @throws GeneralSecurityException Thrown on recipient writing or cipher operation failures
      */
     @Override
     public WritableByteChannel newEncryptingChannel(
             final WritableByteChannel outputChannel,
             final Iterable<RecipientStanzaWriter> recipientStanzaWriters
-    ) throws IOException, GeneralSecurityException {
+    ) throws GeneralSecurityException, IOException {
         return super.newEncryptingChannel(new ArmoredWritableByteChannel(outputChannel), recipientStanzaWriters);
     }
 }

@@ -32,8 +32,8 @@ public interface PayloadKeyWriter {
      * @param buffer Byte Buffer with sufficient capacity for serialized File Header should support at least 128 bytes
      * @param recipientStanzaWriters Recipient Stanza Writers
      * @return Derived Payload Cipher Key for encryption operations
-     * @throws IOException Thrown on serialization failures
      * @throws GeneralSecurityException Thrown on cipher operation failures
+     * @throws IOException Thrown on serialization failures
      */
-    CipherKey writeFileHeader(ByteBuffer buffer, Iterable<RecipientStanzaWriter> recipientStanzaWriters) throws IOException, GeneralSecurityException;
+    CipherKey writeFileHeader(ByteBuffer buffer, Iterable<RecipientStanzaWriter> recipientStanzaWriters) throws GeneralSecurityException, IOException;
 }

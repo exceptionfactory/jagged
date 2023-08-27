@@ -39,11 +39,11 @@ class StandardFileHeaderWriter implements FileHeaderWriter {
      *
      * @param recipientStanzas Recipient Stanzas
      * @return Serialized bytes
-     * @throws IOException Thrown on failures writing serialized Recipient Stanzas
      * @throws GeneralSecurityException Thrown on failures for security operations
+     * @throws IOException Thrown on failures writing serialized Recipient Stanzas
      */
     @Override
-    public ByteBuffer writeRecipientStanzas(final Iterable<RecipientStanza> recipientStanzas) throws IOException, GeneralSecurityException {
+    public ByteBuffer writeRecipientStanzas(final Iterable<RecipientStanza> recipientStanzas) throws GeneralSecurityException, IOException {
         Objects.requireNonNull(recipientStanzas, "Recipient Stanzas required");
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(INITIAL_BUFFER_SIZE)) {

@@ -29,8 +29,11 @@ public interface DecryptingChannelFactory {
      * @param inputChannel Input Channel source containing encrypted bytes
      * @param recipientStanzaReaders Recipient Stanza Readers capable of providing the Identity to read the File Key for decryption
      * @return Readable Byte Channel containing decrypted bytes
-     * @throws IOException Thrown on failures to read Channel or Recipient Stanzas
      * @throws GeneralSecurityException Thrown on failures while processing recipients or performing cipher operations
+     * @throws IOException Thrown on failures to read Channel or Recipient Stanzas
      */
-    ReadableByteChannel newDecryptingChannel(ReadableByteChannel inputChannel, Iterable<RecipientStanzaReader> recipientStanzaReaders) throws IOException, GeneralSecurityException;
+    ReadableByteChannel newDecryptingChannel(
+            ReadableByteChannel inputChannel,
+            Iterable<RecipientStanzaReader> recipientStanzaReaders
+    ) throws GeneralSecurityException, IOException;
 }

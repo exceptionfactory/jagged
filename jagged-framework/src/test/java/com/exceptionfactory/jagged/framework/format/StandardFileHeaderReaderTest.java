@@ -139,7 +139,7 @@ class StandardFileHeaderReaderTest {
     }
 
     @Test
-    void testGetFileHeaderRecipientStanzaArgumentsNotFound() throws IOException, GeneralSecurityException {
+    void testGetFileHeaderRecipientStanzaArgumentsNotFound() throws GeneralSecurityException, IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeVersion(outputStream);
         outputStream.write(SectionIndicator.STANZA.getIndicator());
@@ -270,7 +270,7 @@ class StandardFileHeaderReaderTest {
     }
 
     @Test
-    void testGetFileHeader() throws IOException, GeneralSecurityException {
+    void testGetFileHeader() throws GeneralSecurityException, IOException {
         final ByteBuffer buffer = getFileHeaderBuffer();
 
         final FileHeader fileHeader = reader.getFileHeader(buffer);

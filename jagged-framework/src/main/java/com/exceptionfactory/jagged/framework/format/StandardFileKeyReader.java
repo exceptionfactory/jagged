@@ -38,17 +38,19 @@ import java.util.Objects;
 class StandardFileKeyReader implements FileKeyReader {
     private static final FileHeaderReader FILE_HEADER_READER = new StandardFileHeaderReader();
 
+    private static final HeaderKeyProducer HEADER_KEY_PRODUCER = HeaderKeyProducerFactory.newHeaderKeyProducer();
+
     /**
      * Read File Key from File Header buffer using provided Recipient Stanza Reader and verify Message Authentication Code using derived Header Key
      *
-     * @param buffer File Header buffer
+     * @param buffer File Header buffer with capacity limiting the number and size of possible Recipient Stanzas
      * @param recipientStanzaReader Recipient Stanza Reader
      * @return File Key
-     * @throws IOException Thrown on failures to read File Header
      * @throws GeneralSecurityException Thrown on failures to read File Key or verify File Header
+     * @throws IOException Thrown on failures to read File Header
      */
     @Override
-    public FileKey readFileKey(final ByteBuffer buffer, final RecipientStanzaReader recipientStanzaReader) throws IOException, GeneralSecurityException {
+    public FileKey readFileKey(final ByteBuffer buffer, final RecipientStanzaReader recipientStanzaReader) throws GeneralSecurityException, IOException {
         Objects.requireNonNull(buffer, "Buffer required");
         Objects.requireNonNull(recipientStanzaReader, "Recipient Stanza Reader required");
 
@@ -66,17 +68,12 @@ class StandardFileKeyReader implements FileKeyReader {
         }
     }
 
-    private MacKey getHeaderKey(final FileKey fileKey) throws GeneralSecurityException {
-        final HeaderKeyProducer headerKeyProducer = HeaderKeyProducerFactory.newHeaderKeyProducer();
-        return headerKeyProducer.getHeaderKey(fileKey);
-    }
-
     private boolean isHeaderVerified(final FileHeader fileHeader, final FileKey fileKey) throws GeneralSecurityException, IOException {
         final FileHeaderWriter fileHeaderWriter = new StandardFileHeaderWriter();
         final Iterable<RecipientStanza> recipientStanzas = fileHeader.getRecipientStanzas();
         final ByteBuffer fileHeaderBuffer = fileHeaderWriter.writeRecipientStanzas(recipientStanzas);
 
-        final MacKey headerKey = getHeaderKey(fileKey);
+        final MacKey headerKey = HEADER_KEY_PRODUCER.getHeaderKey(fileKey);
         final MessageAuthenticationCodeProducer producer = MessageAuthenticationCodeProducerFactory.newMessageAuthenticationCodeProducer(headerKey);
         final byte[] messageAuthenticationCode = producer.getMessageAuthenticationCode(fileHeaderBuffer);
 

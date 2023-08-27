@@ -30,7 +30,7 @@ import java.util.Objects;
  * Standard implementation of File Header Reader
  */
 final class StandardFileHeaderReader implements FileHeaderReader {
-    /** Maximum Line Length indicated wrapping lines as described in age-encryption Recipient Stanza section */
+    /** Maximum Line Length with wrapping lines as described in age-encryption Recipient Stanza section */
     private static final int MAXIMUM_LINE_LENGTH = 64;
 
     /** Encoded Message Authentication Code Length in bytes of Base64 characters */

@@ -30,8 +30,8 @@ interface FileHeaderWriter {
      *
      * @param recipientStanzas Recipient Stanzas
      * @return Byte Buffer containing serialized age header
-     * @throws IOException Thrown on failures to write Recipient Stanzas
      * @throws GeneralSecurityException Thrown on failures to run cryptographic operations while serializing header
+     * @throws IOException Thrown on failures to write Recipient Stanzas
      */
-    ByteBuffer writeRecipientStanzas(Iterable<RecipientStanza> recipientStanzas) throws IOException, GeneralSecurityException;
+    ByteBuffer writeRecipientStanzas(Iterable<RecipientStanza> recipientStanzas) throws GeneralSecurityException, IOException;
 }
