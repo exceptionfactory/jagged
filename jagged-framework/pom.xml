@@ -10,7 +10,10 @@
         <version>0.1.0</version>
     </parent>
 
+    <name>jagged-framework</name>
     <artifactId>jagged-framework</artifactId>
+    <description>Jagged framework components for age encryption</description>
+    <url>${project.parent.url}</url>
 
     <dependencies>
         <dependency>

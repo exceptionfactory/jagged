@@ -475,6 +475,7 @@
             <plugin>
                 <groupId>org.jreleaser</groupId>
                 <artifactId>jreleaser-maven-plugin</artifactId>
+                <inherited>false</inherited>
                 <configuration>
                     <jreleaser>
                         <signing>

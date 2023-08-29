@@ -10,7 +10,10 @@
         <version>0.1.0</version>
     </parent>
 
+    <name>jagged-x25519</name>
     <artifactId>jagged-x25519</artifactId>
+    <description>Jagged X25519 recipient support for age encryption</description>
+    <url>${project.parent.url}</url>
 
     <dependencies>
         <dependency>

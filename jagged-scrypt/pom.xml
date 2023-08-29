@@ -10,7 +10,10 @@
         <version>0.1.0</version>
     </parent>
 
+    <name>jagged-scrypt</name>
     <artifactId>jagged-scrypt</artifactId>
+    <description>Jagged scrypt recipient support for age encryption</description>
+    <url>${project.parent.url}</url>
 
     <dependencies>
         <dependency>
