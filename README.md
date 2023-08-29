@@ -4,6 +4,9 @@ Java implementation of age encryption
 
 [![build](https://github.com/exceptionfactory/jagged/actions/workflows/build.yml/badge.svg)](https://github.com/exceptionfactory/jagged/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/exceptionfactory/jagged/branch/main/graph/badge.svg?token=SM7PEI00HT)](https://codecov.io/gh/exceptionfactory/jagged)
+[![vulnerabilities](https://snyk.io/test/github/exceptionfactory/jagged/badge.svg)](https://snyk.io/test/github/exceptionfactory/jagged)
+[![javadoc](https://javadoc.io/badge2/com.exceptionfactory.jagged/jagged-api/javadoc.svg)](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api)
+[![maven-central](https://img.shields.io/maven-central/v/com.exceptionfactory.jagged/jagged-api)](https://central.sonatype.com/artifact/com.exceptionfactory.jagged/jagged-api)
 [![age-encryption.org specification](https://img.shields.io/badge/age--encryption.org-v1-blueviolet)](https://age-encryption.org/v1)
 
 # Build Requirements
