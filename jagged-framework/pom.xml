@@ -13,7 +13,7 @@
     <name>jagged-framework</name>
     <artifactId>jagged-framework</artifactId>
     <description>Jagged framework components for age encryption</description>
-    <url>${project.parent.url}</url>
+    <url>https://github.com/exceptionfactory/jagged</url>
 
     <dependencies>
         <dependency>

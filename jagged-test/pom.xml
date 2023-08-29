@@ -13,7 +13,7 @@
     <name>jagged-test</name>
     <artifactId>jagged-test</artifactId>
     <description>Jagged test vectors for age encryption</description>
-    <url>${project.parent.url}</url>
+    <url>https://github.com/exceptionfactory/jagged</url>
 
     <dependencies>
         <dependency>

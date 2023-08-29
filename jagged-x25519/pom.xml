@@ -13,7 +13,7 @@
     <name>jagged-x25519</name>
     <artifactId>jagged-x25519</artifactId>
     <description>Jagged X25519 recipient support for age encryption</description>
-    <url>${project.parent.url}</url>
+    <url>https://github.com/exceptionfactory/jagged</url>
 
     <dependencies>
         <dependency>

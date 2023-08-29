@@ -13,7 +13,7 @@
     <name>jagged-bech32</name>
     <artifactId>jagged-bech32</artifactId>
     <description>Jagged Bech32 encoding for age encryption</description>
-    <url>${project.parent.url}</url>
+    <url>https://github.com/exceptionfactory/jagged</url>
 
     <dependencies>
         <dependency>
