@@ -60,10 +60,14 @@
         <bouncycastle.version>1.76</bouncycastle.version>
         <checkstyle.version>10.12.1</checkstyle.version>
         <jacoco.version>0.8.10</jacoco.version>
+        <jreleaser.version>1.7.0</jreleaser.version>
         <junit.jupiter.version>5.10.0</junit.jupiter.version>
         <mockito.version>5.4.0</mockito.version>
         <pmd.version>6.55.0</pmd.version>
         <spotbugs.plugin.version>4.7.3.5</spotbugs.plugin.version>
+        <staging.deploy.directory>target/staging-deploy</staging.deploy.directory>
+        <altDeploymentRepository>local::file:./${staging.deploy.directory}</altDeploymentRepository>
+        <maven.central.url>https://s01.oss.sonatype.org</maven.central.url>
     </properties>
 
     <modules>
@@ -276,6 +280,11 @@
                     <artifactId>download-maven-plugin</artifactId>
                     <version>${download.maven.plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.jreleaser</groupId>
+                    <artifactId>jreleaser-maven-plugin</artifactId>
+                    <version>${jreleaser.version}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -462,6 +471,32 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jreleaser</groupId>
+                <artifactId>jreleaser-maven-plugin</artifactId>
+                <configuration>
+                    <jreleaser>
+                        <signing>
+                            <active>ALWAYS</active>
+                            <armored>true</armored>
+                        </signing>
+                        <deploy>
+                            <maven>
+                                <nexus2>
+                                    <maven-central>
+                                        <active>ALWAYS</active>
+                                        <url>${maven.central.url}/service/local</url>
+                                        <snapshotUrl>${maven.central.url}/content/repositories/snapshots/</snapshotUrl>
+                                        <closeRepository>true</closeRepository>
+                                        <releaseRepository>true</releaseRepository>
+                                        <stagingRepositories>${staging.deploy.directory}</stagingRepositories>
+                                    </maven-central>
+                                </nexus2>
+                            </maven>
+                        </deploy>
+                    </jreleaser>
+                </configuration>
             </plugin>
         </plugins>
     </build>
