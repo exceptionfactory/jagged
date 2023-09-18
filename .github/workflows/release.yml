@@ -20,8 +20,10 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
           cache: 'maven'
+      - name: Stage Artifacts
+        run: ./mvnw --batch-mode deploy
       - name: Release
-        run: ./mvnw --batch-mode deploy jreleaser:sign jreleaser:deploy
+        run: ./mvnw --batch-mode jreleaser:sign jreleaser:deploy
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
