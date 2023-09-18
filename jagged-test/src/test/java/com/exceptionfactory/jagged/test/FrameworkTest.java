@@ -141,6 +141,27 @@ class FrameworkTest {
         assertArrayEquals(contentBinary, decrypted);
     }
 
+    @Test
+    void testX25519BinarySingleRecipientMultiplePrivateKeys() throws GeneralSecurityException, IOException {
+        final KeyPair keyPair = generateKeyPair();
+        final KeyPair secondKeyPair = generateKeyPair();
+
+        final String publicKeyEncoded = keyPair.getPublic().toString();
+        final RecipientStanzaWriter recipientStanzaWriter = X25519RecipientStanzaWriterFactory.newRecipientStanzaWriter(publicKeyEncoded);
+        final byte[] encrypted = getEncrypted(CONTENT_BINARY, recipientStanzaWriter, new StandardEncryptingChannelFactory());
+
+        final String privateKeyEncoded = keyPair.getPrivate().toString();
+        final RecipientStanzaReader recipientStanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(privateKeyEncoded);
+
+        final String secondPrivateKeyEncoded = secondKeyPair.getPrivate().toString();
+        final RecipientStanzaReader secondRecipientStanzaReader = X25519RecipientStanzaReaderFactory.newRecipientStanzaReader(secondPrivateKeyEncoded);
+
+        final List<RecipientStanzaReader> recipientStanzaReaders = Arrays.asList(recipientStanzaReader, secondRecipientStanzaReader);
+        final byte[] decrypted = getDecrypted(CONTENT_BINARY.length, recipientStanzaReaders, encrypted, new StandardDecryptingChannelFactory());
+
+        assertArrayEquals(CONTENT_BINARY, decrypted);
+    }
+
     private KeyPair generateKeyPair() throws NoSuchAlgorithmException {
         final KeyPairGenerator keyPairGenerator = new X25519KeyPairGenerator();
         return keyPairGenerator.generateKeyPair();
@@ -173,7 +194,15 @@ class FrameworkTest {
             final DecryptingChannelFactory decryptingChannelFactory
     ) throws GeneralSecurityException, IOException {
         final List<RecipientStanzaReader> recipientStanzaReaders = Collections.singletonList(recipientStanzaReader);
+        return getDecrypted(decryptedLength, recipientStanzaReaders, encrypted, decryptingChannelFactory);
+    }
 
+    private byte[] getDecrypted(
+            final int decryptedLength,
+            final List<RecipientStanzaReader> recipientStanzaReaders,
+            final byte[] encrypted,
+            final DecryptingChannelFactory decryptingChannelFactory
+    ) throws GeneralSecurityException, IOException {
         final ByteArrayInputStream inputStream = new ByteArrayInputStream(encrypted);
         final ReadableByteChannel inputChannel = Channels.newChannel(inputStream);
         final ReadableByteChannel decryptingChannel = decryptingChannelFactory.newDecryptingChannel(inputChannel, recipientStanzaReaders);

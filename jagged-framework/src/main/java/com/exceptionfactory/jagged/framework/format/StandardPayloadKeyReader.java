@@ -87,6 +87,7 @@ public class StandardPayloadKeyReader implements PayloadKeyReader {
         for (final RecipientStanzaReader recipientStanzaReader : recipientStanzaReaders) {
             try {
                 fileKey = fileKeyReader.readFileKey(buffer, recipientStanzaReader);
+                break;
             } catch (final GeneralSecurityException e) {
                 exceptions.add(e);
                 buffer.reset();
