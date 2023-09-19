@@ -11,12 +11,12 @@ Java implementation of age encryption
 
 # Build Requirements
 
-- Java 17
+- Java 21
 - Maven 3.9
 
 # Runtime Requirements
 
-- Java 17 or 11
+- Java 21, 17, or 11
 - Java 8 with [Bouncy Castle Security Provider](https://bouncycastle.org/docs/docs1.8on/org/bouncycastle/jce/provider/BouncyCastleProvider.html)
 
 ## Java Cryptography Architecture
