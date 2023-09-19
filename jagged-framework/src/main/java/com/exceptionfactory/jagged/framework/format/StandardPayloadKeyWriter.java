@@ -41,6 +41,13 @@ import java.util.Objects;
  */
 public class StandardPayloadKeyWriter implements PayloadKeyWriter {
     /**
+     * Standard Payload Key Writer default constructor does not set any variables
+     */
+    public StandardPayloadKeyWriter() {
+
+    }
+
+    /**
      * Write File Header to buffer after generating a File Key and return derived Payload Key
      *
      * @param buffer Byte Buffer with sufficient capacity for serialized File Header should support at least 128 bytes

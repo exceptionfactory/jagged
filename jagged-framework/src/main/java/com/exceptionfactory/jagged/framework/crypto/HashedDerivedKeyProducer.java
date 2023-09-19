@@ -26,6 +26,13 @@ public class HashedDerivedKeyProducer {
     private static final byte FIRST_ITERATION = 1;
 
     /**
+     * Hashed Derived Key Producer default constructor does not set any variables
+     */
+    public HashedDerivedKeyProducer() {
+
+    }
+
+    /**
      * Get Derived Key using HKDF-SHA-256 extracted and expanded from input key
      *
      * @param inputKey Input Key Material
