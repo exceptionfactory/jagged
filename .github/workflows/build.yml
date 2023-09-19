@@ -13,9 +13,9 @@ permissions:
   contents: read
 
 jobs:
-  build-java-17:
+  build-java-21:
     runs-on: ubuntu-latest
-    name: Java 17
+    name: Java 21
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v3
@@ -26,7 +26,7 @@ jobs:
       - name: Setup Java JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'zulu'
           cache: 'maven'
       - name: Build
@@ -35,6 +35,20 @@ jobs:
         uses: codecov/codecov-action@v3
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+  build-java-17:
+    runs-on: ubuntu-latest
+    name: Java 17
+    steps:
+      - name: Checkout Sources
+        uses: actions/checkout@v3
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: 'maven'
+      - name: Build
+        run: ./mvnw --batch-mode --update-snapshots verify
   build-java-11:
     runs-on: ubuntu-latest
     name: Java 11
