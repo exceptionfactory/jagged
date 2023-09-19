@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.exceptionfactory.jagged</groupId>
+        <artifactId>jagged</artifactId>
+        <version>0.2.0-SNAPSHOT</version>
+    </parent>
+
+    <name>jagged-bom</name>
+    <artifactId>jagged-bom</artifactId>
+    <packaging>pom</packaging>
+    <description>Jagged Bill of Materials for age encryption</description>
+    <url>https://github.com/exceptionfactory/jagged</url>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-scrypt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-bech32</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-x25519</artifactId>
+        </dependency>
+    </dependencies>
+</project>
