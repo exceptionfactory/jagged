@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EncryptingChannelTest {
-    private static final int EMPTY_ENCRYPTED_LENGTH = 0;
+    private static final int EMPTY_ENCRYPTED_LENGTH = 16;
 
     private static final byte[] INVALID_KEY = new byte[]{};
 
@@ -90,6 +90,15 @@ class EncryptingChannelTest {
         assertTrue(encryptingChannel.isOpen());
         encryptingChannel.close();
         assertFalse(encryptingChannel.isOpen());
+    }
+
+    @Test
+    void testEmpty() throws GeneralSecurityException, IOException {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final EncryptingChannel encryptingChannel = getEncryptingChannel(outputStream);
+
+        assertTrue(encryptingChannel.isOpen());
+        encryptingChannel.close();
 
         final byte[] bytes = outputStream.toByteArray();
         assertEquals(EMPTY_ENCRYPTED_LENGTH, bytes.length);

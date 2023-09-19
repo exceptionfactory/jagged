@@ -121,10 +121,8 @@ class EncryptingChannel implements WritableByteChannel {
      */
     @Override
     public void close() throws IOException {
-        if (inputBuffer.position() > 0) {
-            payloadIvParameterSpec.setLastChunkFlag();
-            flushInputBuffer();
-        }
+        payloadIvParameterSpec.setLastChunkFlag();
+        flushInputBuffer();
 
         outputChannel.close();
         payloadKey.destroy();
