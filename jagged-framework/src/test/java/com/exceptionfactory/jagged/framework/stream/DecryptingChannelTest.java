@@ -253,7 +253,7 @@ class DecryptingChannelTest {
         return new DecryptingChannel(encryptedChannel, recipientStanzaReaders, payloadKeyReader, byteBufferCipherFactory);
     }
 
-    private static class GetRemainingBufferPayloadKeyReader implements PayloadKeyReader {
+    private static final class GetRemainingBufferPayloadKeyReader implements PayloadKeyReader {
 
         @Override
         public CipherKey getPayloadKey(final ByteBuffer buffer, final Iterable<RecipientStanzaReader> recipientStanzaReaders) {

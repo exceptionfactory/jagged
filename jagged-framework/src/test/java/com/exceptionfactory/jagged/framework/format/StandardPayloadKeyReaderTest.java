@@ -133,7 +133,7 @@ class StandardPayloadKeyReaderTest {
         assertThrows(InvalidParameterSpecException.class, () -> reader.getPayloadKey(buffer, recipientStanzaReaders));
     }
 
-    private static class MockFileKeyReader implements FileKeyReader {
+    private static final class MockFileKeyReader implements FileKeyReader {
 
         @Override
         public FileKey readFileKey(final ByteBuffer buffer, final RecipientStanzaReader recipientStanzaReader) throws GeneralSecurityException {
