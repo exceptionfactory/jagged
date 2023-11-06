@@ -63,11 +63,11 @@
         <maven.surefire.junit5.tree.reporter.version>1.2.1</maven.surefire.junit5.tree.reporter.version>
         <download.maven.plugin.version>1.7.0</download.maven.plugin.version>
         <bouncycastle.version>1.76</bouncycastle.version>
-        <checkstyle.version>10.12.3</checkstyle.version>
-        <jacoco.version>0.8.10</jacoco.version>
+        <checkstyle.version>10.12.4</checkstyle.version>
+        <jacoco.version>0.8.11</jacoco.version>
         <jreleaser.version>1.7.0</jreleaser.version>
-        <junit.jupiter.version>5.10.0</junit.jupiter.version>
-        <mockito.version>5.5.0</mockito.version>
+        <junit.jupiter.version>5.10.1</junit.jupiter.version>
+        <mockito.version>5.7.0</mockito.version>
         <pmd.version>6.55.0</pmd.version>
         <spotbugs.plugin.version>4.7.3.5</spotbugs.plugin.version>
         <staging.deploy.directory>target/staging-deploy</staging.deploy.directory>
