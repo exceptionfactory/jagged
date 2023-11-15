@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * Standard implementation of Message Authentication Code Producer using javax.crypto.Mac with HMAC-SHA-256
  */
-class StandardMessageAuthenticationCodeProducer implements MessageAuthenticationCodeProducer {
+final class StandardMessageAuthenticationCodeProducer implements MessageAuthenticationCodeProducer {
     private final Mac mac;
 
     /**

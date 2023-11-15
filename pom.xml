@@ -69,7 +69,7 @@
         <junit.jupiter.version>5.10.1</junit.jupiter.version>
         <mockito.version>5.7.0</mockito.version>
         <pmd.version>6.55.0</pmd.version>
-        <spotbugs.plugin.version>4.7.3.5</spotbugs.plugin.version>
+        <spotbugs.plugin.version>4.8.1.0</spotbugs.plugin.version>
         <staging.deploy.directory>target/staging-deploy</staging.deploy.directory>
         <altDeploymentRepository>local::file:./${staging.deploy.directory}</altDeploymentRepository>
         <maven.central.url>https://s01.oss.sonatype.org</maven.central.url>

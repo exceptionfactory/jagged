@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Decrypting implementation of Readable Byte Channel capable of streaming decryption in chunks of 64 KiB
  */
-class DecryptingChannel implements ReadableByteChannel {
+final class DecryptingChannel implements ReadableByteChannel {
     private static final int END_OF_FILE = -1;
 
     private final ByteBuffer inputBuffer = ByteBuffer.allocate(ChunkSize.ENCRYPTED.getSize());

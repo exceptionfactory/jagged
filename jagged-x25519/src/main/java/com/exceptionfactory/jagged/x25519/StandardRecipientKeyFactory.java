@@ -31,7 +31,7 @@ import java.util.Objects;
 /**
  * Standard implementation of X25519 Recipient Key Factory using ASN.1 with DER for Java Cryptography
  */
-class StandardRecipientKeyFactory implements RecipientKeyFactory {
+final class StandardRecipientKeyFactory implements RecipientKeyFactory {
     private static final int COORDINATE_LENGTH = RecipientKeyType.X25519.getKeyLength();
 
     /** PKCS8 Private Key specification encoded length in bytes containing 32 byte key plus DER encoded version and algorithm */

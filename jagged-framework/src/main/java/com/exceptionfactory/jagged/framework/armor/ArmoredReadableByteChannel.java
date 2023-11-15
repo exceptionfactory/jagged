@@ -25,7 +25,7 @@ import java.util.Objects;
 /**
  * Readable Byte Channel supporting age encryption files encoded according to strict PEM encoding described in RFC 7468 Section 3
  */
-class ArmoredReadableByteChannel implements ReadableByteChannel {
+final class ArmoredReadableByteChannel implements ReadableByteChannel {
     /** Base64 Decoder supports padding characters */
     private static final Base64.Decoder DECODER = Base64.getDecoder();
 

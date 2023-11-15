@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * Writable Byte Channel supporting age encryption files with Base64 according to strict PEM encoding described in RFC 7468 Section 3
  */
-class ArmoredWritableByteChannel implements WritableByteChannel {
+final class ArmoredWritableByteChannel implements WritableByteChannel {
     private static final int HEADER_BUFFER_LENGTH = 36;
 
     private static final int FOOTER_BUFFER_LENGTH = 34;

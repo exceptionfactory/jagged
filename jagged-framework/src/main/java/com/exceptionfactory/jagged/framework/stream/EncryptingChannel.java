@@ -33,7 +33,7 @@ import java.util.Objects;
 /**
  * Encrypting implementation of Writable Byte Channel capable of streaming encryption in chunks of 64 KiB
  */
-class EncryptingChannel implements WritableByteChannel {
+final class EncryptingChannel implements WritableByteChannel {
     private final ByteBuffer inputBuffer = ByteBuffer.allocate(ChunkSize.PLAIN.getSize());
 
     private final ByteBuffer outputBuffer = ByteBuffer.allocate(ChunkSize.ENCRYPTED.getSize());

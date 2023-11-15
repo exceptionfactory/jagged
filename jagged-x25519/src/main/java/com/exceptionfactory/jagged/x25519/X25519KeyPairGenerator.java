@@ -33,7 +33,7 @@ import java.util.Objects;
 /**
  * X25519 Key Pair Generator produces Public and Private Keys encoded using Bech32 for use with age encryption
  */
-public class X25519KeyPairGenerator extends KeyPairGenerator {
+public final class X25519KeyPairGenerator extends KeyPairGenerator {
     private static final Charset ENCODING_CHARACTER_SET = StandardCharsets.US_ASCII;
 
     private static final String ALGORITHM = RecipientIndicator.KEY_ALGORITHM.getIndicator();

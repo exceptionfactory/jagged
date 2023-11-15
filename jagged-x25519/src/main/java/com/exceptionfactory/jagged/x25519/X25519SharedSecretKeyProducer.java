@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * Shared Secret Key Producer using X25519 Key Agreement described in RFC 7748
  */
-class X25519SharedSecretKeyProducer implements SharedSecretKeyProducer {
+final class X25519SharedSecretKeyProducer implements SharedSecretKeyProducer {
     private static final boolean LAST_PHASE = true;
 
     private final KeyAgreement keyAgreement;
