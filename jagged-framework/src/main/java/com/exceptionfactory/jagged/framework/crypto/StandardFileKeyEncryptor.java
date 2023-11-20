@@ -57,7 +57,7 @@ class StandardFileKeyEncryptor implements FileKeyEncryptor {
         Objects.requireNonNull(fileKey, "File Key required");
         Objects.requireNonNull(cipherKey, "Cipher Key required");
 
-        final PayloadIvParameterSpec parameterSpec = new PayloadIvParameterSpec();
+        final FileKeyIvParameterSpec parameterSpec = new FileKeyIvParameterSpec();
         final Cipher cipher = cipherFactory.getInitializedCipher(CipherFactory.CipherMode.ENCRYPT, cipherKey, parameterSpec);
 
         final byte[] fileKeyEncoded = fileKey.getEncoded();
