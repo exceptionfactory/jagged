@@ -23,12 +23,10 @@ import javax.crypto.spec.IvParameterSpec;
 final class FileKeyIvParameterSpec extends IvParameterSpec {
     private static final int INITIALIZATION_VECTOR_LENGTH = 12;
 
-    private static final byte[] STANDARD_INITIALIZATION_VECTOR = new byte[INITIALIZATION_VECTOR_LENGTH];
-
     /**
      * File Key Initialization Vector Parameter Specification with array of 12 bytes
      */
     FileKeyIvParameterSpec() {
-        super(STANDARD_INITIALIZATION_VECTOR);
+        super(new byte[INITIALIZATION_VECTOR_LENGTH]);
     }
 }
