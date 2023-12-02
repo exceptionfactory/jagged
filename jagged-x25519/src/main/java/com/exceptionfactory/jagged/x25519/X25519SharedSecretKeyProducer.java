@@ -19,7 +19,6 @@ import com.exceptionfactory.jagged.framework.crypto.SharedSecretKey;
 
 import javax.crypto.KeyAgreement;
 import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Objects;
@@ -30,18 +29,19 @@ import java.util.Objects;
 final class X25519SharedSecretKeyProducer implements SharedSecretKeyProducer {
     private static final boolean LAST_PHASE = true;
 
-    private final KeyAgreement keyAgreement;
+    private final PrivateKey privateKey;
+
+    private final KeyAgreementFactory keyAgreementFactory;
 
     /**
      * X25519 Shared Secret Key Producer with Private Key for initialization
      *
      * @param privateKey X25519 Private Key
      * @param keyAgreementFactory Key Agreement Factory
-     * @throws GeneralSecurityException Thrown on failure to initialize Key Agreement operations
      */
-    X25519SharedSecretKeyProducer(final PrivateKey privateKey, final KeyAgreementFactory keyAgreementFactory) throws GeneralSecurityException {
-        Objects.requireNonNull(privateKey, "Private Key required");
-        keyAgreement = keyAgreementFactory.getInitializedKeyAgreement(privateKey);
+    X25519SharedSecretKeyProducer(final PrivateKey privateKey, final KeyAgreementFactory keyAgreementFactory) {
+        this.privateKey = Objects.requireNonNull(privateKey, "Private Key required");
+        this.keyAgreementFactory = Objects.requireNonNull(keyAgreementFactory, "Key Agreement Factory required");
     }
 
     /**
@@ -49,11 +49,12 @@ final class X25519SharedSecretKeyProducer implements SharedSecretKeyProducer {
      *
      * @param publicKey X25519 Public Key
      * @return Shared Secret Key
-     * @throws InvalidKeyException Thrown on failures to generate shared secret key
+     * @throws GeneralSecurityException Thrown on failures to generate shared secret key
      */
     @Override
-    public SharedSecretKey getSharedSecretKey(final PublicKey publicKey) throws InvalidKeyException {
+    public SharedSecretKey getSharedSecretKey(final PublicKey publicKey) throws GeneralSecurityException {
         Objects.requireNonNull(publicKey, "Public Key required");
+        final KeyAgreement keyAgreement = keyAgreementFactory.getInitializedKeyAgreement(privateKey);
         keyAgreement.doPhase(publicKey, LAST_PHASE);
         final byte[] secretKey = keyAgreement.generateSecret();
         return new SharedSecretKey(secretKey);

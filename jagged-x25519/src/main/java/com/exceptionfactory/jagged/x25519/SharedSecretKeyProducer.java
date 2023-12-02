@@ -17,7 +17,7 @@ package com.exceptionfactory.jagged.x25519;
 
 import com.exceptionfactory.jagged.framework.crypto.SharedSecretKey;
 
-import java.security.InvalidKeyException;
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 /**
@@ -29,7 +29,7 @@ interface SharedSecretKeyProducer {
      *
      * @param publicKey Public Key
      * @return Shared Secret Key
-     * @throws InvalidKeyException Thrown on failures to produced Shared Secret Key
+     * @throws GeneralSecurityException Thrown on failures to produced Shared Secret Key
      */
-    SharedSecretKey getSharedSecretKey(PublicKey publicKey) throws InvalidKeyException;
+    SharedSecretKey getSharedSecretKey(PublicKey publicKey) throws GeneralSecurityException;
 }
