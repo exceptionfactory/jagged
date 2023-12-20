@@ -134,24 +134,37 @@ The `jagged-api` module contains the core public interfaces for encryption and d
 contains interfaces and classes in the `com.exceptionfactory.jagged` package, which provide integration and extension
 points for other components.
 
-The `FileKey` class implements [java.crypto.SecretKey](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/SecretKey.html)
+The
+[FileKey](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api/latest/com/exceptionfactory/jagged/FileKey.html)
+class implements
+[java.crypto.SecretKey](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/SecretKey.html)
 and supports the primary contract for age identities and recipients.
 
-The `RecipientStanza` interface follows the pattern of the age [Stanza](https://pkg.go.dev/filippo.io/age#Stanza),
+The
+[RecipientStanza](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api/latest/com/exceptionfactory/jagged/RecipientStanza.html)
+interface follows the pattern of the age [Stanza](https://pkg.go.dev/filippo.io/age#Stanza),
 providing access to the Type, Arguments, and binary Body elements.
 
-The `RecipientStanzaReader` interface serves as the age [Identity](https://pkg.go.dev/filippo.io/age#Identity) 
+The
+[RecipientStanzaReader](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api/latest/com/exceptionfactory/jagged/RecipientStanzaReader.html)
+interface serves as the age [Identity](https://pkg.go.dev/filippo.io/age#Identity) 
 abstraction, responsible for reading `RecipientStanza` objects and return a decrypted `FileKey`.
 
-The `RecipientStanzaWriter` interface follows the age [Recipient](https://pkg.go.dev/filippo.io/age#Recipient)
+The 
+[RecipientStanzaWriter](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api/latest/com/exceptionfactory/jagged/RecipientStanzaWriter.html)
+interface follows the age [Recipient](https://pkg.go.dev/filippo.io/age#Recipient)
 abstraction, responsible for wrapping a `FileKey` and returning a collection of `RecipientStanza` objects.
 
-The `EncryptingChannelFactory` interface wraps a provided
+The
+[EncryptingChannelFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api/latest/com/exceptionfactory/jagged/EncryptingChannelFactory.html)
+interface wraps a provided
 [WritableByteChannel](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/channels/WritableByteChannel.html) and returns
 a `WritableByteChannel` that supports streaming encryption to one or more recipients based on supplied
 `RecipientStanzaWriter` instances.
 
-The `DecryptingChannelFactory` interface wraps a provided
+The
+[DecryptingChannelFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api/latest/com/exceptionfactory/jagged/DecryptingChannelFactory.html)
+interface wraps a provided
 [ReadableByteChannel](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/channels/ReadableByteChannel.html) and returns
 a `ReadableByteChannel` that supports streaming decryption for a matched identity based on supplied
 `RecipientStanzaReader` instances.
@@ -160,28 +173,45 @@ a `ReadableByteChannel` that supports streaming decryption for a matched identit
 
 The `jagged-bech32` module contains an implementation of the Bech32 encoding specification defined according to
 [Bitcoin Improvement Proposal 0173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki). Bech32 encoding
-supports a standard representation of X25519 private and public keys. The `Bech32` class follows the pattern of
-[java.util.Base64](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Base64.html) and encloses `Bech32.Decoder` and
-`Bech32.Encoder` interfaces. Bech32 encoding consists of a Human-Readable Part prefix, a separator, and data part that
+supports a standard representation of X25519 private and public keys. The
+[Bech32](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-bech32/latest/com/exceptionfactory/jagged/bech32/Bech32.html)
+class follows the pattern of
+[java.util.Base64](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Base64.html) and encloses
+[Bech32.Decoder](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-bech32/latest/com/exceptionfactory/jagged/bech32/Bech32.Decoder.html)
+and
+[Bech32.Encoder](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-bech32/latest/com/exceptionfactory/jagged/bech32/Bech32.Encoder.html)
+interfaces. Bech32 encoding consists of a Human-Readable Part prefix, a separator, and data part that
 ends with a checksum.
 
 ## jagged-framework
 
 The `jagged-framework` module includes shared components for common cryptographic operations.
 
-The `stream` package includes the `StandardDecryptingChannelFactory` and `StandardEncryptingChannelFactory` classes,
+The `stream` package includes the
+[StandardDecryptingChannelFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-framework/latest/com/exceptionfactory/jagged/framework/stream/StandardDecryptingChannelFactory.html)
+and
+[StandardEncryptingChannelFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-framework/latest/com/exceptionfactory/jagged/framework/stream/StandardEncryptingChannelFactory.html)
+classes,
 which implement the corresponding public interfaces for streaming cipher operations.
 
-The `armor` packaged includes the `ArmoredDecryptingChannelFactory` and `ArmoredEncryptingChannelFactory` classes,
+The `armor` packaged includes the
+[ArmoredDecryptingChannelFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-framework/latest/com/exceptionfactory/jagged/framework/armor/ArmoredDecryptingChannelFactory.html)
+and
+[ArmoredEncryptingChannelFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-framework/latest/com/exceptionfactory/jagged/framework/armor/ArmoredEncryptingChannelFactory.html)
+classes,
 supporting reading and writing ASCII armored files with standard PEM header and footer lines.
 
 ## jagged-scrypt
 
 The `jagged-scrypt` module supports encryption and decryption using a passphrase and configurable work factor.
 
-The `ScryptRecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using a passphrase.
+The
+[ScryptRecipientStanzaReaderFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-scrypt/latest/com/exceptionfactory/jagged/scrypt/ScryptRecipientStanzaReaderFactory.html)
+creates instances of `RecipientStanzaReader` using a passphrase.
 
-The `ScryptRecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using a passphrase and 
+The
+[ScryptRecipientStanzaWriterFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-scrypt/latest/com/exceptionfactory/jagged/scrypt/ScryptRecipientStanzaWriterFactory.html)
+creates instances of `RecipientStanzaWriter` using a passphrase and 
 a work factor with a minimum value of 2 and a maximum value of 20.
 
 The module includes a custom implementation of the scrypt key derivation function with predefined settings that
@@ -193,14 +223,28 @@ The `jagged-x25519` module supports encryption and decryption using public and p
 key agreement functions use the Java Cryptography Architecture framework. Key encoding and decoding functions use the
 `jagged-bech32` library.
 
-The `X25519KeyPairGenerator` class implements
+The `X25519KeyFactory` class implements
+[java.security.KeyFactory](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyFactory.html)
+and supports translating an encoded X25519 private key to the corresponding X25519 public key. The `translateKey` method
+accepts an instance of the
+[javax.crypto.spec.SecretKeySpec](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/spec/SecretKeySpec.html)
+class. The `SecretKeySpec` must be constructed with the `key` byte array containing the encoded private key, and with
+`X25519` set as the value of the `algorithm` argument.
+
+The 
+[X25519KeyPairGenerator](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-x25519/latest/com/exceptionfactory/jagged/x25519/X25519KeyPairGenerator.html)
+class implements
 [java.security.KeyPairGenerator](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyPairGenerator.html)
 and returns public and private key pairs encoded using Bech32.
 
-The `X25519RecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using a private key encoded using
+The
+[X25519RecipientStanzaReaderFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-x25519/latest/com/exceptionfactory/jagged/x25519/X25519RecipientStanzaReaderFactory.html)
+creates instances of `RecipientStanzaReader` using a private key encoded using
 Bech32. Encoded private keys begin with `AGE-SECRET-KEY-1` as the Bech32 Human-Readable Part and separator.
 
-The `X25519RecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using a public key encoded using
+The
+[X25519RecipientStanzaWriterFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-x25519/latest/com/exceptionfactory/jagged/x25519/X25519RecipientStanzaWriterFactory.html)
+creates instances of `RecipientStanzaWriter` using a public key encoded using
 Bech32. Encoded public keys begin with `age1` as the Bech32 Human-Readable Part and separator.
 
 ## jagged-test
@@ -248,7 +292,9 @@ encoding and decoding.
 ## X25519 Key Pair Generation
 
 Jagged supports public and private keys produced using the [age-keygen](https://filippo.io/age/age-keygen.1) command and
-also provides key pair generation using the `X25519KeyPairGenerator` class. The class implements
+also provides key pair generation using the
+[X25519KeyPairGenerator](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-x25519/latest/com/exceptionfactory/jagged/x25519/X25519KeyPairGenerator.html)
+class. The class implements
 [KeyPairGenerator](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyPairGenerator.html) and
 supports standard methods for generating
 [KeyPair](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyPair.html) instances. Both
@@ -265,8 +311,11 @@ System.out.printf("Public key: %s", publicKey);
 
 ## Binary File Encryption with X25519
 
-Encryption operations require one or more X25519 public keys. Jagged provides the `X25519RecipientStanzaWriterFactory`
-class for creating instances of `RecpientStanzaWriter` to support encryption operations. The factory class accepts a
+Encryption operations require one or more X25519 public keys. Jagged provides the 
+[X25519RecipientStanzaWriterFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-x25519/latest/com/exceptionfactory/jagged/x25519/X25519RecipientStanzaWriterFactory.html)
+class for creating instances of
+[RecpientStanzaWriter](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api/latest/com/exceptionfactory/jagged/RecipientStanzaWriter.html)
+to support encryption operations. The factory class accepts a
 standard Java String containing a Bech32 encoded public key starting with `age1` and also supports other implementations
 of [CharSequence](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/CharSequence.html) to provide
 more control over encoded keys.
@@ -298,7 +347,10 @@ try (
 ## Binary File Decryption with X25519
 
 Decryption operations require a private key corresponding to a recipient from the age file header. Jagged provides the
-`X25519RecipientStanzaReaderFactory` class for creating instances of `RecipientStanzaReader` to support decryption
+[X25519RecipientStanzaReaderFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-x25519/latest/com/exceptionfactory/jagged/x25519/X25519RecipientStanzaReaderFactory.html)
+class for creating instances of
+[RecipientStanzaReader](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api/latest/com/exceptionfactory/jagged/RecipientStanzaReader.html)
+to support decryption
 operations. The factory class accepts a Bech32 encoded private key starting with `AGE-SECRET-KEY-1` represented as a
 Java String or sequence of characters.
 
