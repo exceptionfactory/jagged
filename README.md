@@ -130,7 +130,9 @@ Jagged consists of multiple modules supporting different aspects of the age encr
 
 ## jagged-api
 
-The `jagged-api` module contains the core public interfaces for encryption and decryption operations. The module
+The
+[jagged-api](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-api/latest/com/exceptionfactory/jagged/package-summary.html)
+module contains the core public interfaces for encryption and decryption operations. The module
 contains interfaces and classes in the `com.exceptionfactory.jagged` package, which provide integration and extension
 points for other components.
 
@@ -171,7 +173,9 @@ a `ReadableByteChannel` that supports streaming decryption for a matched identit
 
 ## jagged-bech32
 
-The `jagged-bech32` module contains an implementation of the Bech32 encoding specification defined according to
+The 
+[jagged-bech32](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-bech32/latest/com/exceptionfactory/jagged/bech32/package-summary.html)
+module contains an implementation of the Bech32 encoding specification defined according to
 [Bitcoin Improvement Proposal 0173](https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki). Bech32 encoding
 supports a standard representation of X25519 private and public keys. The
 [Bech32](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-bech32/latest/com/exceptionfactory/jagged/bech32/Bech32.html)
@@ -185,7 +189,9 @@ ends with a checksum.
 
 ## jagged-framework
 
-The `jagged-framework` module includes shared components for common cryptographic operations.
+The 
+[jagged-framework](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-framework/latest/index.html)
+module includes shared components for common cryptographic operations.
 
 The `stream` package includes the
 [StandardDecryptingChannelFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-framework/latest/com/exceptionfactory/jagged/framework/stream/StandardDecryptingChannelFactory.html)
@@ -203,7 +209,9 @@ supporting reading and writing ASCII armored files with standard PEM header and 
 
 ## jagged-scrypt
 
-The `jagged-scrypt` module supports encryption and decryption using a passphrase and configurable work factor.
+The
+[jagged-scrypt](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-scrypt/latest/com/exceptionfactory/jagged/scrypt/package-summary.html)
+module supports encryption and decryption using a passphrase and configurable work factor.
 
 The
 [ScryptRecipientStanzaReaderFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-scrypt/latest/com/exceptionfactory/jagged/scrypt/ScryptRecipientStanzaReaderFactory.html)
@@ -219,7 +227,9 @@ match age encryption scrypt recipient specifications.
 
 ## jagged-x25519
 
-The `jagged-x25519` module supports encryption and decryption using public and private key pairs. Key generation and
+The
+[jagged-x25519](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-x25519/latest/com/exceptionfactory/jagged/x25519/package-summary.html)
+module supports encryption and decryption using public and private key pairs. Key generation and
 key agreement functions use the Java Cryptography Architecture framework. Key encoding and decoding functions use the
 `jagged-bech32` library.
 
