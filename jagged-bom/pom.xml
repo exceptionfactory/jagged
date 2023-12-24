@@ -16,26 +16,33 @@
     <description>Jagged Bill of Materials for age encryption</description>
     <url>https://github.com/exceptionfactory/jagged</url>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.exceptionfactory.jagged</groupId>
-            <artifactId>jagged-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.exceptionfactory.jagged</groupId>
-            <artifactId>jagged-framework</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.exceptionfactory.jagged</groupId>
-            <artifactId>jagged-scrypt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.exceptionfactory.jagged</groupId>
-            <artifactId>jagged-bech32</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.exceptionfactory.jagged</groupId>
-            <artifactId>jagged-x25519</artifactId>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-api</artifactId>
+                <version>0.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-framework</artifactId>
+                <version>0.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-scrypt</artifactId>
+                <version>0.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-bech32</artifactId>
+                <version>0.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-x25519</artifactId>
+                <version>0.2.1-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
