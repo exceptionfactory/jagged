@@ -108,7 +108,9 @@ final class DecryptingChannel implements ReadableByteChannel {
 
             final int plainBufferRead = readPlainBuffer(outputBuffer);
             if (END_OF_FILE == plainBufferRead) {
-                read = END_OF_FILE;
+                if (read == 0) {
+                    read = END_OF_FILE;
+                }
                 break;
             } else {
                 read += plainBufferRead;
