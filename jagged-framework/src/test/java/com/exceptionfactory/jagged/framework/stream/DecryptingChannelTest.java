@@ -206,9 +206,13 @@ class DecryptingChannelTest {
 
         outputBuffer.position(0);
         final int secondDecrypted = decryptingChannel.read(outputBuffer);
-        assertEquals(END_OF_FILE, secondDecrypted);
+        assertEquals(HALF_BUFFER_SIZE, secondDecrypted);
 
         assertArrayEquals(inputBytes, outputBuffer.array());
+
+        outputBuffer.position(0);
+        final int thirdDecrypted = decryptingChannel.read(outputBuffer);
+        assertEquals(END_OF_FILE, thirdDecrypted);
     }
 
     @Test
