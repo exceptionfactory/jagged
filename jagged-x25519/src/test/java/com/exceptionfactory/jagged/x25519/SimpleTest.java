@@ -32,8 +32,8 @@ public class SimpleTest {
 
   @Test
   public void oldio() throws IOException, GeneralSecurityException {
-    ByteArrayOutputStream out1;
-    try (out1 = new ByteArrayOutputStream();
+    ByteArrayOutputStream out;
+    try (ByteArrayOutputStream out1 = out = new ByteArrayOutputStream();
         WritableByteChannel out2 = newChannel(out1);
         WritableByteChannel out3 =
             encryptingChannelFactory.newEncryptingChannel(
@@ -44,7 +44,7 @@ public class SimpleTest {
         OutputStream out4 = newOutputStream(out3)) {
       out4.write("this is a test".getBytes());
     }
-    try (ByteArrayInputStream in1 = new ByteArrayInputStream(out1.toByteArray());
+    try (ByteArrayInputStream in1 = new ByteArrayInputStream(out.toByteArray());
         ReadableByteChannel in2 = newChannel(in1);
         ReadableByteChannel in3 =
             decryptingChannelFactory.newDecryptingChannel(
