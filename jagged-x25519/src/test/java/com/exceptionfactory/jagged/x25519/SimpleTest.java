@@ -58,4 +58,29 @@ public class SimpleTest {
       assertEquals("this is a test", in6.readLine());
     }
   }
+
+  @Test
+  public void oldio2() throws IOException, GeneralSecurityException {
+    ByteArrayOutputStream out;
+    try (OutputStream out2 =
+        newOutputStream(
+            encryptingChannelFactory.newEncryptingChannel(
+                newChannel(out = new ByteArrayOutputStream()),
+                singletonList(
+                    newRecipientStanzaWriter(
+                        "age1360h7jtlv3072kf8lq2z0jkr0l60qkyysrl9vcvm6lga7l36n52sppnvtf"))))) {
+      out2.write("this is a test".getBytes());
+    }
+    try (BufferedReader in =
+        new BufferedReader(
+            new InputStreamReader(
+                newInputStream(
+                    decryptingChannelFactory.newDecryptingChannel(
+                        newChannel(new ByteArrayInputStream(out.toByteArray())),
+                        singletonList(
+                            newRecipientStanzaReader(
+                                "AGE-SECRET-KEY-1RFE6TPACNNZU077UZYEZRT8980DQPQY363LN2T9HZEQX225WTZUQDJLFLJ"))))))) {
+      assertEquals("this is a test", in.readLine());
+    }
+  }
 }
