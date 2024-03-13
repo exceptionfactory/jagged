@@ -104,6 +104,9 @@ class ArmoredWritableByteChannelTest {
         final byte[] armored = outputStream.toByteArray();
         final byte[] expected = getExpected(LINE_EXPECTED, LINE_EXPECTED, LINE_EXPECTED);
         assertArrayEquals(expected, armored);
+
+        channel.close();
+        assertFalse(channel.isOpen());
     }
 
     @Test

@@ -93,6 +93,21 @@ class EncryptingChannelTest {
     }
 
     @Test
+    void testCloseRepeated() throws GeneralSecurityException, IOException {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final EncryptingChannel encryptingChannel = getEncryptingChannel(outputStream);
+
+        encryptingChannel.close();
+        assertFalse(encryptingChannel.isOpen());
+
+        encryptingChannel.close();
+        assertFalse(encryptingChannel.isOpen());
+
+        final byte[] bytes = outputStream.toByteArray();
+        assertEquals(EMPTY_ENCRYPTED_LENGTH, bytes.length);
+    }
+
+    @Test
     void testEmpty() throws GeneralSecurityException, IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         final EncryptingChannel encryptingChannel = getEncryptingChannel(outputStream);

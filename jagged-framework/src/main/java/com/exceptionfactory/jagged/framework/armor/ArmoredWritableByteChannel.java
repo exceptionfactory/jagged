@@ -111,12 +111,13 @@ final class ArmoredWritableByteChannel implements WritableByteChannel {
      */
     @Override
     public void close() throws IOException {
-        if (lineBuffer.position() > 0) {
-            writeLineBuffer();
+        if (outputChannel.isOpen()) {
+            if (lineBuffer.position() > 0) {
+                writeLineBuffer();
+            }
+            writeFooter();
+            outputChannel.close();
         }
-
-        writeFooter();
-        outputChannel.close();
     }
 
     private void writeHeader() throws IOException {
