@@ -29,6 +29,8 @@ jobs:
         run: ./mvnw --batch-mode --update-snapshots verify
       - name: Codecov
         uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
   build-java-17:
     runs-on: ubuntu-latest
     name: Java 17
