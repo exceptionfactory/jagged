@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.exceptionfactory.jagged</groupId>
         <artifactId>jagged</artifactId>
-        <version>0.3.2-SNAPSHOT</version>
+        <version>0.3.2</version>
     </parent>
 
     <name>jagged-bom</name>
@@ -21,27 +21,27 @@
             <dependency>
                 <groupId>com.exceptionfactory.jagged</groupId>
                 <artifactId>jagged-api</artifactId>
-                <version>0.3.2-SNAPSHOT</version>
+                <version>0.3.2</version>
             </dependency>
             <dependency>
                 <groupId>com.exceptionfactory.jagged</groupId>
                 <artifactId>jagged-framework</artifactId>
-                <version>0.3.2-SNAPSHOT</version>
+                <version>0.3.2</version>
             </dependency>
             <dependency>
                 <groupId>com.exceptionfactory.jagged</groupId>
                 <artifactId>jagged-scrypt</artifactId>
-                <version>0.3.2-SNAPSHOT</version>
+                <version>0.3.2</version>
             </dependency>
             <dependency>
                 <groupId>com.exceptionfactory.jagged</groupId>
                 <artifactId>jagged-bech32</artifactId>
-                <version>0.3.2-SNAPSHOT</version>
+                <version>0.3.2</version>
             </dependency>
             <dependency>
                 <groupId>com.exceptionfactory.jagged</groupId>
                 <artifactId>jagged-x25519</artifactId>
-                <version>0.3.2-SNAPSHOT</version>
+                <version>0.3.2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
