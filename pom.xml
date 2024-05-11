@@ -62,7 +62,7 @@
         <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
         <maven.surefire.junit5.tree.reporter.version>1.2.1</maven.surefire.junit5.tree.reporter.version>
         <download.maven.plugin.version>1.8.1</download.maven.plugin.version>
-        <bouncycastle.version>1.77</bouncycastle.version>
+        <bouncycastle.version>1.78.1</bouncycastle.version>
         <checkstyle.version>10.14.1</checkstyle.version>
         <jacoco.version>0.8.11</jacoco.version>
         <jreleaser.version>1.11.0</jreleaser.version>
