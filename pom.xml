@@ -51,25 +51,25 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.checkstyle.plugin.version>3.3.1</maven.checkstyle.plugin.version>
         <maven.clean.plugin.version>3.3.2</maven.clean.plugin.version>
-        <maven.compiler.plugin.version>3.12.1</maven.compiler.plugin.version>
-        <maven.deploy.plugin.version>3.1.1</maven.deploy.plugin.version>
+        <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+        <maven.deploy.plugin.version>3.1.2</maven.deploy.plugin.version>
         <maven.install.plugin.version>3.1.1</maven.install.plugin.version>
-        <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
+        <maven.jar.plugin.version>3.4.1</maven.jar.plugin.version>
         <maven.javadoc.plugin.version>3.6.3</maven.javadoc.plugin.version>
-        <maven.pmd.plugin.version>3.21.2</maven.pmd.plugin.version>
+        <maven.pmd.plugin.version>3.22.0</maven.pmd.plugin.version>
         <maven.resources.plugin.version>3.3.1</maven.resources.plugin.version>
-        <maven.source.plugin.version>3.3.0</maven.source.plugin.version>
+        <maven.source.plugin.version>3.3.1</maven.source.plugin.version>
         <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
         <maven.surefire.junit5.tree.reporter.version>1.2.1</maven.surefire.junit5.tree.reporter.version>
-        <download.maven.plugin.version>1.8.1</download.maven.plugin.version>
+        <download.maven.plugin.version>1.9.0</download.maven.plugin.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
-        <checkstyle.version>10.14.1</checkstyle.version>
-        <jacoco.version>0.8.11</jacoco.version>
-        <jreleaser.version>1.11.0</jreleaser.version>
+        <checkstyle.version>10.16.0</checkstyle.version>
+        <jacoco.version>0.8.12</jacoco.version>
+        <jreleaser.version>1.12.0</jreleaser.version>
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
-        <mockito.version>5.11.0</mockito.version>
-        <pmd.version>6.55.0</pmd.version>
-        <spotbugs.plugin.version>4.8.1.0</spotbugs.plugin.version>
+        <mockito.version>5.12.0</mockito.version>
+        <pmd.version>7.1.0</pmd.version>
+        <spotbugs.plugin.version>4.8.5.0</spotbugs.plugin.version>
         <staging.deploy.directory>target/staging-deploy</staging.deploy.directory>
         <altDeploymentRepository>local::file:./${staging.deploy.directory}</altDeploymentRepository>
         <maven.central.url>https://s01.oss.sonatype.org</maven.central.url>
