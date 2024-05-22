@@ -44,7 +44,11 @@ class CryptographicAlgorithmKey implements SecretKey {
      * @param cryptographicAlgorithm Cryptographic Algorithm
      */
     CryptographicAlgorithmKey(final byte[] key, final CryptographicKeyType cryptographicKeyType, final CryptographicAlgorithm cryptographicAlgorithm) {
-        this.key = getValidatedKey(key, cryptographicKeyType);
+        this(getValidatedKey(key, cryptographicKeyType), cryptographicAlgorithm);
+    }
+
+    private CryptographicAlgorithmKey(final byte[] validatedKey, final CryptographicAlgorithm cryptographicAlgorithm) {
+        this.key = validatedKey;
         this.cryptographicAlgorithm = Objects.requireNonNull(cryptographicAlgorithm, "Algorithm required");
     }
 
