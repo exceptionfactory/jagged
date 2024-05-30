@@ -35,6 +35,11 @@
             </dependency>
             <dependency>
                 <groupId>com.exceptionfactory.jagged</groupId>
+                <artifactId>jagged-ssh</artifactId>
+                <version>0.3.3-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.exceptionfactory.jagged</groupId>
                 <artifactId>jagged-bech32</artifactId>
                 <version>0.3.3-SNAPSHOT</version>
             </dependency>
