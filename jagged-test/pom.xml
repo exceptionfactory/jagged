@@ -30,6 +30,10 @@
         </dependency>
         <dependency>
             <groupId>com.exceptionfactory.jagged</groupId>
+            <artifactId>jagged-ssh</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.exceptionfactory.jagged</groupId>
             <artifactId>jagged-bech32</artifactId>
         </dependency>
         <dependency>
