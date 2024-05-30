@@ -83,6 +83,7 @@
         <module>jagged-bom</module>
         <module>jagged-framework</module>
         <module>jagged-scrypt</module>
+        <module>jagged-ssh</module>
         <module>jagged-test</module>
         <module>jagged-x25519</module>
     </modules>
