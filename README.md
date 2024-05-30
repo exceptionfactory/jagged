@@ -28,6 +28,7 @@ framework for the following algorithms:
 - `ChaCha20-Poly1305` with [javax.crypto.Cipher](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/Cipher.html)
 - `HmacSHA256` with [javax.crypto.Mac](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/Mac.html)
 - `PBKDF2WithHmacSHA256` with [javax.crypto.SecretKeyFactory](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/SecretKeyFactory.html)
+- `RSA/ECB/OAEPPadding` with [javax.crypto.Cipher](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/Cipher.html)
 - `X25519` with [javax.crypto.KeyAgreement](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/KeyAgreement.html)
 - `X25519` with [java.security.KeyFactory](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyFactory.html)
 - `X25519` with [java.security.KeyPairGenerator](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyPairGenerator.html)
@@ -63,6 +64,7 @@ Jagged supports streaming encryption and decryption using standard recipient typ
 - Encryption and decryption of [armored age files](https://github.com/C2SP/C2SP/blob/main/age.md#ascii-armor)
 - [X25519](https://github.com/C2SP/C2SP/blob/main/age.md#the-x25519-recipient-type) recipients and identities
 - [scrypt](https://github.com/C2SP/C2SP/blob/main/age.md#the-scrypt-recipient-type) recipients and identities
+- [ssh-rsa](https://github.com/FiloSottile/age/blob/main/README.md#ssh-keys) recipients and identities
 
 # Specifications
 
@@ -117,6 +119,10 @@ a File Key.
 
 The scrypt type encrypts a File Key with ChaCha20-Poly1305.
 
+The ssh-rsa type encrypts a File Key with RSA-OAEP.
+
+- [RFC 8017](https://www.rfc-editor.org/rfc/rfc8017) PKCS #1: RSA Cryptography Specifications Version 2.2
+
 # Modules
 
 Jagged consists of multiple modules supporting different aspects of the age encryption specification.
@@ -125,6 +131,7 @@ Jagged consists of multiple modules supporting different aspects of the age encr
 - jagged-bech32
 - jagged-framework
 - jagged-scrypt
+- jagged-ssh
 - jagged-test
 - jagged-x25519
 
@@ -224,6 +231,20 @@ a work factor with a minimum value of 2 and a maximum value of 20.
 
 The module includes a custom implementation of the scrypt key derivation function with predefined settings that
 match age encryption scrypt recipient specifications.
+
+## jagged-ssh
+
+The `jagged-ssh` module supports encryption and decryption using public and private SSH key pairs. The SSH key pair
+implementation is compatible with the [agessh](https://pkg.go.dev/filippo.io/age/agessh) package, which defines
+recipient stanzas with an algorithm and an encoded fingerprint of the public key.
+
+The `SshRsaRecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using an RSA private key.
+
+The `SshRsaRecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using an RSA public key.
+
+The SSH RSA implementation uses Optimal Asymmetric Encryption Padding as defined in
+[RFC 8017 Section 7.1](https://www.rfc-editor.org/rfc/rfc8017#section-7.1). Following the age implementation, RSA OAEP
+cipher operations use `SHA-256` as the hash algorithm with the mask generation function.
 
 ## jagged-x25519
 
