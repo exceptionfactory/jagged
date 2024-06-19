@@ -19,6 +19,8 @@ import com.exceptionfactory.jagged.RecipientStanzaReader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateCrtKey;
@@ -36,6 +38,18 @@ class SshRsaRecipientStanzaReaderFactoryTest {
     @Test
     void testNewRecipientStanzaReader() throws GeneralSecurityException {
         final RecipientStanzaReader reader = SshRsaRecipientStanzaReaderFactory.newRecipientStanzaReader(rsaPrivateKey);
+
+        assertNotNull(reader);
+    }
+
+    @Test
+    void testNewRecipientStanzaReaderOpenSshKey() throws GeneralSecurityException, IOException {
+        final ByteBuffer rsaPrivateKeyBuffer = OpenSshKeyPairReaderTest.getRsaPrivateKeyBuffer();
+        final ByteBuffer inputBuffer = OpenSshKeyPairReaderTest.getRsaKeyPairBuffer(rsaPrivateKeyBuffer);
+        final byte[] encoded = new byte[inputBuffer.remaining()];
+        inputBuffer.get(encoded);
+
+        final RecipientStanzaReader reader = SshRsaRecipientStanzaReaderFactory.newRecipientStanzaReader(encoded);
 
         assertNotNull(reader);
     }

@@ -17,7 +17,10 @@ package com.exceptionfactory.jagged.ssh;
 
 import com.exceptionfactory.jagged.RecipientStanzaReader;
 
+import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateCrtKey;
 
 /**
@@ -37,5 +40,21 @@ public final class SshRsaRecipientStanzaReaderFactory {
      */
     public static RecipientStanzaReader newRecipientStanzaReader(final RSAPrivateCrtKey rsaPrivateCrtKey) throws GeneralSecurityException {
         return new SshRsaRecipientStanzaReader(rsaPrivateCrtKey);
+    }
+
+    /**
+     * Create new ssh-rsa Recipient Stanza Reader using an unencrypted OpenSSH Version 1 RSA Private Key
+     *
+     * @param encoded Byte array containing an unencrypted OpenSSH Version 1 RSA Private Key
+     * @return ssh-rsa Recipient Stanza Reader
+     * @throws GeneralSecurityException Thrown on failures to read private or process public key
+     */
+    public static RecipientStanzaReader newRecipientStanzaReader(final byte[] encoded) throws GeneralSecurityException {
+        final OpenSshKeyPairReader openSshKeyPairReader = new OpenSshKeyPairReader();
+        final ByteBuffer encodedBuffer = ByteBuffer.wrap(encoded);
+        final KeyPair keyPair = openSshKeyPairReader.read(encodedBuffer);
+        final PrivateKey privateKey = keyPair.getPrivate();
+        final RSAPrivateCrtKey rsaPrivateCrtKey = (RSAPrivateCrtKey) privateKey;
+        return newRecipientStanzaReader(rsaPrivateCrtKey);
     }
 }

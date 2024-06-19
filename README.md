@@ -28,6 +28,7 @@ framework for the following algorithms:
 - `ChaCha20-Poly1305` with [javax.crypto.Cipher](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/Cipher.html)
 - `HmacSHA256` with [javax.crypto.Mac](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/Mac.html)
 - `PBKDF2WithHmacSHA256` with [javax.crypto.SecretKeyFactory](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/SecretKeyFactory.html)
+- `RSA` with [java.security.KeyFactory](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyFactory.html)
 - `RSA/ECB/OAEPPadding` with [javax.crypto.Cipher](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/Cipher.html)
 - `X25519` with [javax.crypto.KeyAgreement](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/javax/crypto/KeyAgreement.html)
 - `X25519` with [java.security.KeyFactory](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyFactory.html)
@@ -238,7 +239,8 @@ The `jagged-ssh` module supports encryption and decryption using public and priv
 implementation is compatible with the [agessh](https://pkg.go.dev/filippo.io/age/agessh) package, which defines
 recipient stanzas with an algorithm and an encoded fingerprint of the public key.
 
-The `SshRsaRecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using an RSA private key.
+The `SshRsaRecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using an RSA private key or an
+[OpenSSH Version 1 Private Key](https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.key).
 
 The `SshRsaRecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using an RSA public key.
 
