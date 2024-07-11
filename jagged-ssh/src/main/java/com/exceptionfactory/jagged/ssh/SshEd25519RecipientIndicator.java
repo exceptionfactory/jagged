@@ -16,22 +16,22 @@
 package com.exceptionfactory.jagged.ssh;
 
 /**
- * SSH Key Types
+ * SSH Ed25519 Recipient Indicators for reading and writing Recipient Stanzas
  */
-enum SshKeyType {
-    DSS("ssh-dss"),
+enum SshEd25519RecipientIndicator {
+    /** SSH Ed25519 Recipient Stanza Type */
+    STANZA_TYPE("ssh-ed25519"),
 
-    ED25519("ssh-ed25519"),
+    /** Key Information used for HKDF-SHA-256 */
+    KEY_INFORMATION("age-encryption.org/v1/ssh-ed25519");
 
-    RSA("ssh-rsa");
+    private final String indicator;
 
-    private final String keyType;
-
-    SshKeyType(final String keyType) {
-        this.keyType = keyType;
+    SshEd25519RecipientIndicator(final String indicator) {
+        this.indicator = indicator;
     }
 
-    String getKeyType() {
-        return keyType;
+    public String getIndicator() {
+        return indicator;
     }
 }

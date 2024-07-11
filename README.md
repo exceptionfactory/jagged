@@ -66,6 +66,7 @@ Jagged supports streaming encryption and decryption using standard recipient typ
 - [X25519](https://github.com/C2SP/C2SP/blob/main/age.md#the-x25519-recipient-type) recipients and identities
 - [scrypt](https://github.com/C2SP/C2SP/blob/main/age.md#the-scrypt-recipient-type) recipients and identities
 - [ssh-rsa](https://github.com/FiloSottile/age/blob/main/README.md#ssh-keys) recipients and identities
+- [ssh-ed25519](https://github.com/FiloSottile/age/blob/main/README.md#ssh-keys) recipients and identities
 
 # Specifications
 
@@ -119,6 +120,21 @@ a File Key.
 - [RFC 7914](https://www.rfc-editor.org/rfc/rfc7914.html) The scrypt Password-Based Key Derivation Function
 
 The scrypt type encrypts a File Key with ChaCha20-Poly1305.
+
+The ssh-ed25519 and ssh-rsa types support reading private key pairs formatted using OpenSSH Private Key Version 1.
+
+- [OpenSSH PROTOCOL.key](https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.key)
+
+The ssh-ed25519 type uses Curve25519 for Elliptic Curve Diffie-Hellman shared secret key exchanges based on computing
+equivalent values from keys described in the Edwards-curve Digital Signature Algorithm edwards25519.
+
+- [RFC 8032](https://www.rfc-editor.org/rfc/rfc8032) Edwards-Curve Digital Signature Algorithm
+
+The ssh-ed25519 type reads SSH public keys encoded according to the SSH protocol.
+
+- [RFC 8709](https://www.rfc-editor.org/rfc/rfc8709) Ed25519 and Ed448 Public Key Algorithms for the Secure Shell (SSH) Protocol
+
+The ssh-ed25519 type encrypts a File Key with ChaCha20-Poly1305.
 
 The ssh-rsa type encrypts a File Key with RSA-OAEP.
 
@@ -239,10 +255,24 @@ The `jagged-ssh` module supports encryption and decryption using public and priv
 implementation is compatible with the [agessh](https://pkg.go.dev/filippo.io/age/agessh) package, which defines
 recipient stanzas with an algorithm and an encoded fingerprint of the public key.
 
+The `SshEd25519RecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using an
+[OpenSSH Version 1 Private Key](https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.key).
+
+The `SshEd25519RecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using an SSH Ed25519 public
+key encoded according to [RFC 8709 Section 4](https://www.rfc-editor.org/rfc/rfc8709#name-public-key-format).
+
 The `SshRsaRecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using an RSA private key or an
 [OpenSSH Version 1 Private Key](https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.key).
 
 The `SshRsaRecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using an RSA public key.
+
+The SSH Ed25519 implementation uses Elliptic Curve Diffie-Hellman with Curve25519 as defined in
+[RFC 7748 Section 6.1](https://www.rfc-editor.org/rfc/rfc7748.html#section-6.1). As integrated in the age reference
+implementation, the SSH Ed25519 implementation converts the public key coordinate from the twisted Edwards curve to the
+corresponding coordinate on the Montgomery curve according to the birational maps described in
+[RFC 7748 Section 4.1](https://www.rfc-editor.org/rfc/rfc7748#section-4.1). The implementation converts the Ed25519
+private key seed to the corresponding X25519 private key using the first 32 bytes of an `SHA-512` hash of the seed.
+The SSH Ed25519 implementation uses ChaCha20-Poly1305 for encrypting and decrypting File Keys.
 
 The SSH RSA implementation uses Optimal Asymmetric Encryption Padding as defined in
 [RFC 8017 Section 7.1](https://www.rfc-editor.org/rfc/rfc8017#section-7.1). Following the age implementation, RSA OAEP

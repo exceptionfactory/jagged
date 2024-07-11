@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.framework.crypto;
+package com.exceptionfactory.jagged.ssh;
+
+import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
 
 /**
- * Message Authentication Code Key extension of Cryptographic Algorithm Key using HmacSHA256
+ * Reader abstraction for loading Public Keys
+ *
+ * @param <T> Public Key Type
  */
-public class MacKey extends CryptographicAlgorithmKey {
+interface PublicKeyReader<T extends PublicKey> {
     /**
-     * Message Authentication Code Key constructor with required symmetric key
+     * Read Public Key
      *
-     * @param key Symmetric Key with byte length based on Cryptographic Key Type
-     * @param cryptographicKeyDescription Cryptographic Key Description
+     * @param inputBuffer Input Buffer to be read
+     * @return Public Key
+     * @throws GeneralSecurityException Thrown on failures to parse input buffer
      */
-    public MacKey(final byte[] key, final CryptographicKeyDescription cryptographicKeyDescription) {
-        super(key, cryptographicKeyDescription, CryptographicAlgorithm.HMACSHA256);
-    }
+    T read(ByteBuffer inputBuffer) throws GeneralSecurityException;
 }

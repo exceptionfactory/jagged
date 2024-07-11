@@ -48,7 +48,7 @@ class OpenSshKeyPairReaderTest {
 
     private static final byte VALID_PADDING = 1;
 
-    private static final byte INVALID_PADDING = 2;
+    private static final byte INVALID_PADDING = 3;
 
     private static final String INVALID_KEY_TYPE = "ssh-invalid";
 
@@ -376,7 +376,7 @@ class OpenSshKeyPairReaderTest {
         final ByteBuffer formattedBuffer = ByteBuffer.allocate(BUFFER_SIZE);
         putCipherKdfKeyCount(formattedBuffer, VALID_KEY_COUNT);
 
-        final SshKeyType sshKeyType = SshKeyType.ED25519;
+        final SshKeyType sshKeyType = SshKeyType.DSS;
 
         final ByteBuffer publicKeyBuffer = ByteBuffer.allocate(BUFFER_SIZE);
         putBlock(publicKeyBuffer, sshKeyType.getKeyType().getBytes(StandardCharsets.UTF_8));
@@ -401,22 +401,32 @@ class OpenSshKeyPairReaderTest {
         final ByteBuffer rsaPrivateKeyBuffer = getRsaPrivateKeyBuffer();
         rsaPrivateKeyBuffer.put(INVALID_PADDING);
 
-        final ByteBuffer rsaKeyPairBuffer = getRsaKeyPairBuffer(rsaPrivateKeyBuffer);
+        final ByteBuffer rsaKeyPairBuffer = getKeyPairBuffer(SshKeyType.RSA, rsaPrivateKeyBuffer);
 
         assertThrows(BadPaddingException.class, () -> reader.read(rsaKeyPairBuffer));
     }
 
     @Test
-    void testRead() throws IOException, GeneralSecurityException {
+    void testReadRsa() throws IOException, GeneralSecurityException {
         final ByteBuffer rsaPrivateKeyBuffer = getRsaPrivateKeyBuffer();
-        final ByteBuffer rsaKeyPairBuffer = getRsaKeyPairBuffer(rsaPrivateKeyBuffer);
+        final ByteBuffer rsaKeyPairBuffer = getKeyPairBuffer(SshKeyType.RSA, rsaPrivateKeyBuffer);
 
         final KeyPair keyPair = reader.read(rsaKeyPairBuffer);
 
-        assertKeyPairFound(keyPair);
+        assertKeyPairFound(keyPair, RSA_ALGORITHM);
     }
 
-    static ByteBuffer getRsaKeyPairBuffer(final ByteBuffer privateKeyBuffer) throws IOException {
+    @Test
+    void testReadEd25519() throws IOException, GeneralSecurityException {
+        final ByteBuffer ed25519PrivateKeyBuffer = getEd25519PrivateKeyBuffer();
+        final ByteBuffer ed25519KeyPairBuffer = getKeyPairBuffer(SshKeyType.ED25519, ed25519PrivateKeyBuffer);
+
+        final KeyPair keyPair = reader.read(ed25519KeyPairBuffer);
+
+        assertKeyPairFound(keyPair, Ed25519KeyIndicator.KEY_ALGORITHM.getIndicator());
+    }
+
+    static ByteBuffer getKeyPairBuffer(final SshKeyType sshKeyType, final ByteBuffer privateKeyBuffer) throws IOException {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         outputStream.write(OpenSshKeyIndicator.HEADER.getIndicator());
         outputStream.write(KeySeparator.LINE_FEED.getCode());
@@ -424,8 +434,6 @@ class OpenSshKeyPairReaderTest {
 
         final ByteBuffer formattedBuffer = ByteBuffer.allocate(BUFFER_SIZE);
         putCipherKdfKeyCount(formattedBuffer, VALID_KEY_COUNT);
-
-        final SshKeyType sshKeyType = SshKeyType.RSA;
 
         final ByteBuffer publicKeyBuffer = ByteBuffer.allocate(BUFFER_SIZE);
         putBlock(publicKeyBuffer, sshKeyType.getKeyType().getBytes(StandardCharsets.UTF_8));
@@ -452,7 +460,21 @@ class OpenSshKeyPairReaderTest {
         return privateKeyBuffer;
     }
 
-    private static void assertKeyPairFound(final KeyPair keyPair) {
+    static ByteBuffer getEd25519PrivateKeyBuffer() {
+        final ByteBuffer privateKeyBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+        privateKeyBuffer.putInt(CHECK_NUMBER);
+        privateKeyBuffer.putInt(CHECK_NUMBER);
+        putBlock(privateKeyBuffer, SshKeyType.ED25519.getKeyType().getBytes(StandardCharsets.UTF_8));
+
+        final ByteBuffer ed25519PrivateKeyBuffer = SshEd25519OpenSshKeyPairReaderTest.getPrivateKeyBuffer();
+        privateKeyBuffer.put(ed25519PrivateKeyBuffer);
+        putBlock(privateKeyBuffer, EMPTY_BLOCK);
+        privateKeyBuffer.put(VALID_PADDING);
+
+        return privateKeyBuffer;
+    }
+
+    private static void assertKeyPairFound(final KeyPair keyPair, final String algorithm) {
         assertNotNull(keyPair);
 
         final PrivateKey privateKey = keyPair.getPrivate();
@@ -461,8 +483,8 @@ class OpenSshKeyPairReaderTest {
         final PublicKey publicKey = keyPair.getPublic();
         assertNotNull(publicKey);
 
-        assertEquals(RSA_ALGORITHM, privateKey.getAlgorithm());
-        assertEquals(RSA_ALGORITHM, publicKey.getAlgorithm());
+        assertEquals(algorithm, privateKey.getAlgorithm());
+        assertEquals(algorithm, publicKey.getAlgorithm());
     }
 
     private static byte[] getEncoded(final ByteBuffer formattedBuffer) {

@@ -13,37 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.framework.crypto;
+package com.exceptionfactory.jagged.ssh;
 
 /**
- * Cryptographic Key Type references for construction and validation
+ * Elliptic Curve Key Type enumerates standard properties for Ed25519 and X25519 keys
  */
-enum CryptographicKeyType implements CryptographicKeyDescription {
-    /** Extracted intermediate key for subsequent expansion */
-    EXTRACTED_KEY(32),
+enum EllipticCurveKeyType {
+    /** Ed25519 coordinate key of 32 bytes for twisted Edwards curve digital signature operations */
+    ED25519("Ed25519", 32),
 
-    /** Encrypted File Key */
-    ENCRYPTED_FILE_KEY(32),
+    /** Curve25519 coordinate key of 32 bytes for X25519 key agreement operations */
+    X25519("X25519", 32);
 
-    /** Header Key */
-    HEADER_KEY(32),
-
-    /** Cipher Key */
-    CIPHER_KEY(32),
-
-    /** Payload Nonce */
-    PAYLOAD_NONCE(16),
-
-    /** Shared Salt Key */
-    SHARED_SALT(64),
-
-    /** Shared Secret Key */
-    SHARED_SECRET(32);
+    private final String algorithm;
 
     private final int keyLength;
 
-    CryptographicKeyType(final int keyLength) {
+    EllipticCurveKeyType(final String algorithm, final int keyLength) {
+        this.algorithm = algorithm;
         this.keyLength = keyLength;
+    }
+
+    /**
+     * Get algorithm name for Java Cryptography Architecture operations
+     *
+     * @return Algorithm name
+     */
+    String getAlgorithm() {
+        return algorithm;
     }
 
     /**
@@ -51,8 +48,7 @@ enum CryptographicKeyType implements CryptographicKeyDescription {
      *
      * @return Key length in bytes
      */
-    @Override
-    public int getKeyLength() {
+    int getKeyLength() {
         return keyLength;
     }
 }

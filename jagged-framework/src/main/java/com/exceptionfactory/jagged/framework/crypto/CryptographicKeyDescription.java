@@ -16,43 +16,13 @@
 package com.exceptionfactory.jagged.framework.crypto;
 
 /**
- * Cryptographic Key Type references for construction and validation
+ * Abstraction for describing Cryptographic Key properties
  */
-enum CryptographicKeyType implements CryptographicKeyDescription {
-    /** Extracted intermediate key for subsequent expansion */
-    EXTRACTED_KEY(32),
-
-    /** Encrypted File Key */
-    ENCRYPTED_FILE_KEY(32),
-
-    /** Header Key */
-    HEADER_KEY(32),
-
-    /** Cipher Key */
-    CIPHER_KEY(32),
-
-    /** Payload Nonce */
-    PAYLOAD_NONCE(16),
-
-    /** Shared Salt Key */
-    SHARED_SALT(64),
-
-    /** Shared Secret Key */
-    SHARED_SECRET(32);
-
-    private final int keyLength;
-
-    CryptographicKeyType(final int keyLength) {
-        this.keyLength = keyLength;
-    }
-
+public interface CryptographicKeyDescription {
     /**
      * Get key length in bytes
      *
      * @return Key length in bytes
      */
-    @Override
-    public int getKeyLength() {
-        return keyLength;
-    }
+    int getKeyLength();
 }

@@ -13,36 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.framework.crypto;
+package com.exceptionfactory.jagged.ssh;
+
+import com.exceptionfactory.jagged.framework.crypto.CryptographicKeyDescription;
 
 /**
- * Cryptographic Key Type references for construction and validation
+ * SSH Ed25519 Key Type references for construction and validation
  */
-enum CryptographicKeyType implements CryptographicKeyDescription {
-    /** Extracted intermediate key for subsequent expansion */
-    EXTRACTED_KEY(32),
+enum SshEd25519KeyType implements CryptographicKeyDescription {
+    /** Derived Secret Key */
+    DERIVED(32),
 
-    /** Encrypted File Key */
-    ENCRYPTED_FILE_KEY(32),
+    /** Empty Input Key for HKDF-SHA-256 */
+    EMPTY(0),
 
-    /** Header Key */
-    HEADER_KEY(32),
-
-    /** Cipher Key */
-    CIPHER_KEY(32),
-
-    /** Payload Nonce */
-    PAYLOAD_NONCE(16),
-
-    /** Shared Salt Key */
-    SHARED_SALT(64),
-
-    /** Shared Secret Key */
-    SHARED_SECRET(32);
+    /** Marshalled Public Key */
+    MARSHALLED(51);
 
     private final int keyLength;
 
-    CryptographicKeyType(final int keyLength) {
+    SshEd25519KeyType(final int keyLength) {
         this.keyLength = keyLength;
     }
 
