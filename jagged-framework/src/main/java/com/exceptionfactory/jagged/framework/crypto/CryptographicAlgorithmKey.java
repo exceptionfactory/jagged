@@ -40,11 +40,11 @@ class CryptographicAlgorithmKey implements SecretKey {
      * Cryptographic Algorithm Key constructor with required symmetric key
      *
      * @param key Symmetric Key
-     * @param cryptographicKeyType Cryptographic Key Type
+     * @param cryptographicKeyDescription Cryptographic Key Description
      * @param cryptographicAlgorithm Cryptographic Algorithm
      */
-    CryptographicAlgorithmKey(final byte[] key, final CryptographicKeyType cryptographicKeyType, final CryptographicAlgorithm cryptographicAlgorithm) {
-        this(getValidatedKey(key, cryptographicKeyType), cryptographicAlgorithm);
+    CryptographicAlgorithmKey(final byte[] key, final CryptographicKeyDescription cryptographicKeyDescription, final CryptographicAlgorithm cryptographicAlgorithm) {
+        this(getValidatedKey(key, cryptographicKeyDescription), cryptographicAlgorithm);
     }
 
     private CryptographicAlgorithmKey(final byte[] validatedKey, final CryptographicAlgorithm cryptographicAlgorithm) {
@@ -101,10 +101,10 @@ class CryptographicAlgorithmKey implements SecretKey {
         return destroyed.get();
     }
 
-    private static byte[] getValidatedKey(final byte[] key, final CryptographicKeyType cryptographicKeyType) {
+    private static byte[] getValidatedKey(final byte[] key, final CryptographicKeyDescription cryptographicKeyDescription) {
         Objects.requireNonNull(key, "Symmetric Key required");
-        Objects.requireNonNull(cryptographicKeyType, "Cryptographic Key Type required");
-        final int cryptographicKeyLength = cryptographicKeyType.getKeyLength();
+        Objects.requireNonNull(cryptographicKeyDescription, "Cryptographic Key Description required");
+        final int cryptographicKeyLength = cryptographicKeyDescription.getKeyLength();
         if (cryptographicKeyLength == key.length) {
             return key;
         } else {

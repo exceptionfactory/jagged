@@ -45,7 +45,7 @@ class SshRsaRecipientStanzaReaderFactoryTest {
     @Test
     void testNewRecipientStanzaReaderOpenSshKey() throws GeneralSecurityException, IOException {
         final ByteBuffer rsaPrivateKeyBuffer = OpenSshKeyPairReaderTest.getRsaPrivateKeyBuffer();
-        final ByteBuffer inputBuffer = OpenSshKeyPairReaderTest.getRsaKeyPairBuffer(rsaPrivateKeyBuffer);
+        final ByteBuffer inputBuffer = OpenSshKeyPairReaderTest.getKeyPairBuffer(SshKeyType.RSA, rsaPrivateKeyBuffer);
         final byte[] encoded = new byte[inputBuffer.remaining()];
         inputBuffer.get(encoded);
 

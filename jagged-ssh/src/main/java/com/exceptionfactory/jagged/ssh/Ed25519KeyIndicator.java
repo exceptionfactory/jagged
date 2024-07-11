@@ -16,22 +16,22 @@
 package com.exceptionfactory.jagged.ssh;
 
 /**
- * SSH Key Types
+ * Ed25519 Key indicator fields
  */
-enum SshKeyType {
-    DSS("ssh-dss"),
+enum Ed25519KeyIndicator {
+    /** Algorithm */
+    KEY_ALGORITHM("Ed25519"),
 
-    ED25519("ssh-ed25519"),
+    /** Format */
+    KEY_FORMAT("RAW");
 
-    RSA("ssh-rsa");
+    private final String indicator;
 
-    private final String keyType;
-
-    SshKeyType(final String keyType) {
-        this.keyType = keyType;
+    Ed25519KeyIndicator(final String indicator) {
+        this.indicator = indicator;
     }
 
-    String getKeyType() {
-        return keyType;
+    String getIndicator() {
+        return indicator;
     }
 }

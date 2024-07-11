@@ -37,6 +37,8 @@ class OpenSshKeyPairReader extends OpenSshKeyByteBufferReader {
 
     private static final SshRsaOpenSshKeyPairReader SSH_RSA_OPEN_SSH_KEY_PAIR_READER = new SshRsaOpenSshKeyPairReader();
 
+    private static final SshEd25519OpenSshKeyPairReader SSH_ED25519_OPEN_SSH_KEY_PAIR_READER = new SshEd25519OpenSshKeyPairReader();
+
     /**
      * Read Public and Private Key Pair from buffer containing OpenSSH Key Version 1
      *
@@ -119,6 +121,8 @@ class OpenSshKeyPairReader extends OpenSshKeyByteBufferReader {
             if (sshKeyType == privateSshKeyType) {
                 if (SshKeyType.RSA == privateSshKeyType) {
                     keyPair = SSH_RSA_OPEN_SSH_KEY_PAIR_READER.read(privateKeyBuffer);
+                } else if (SshKeyType.ED25519 == privateSshKeyType) {
+                    keyPair = SSH_ED25519_OPEN_SSH_KEY_PAIR_READER.read(privateKeyBuffer);
                 } else {
                     throw new InvalidKeyException(String.format("OpenSSH Private Key Type [%s] not supported", sshKeyType.getKeyType()));
                 }
@@ -163,6 +167,7 @@ class OpenSshKeyPairReader extends OpenSshKeyByteBufferReader {
             if (padExpected != pad) {
                 throw new BadPaddingException(String.format("Private Key Padding Character [%d] does not match expected [%d]", pad, padExpected));
             }
+            padExpected++;
         }
     }
 

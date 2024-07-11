@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.framework.crypto;
+package com.exceptionfactory.jagged.ssh;
+
+import com.exceptionfactory.jagged.framework.crypto.MacKey;
 
 /**
- * Message Authentication Code Key extension of Cryptographic Algorithm Key using HmacSHA256
+ * SSH Ed25519 Marshalled Public Key containing marshalled SSH public key bytes
  */
-public class MacKey extends CryptographicAlgorithmKey {
+final class SshEd25519MarshalledKey extends MacKey {
     /**
-     * Message Authentication Code Key constructor with required symmetric key
+     * SSH Ed25519 Marshalled Public Key constructor with required key
      *
-     * @param key Symmetric Key with byte length based on Cryptographic Key Type
-     * @param cryptographicKeyDescription Cryptographic Key Description
+     * @param key Marshalled Key consisting of 51 bytes
      */
-    public MacKey(final byte[] key, final CryptographicKeyDescription cryptographicKeyDescription) {
-        super(key, cryptographicKeyDescription, CryptographicAlgorithm.HMACSHA256);
+    SshEd25519MarshalledKey(final byte[] key) {
+        super(key, SshEd25519KeyType.MARSHALLED);
     }
 }

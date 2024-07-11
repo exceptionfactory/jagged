@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.framework.crypto;
+package com.exceptionfactory.jagged.ssh;
+
+import com.exceptionfactory.jagged.framework.crypto.SharedSecretKey;
+
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
 
 /**
- * Message Authentication Code Key extension of Cryptographic Algorithm Key using HmacSHA256
+ * Abstraction around javax.crypto.KeyAgreement for Shared Secret Key production
  */
-public class MacKey extends CryptographicAlgorithmKey {
+interface SharedSecretKeyProducer {
     /**
-     * Message Authentication Code Key constructor with required symmetric key
+     * Get Shared Secret Key using provided Public Key
      *
-     * @param key Symmetric Key with byte length based on Cryptographic Key Type
-     * @param cryptographicKeyDescription Cryptographic Key Description
+     * @param publicKey Public Key
+     * @return Shared Secret Key
+     * @throws GeneralSecurityException Thrown on failures to produce Shared Secret Key
      */
-    public MacKey(final byte[] key, final CryptographicKeyDescription cryptographicKeyDescription) {
-        super(key, cryptographicKeyDescription, CryptographicAlgorithm.HMACSHA256);
-    }
+    SharedSecretKey getSharedSecretKey(PublicKey publicKey) throws GeneralSecurityException;
 }

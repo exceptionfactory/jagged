@@ -13,19 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.exceptionfactory.jagged.framework.crypto;
+package com.exceptionfactory.jagged.ssh;
+
+import com.exceptionfactory.jagged.framework.crypto.MacKey;
 
 /**
- * Message Authentication Code Key extension of Cryptographic Algorithm Key using HmacSHA256
+ * Empty Input Key extension of Message Authentication Code Key for HKDF from salt key
  */
-public class MacKey extends CryptographicAlgorithmKey {
+final class EmptyInputKey extends MacKey {
+    private static final byte[] EMPTY = new byte[]{};
+
     /**
-     * Message Authentication Code Key constructor with required symmetric key
+     * Empty Input Key constructor
      *
-     * @param key Symmetric Key with byte length based on Cryptographic Key Type
-     * @param cryptographicKeyDescription Cryptographic Key Description
      */
-    public MacKey(final byte[] key, final CryptographicKeyDescription cryptographicKeyDescription) {
-        super(key, cryptographicKeyDescription, CryptographicAlgorithm.HMACSHA256);
+    EmptyInputKey() {
+        super(EMPTY, SshEd25519KeyType.EMPTY);
     }
 }
