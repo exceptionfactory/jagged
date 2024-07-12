@@ -136,6 +136,10 @@ The ssh-ed25519 type reads SSH public keys encoded according to the SSH protocol
 
 The ssh-ed25519 type encrypts a File Key with ChaCha20-Poly1305.
 
+The ssh-rsa type reads SSH public keys encoded according to the SSH protocol.
+
+- [RFC 4253](https://www.rfc-editor.org/rfc/rfc4253) The Secure Shell (SSH) Transport Layer Protocol
+
 The ssh-rsa type encrypts a File Key with RSA-OAEP.
 
 - [RFC 8017](https://www.rfc-editor.org/rfc/rfc8017) PKCS #1: RSA Cryptography Specifications Version 2.2
@@ -264,7 +268,8 @@ key encoded according to [RFC 8709 Section 4](https://www.rfc-editor.org/rfc/rfc
 The `SshRsaRecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using an RSA private key or an
 [OpenSSH Version 1 Private Key](https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.key).
 
-The `SshRsaRecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using an RSA public key.
+The `SshRsaRecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using an RSA public key or an SSH
+RSA public key encoded according to [RFC 4253 Section 6.6](https://www.rfc-editor.org/rfc/rfc4253#section-6.6).
 
 The SSH Ed25519 implementation uses Elliptic Curve Diffie-Hellman with Curve25519 as defined in
 [RFC 7748 Section 6.1](https://www.rfc-editor.org/rfc/rfc7748.html#section-6.1). As integrated in the age reference

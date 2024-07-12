@@ -16,83 +16,29 @@
 package com.exceptionfactory.jagged.ssh;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Objects;
 
 /**
  * SSH Ed25519 Public Key Reader implementation based on ssh-ed25519 format described in RFC 8709 Section 4
  */
 class SshEd25519PublicKeyReader extends SshPublicKeyReader<Ed25519PublicKey> {
-    private static final int ENCODED_LENGTH = 68;
-
-    private static final String ALGORITHM_FORMAT = SshEd25519RecipientIndicator.STANZA_TYPE.getIndicator();
-
-    private static final byte[] ALGORITHM = ALGORITHM_FORMAT.getBytes(StandardCharsets.UTF_8);
-
-    private static final byte SPACE_SEPARATOR = 32;
-
-    private static final Base64.Decoder DECODER = Base64.getDecoder();
+    /**
+     * SSH Ed25519 Public Key Reader constructor configures the expected ssh-ed25519 algorithm
+     */
+    SshEd25519PublicKeyReader() {
+        super(SshEd25519RecipientIndicator.STANZA_TYPE.getIndicator());
+    }
 
     /**
-     * Read Public Key
+     * Read Ed25519 Public Key from block of 32 bytes
      *
-     * @param inputBuffer Input Buffer to be read
+     * @param decodedBuffer Buffer of bytes decoded from Base64 public key
      * @return Ed25519 Public Key
-     * @throws GeneralSecurityException Thrown on failures to parse input buffer
+     * @throws GeneralSecurityException Thrown when block length not equal to expected key length
      */
     @Override
-    public Ed25519PublicKey read(final ByteBuffer inputBuffer) throws GeneralSecurityException {
-        Objects.requireNonNull(inputBuffer, "Input Buffer required");
-
-        final byte[] algorithm = new byte[ALGORITHM.length];
-        inputBuffer.get(algorithm);
-
-        final Ed25519PublicKey publicKey;
-
-        if (Arrays.equals(ALGORITHM, algorithm)) {
-            final byte separator = inputBuffer.get();
-            if (SPACE_SEPARATOR == separator) {
-                publicKey = readEncodedPublicKey(inputBuffer);
-            } else {
-                throw new InvalidKeyException("Algorithm format space separator not found");
-            }
-        } else {
-            throw new InvalidKeyException(String.format("Public key algorithm format [%s] not found", ALGORITHM_FORMAT));
-        }
-
-        return publicKey;
-    }
-
-    private Ed25519PublicKey readEncodedPublicKey(final ByteBuffer inputBuffer) throws InvalidKeyException {
-        final Ed25519PublicKey publicKey;
-
-        if (inputBuffer.remaining() >= ENCODED_LENGTH) {
-            final byte[] encoded = new byte[ENCODED_LENGTH];
-            inputBuffer.get(encoded);
-
-            final byte[] decoded = DECODER.decode(encoded);
-            final ByteBuffer decodedBuffer = ByteBuffer.wrap(decoded);
-
-            final byte[] algorithm = readBlock(decodedBuffer);
-            if (Arrays.equals(ALGORITHM, algorithm)) {
-                publicKey = readPublicKey(decodedBuffer);
-            } else {
-                throw new InvalidKeyException(String.format("Encoded key algorithm [%s] not found", ALGORITHM_FORMAT));
-            }
-        } else {
-            final int remaining = inputBuffer.remaining();
-            final String message = String.format("Encoded public key length [%d] less than required [%d]", remaining, ENCODED_LENGTH);
-            throw new InvalidKeyException(message);
-        }
-
-        return publicKey;
-    }
-
-    private Ed25519PublicKey readPublicKey(final ByteBuffer decodedBuffer) throws InvalidKeyException {
+    protected Ed25519PublicKey readPublicKey(final ByteBuffer decodedBuffer) throws GeneralSecurityException {
         final byte[] block = readBlock(decodedBuffer);
         if (EllipticCurveKeyType.ED25519.getKeyLength() == block.length) {
             return new Ed25519PublicKey(block);

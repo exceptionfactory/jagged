@@ -19,6 +19,8 @@ import com.exceptionfactory.jagged.RecipientStanzaWriter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 
@@ -37,5 +39,21 @@ class SshRsaRecipientStanzaWriterFactoryTest {
         final RecipientStanzaWriter writer = SshRsaRecipientStanzaWriterFactory.newRecipientStanzaWriter(rsaPublicKey);
 
         assertNotNull(writer);
+    }
+
+    @Test
+    void testNewRecipientStanzaWriterEncodedPublicKey() throws GeneralSecurityException {
+        final byte[] encoded = getSshKeyEncoded();
+
+        final RecipientStanzaWriter writer = SshRsaRecipientStanzaWriterFactory.newRecipientStanzaWriter(encoded);
+
+        assertNotNull(writer);
+    }
+
+    private byte[] getSshKeyEncoded() throws NoSuchAlgorithmException {
+        final ByteBuffer publicKeyBuffer = SshRsaPublicKeyReaderTest.getPublicKeyBuffer();
+        final byte[] encoded = new byte[publicKeyBuffer.remaining()];
+        publicKeyBuffer.get(encoded);
+        return encoded;
     }
 }

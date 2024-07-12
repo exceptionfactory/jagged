@@ -75,8 +75,7 @@ class SshEd25519PublicKeyReaderTest {
         inputBuffer.put(SPACE_SEPARATOR);
         inputBuffer.flip();
 
-        final InvalidKeyException exception = assertThrows(InvalidKeyException.class, () -> reader.read(inputBuffer));
-        assertTrue(exception.getMessage().contains(Integer.toString(REQUIRED_LENGTH)));
+        assertThrows(InvalidKeyException.class, () -> reader.read(inputBuffer));
     }
 
     @Test

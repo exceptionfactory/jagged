@@ -17,6 +17,8 @@ package com.exceptionfactory.jagged.ssh;
 
 import com.exceptionfactory.jagged.RecipientStanzaWriter;
 
+import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
 import java.security.interfaces.RSAPublicKey;
 
 /**
@@ -35,5 +37,19 @@ public final class SshRsaRecipientStanzaWriterFactory {
      */
     public static RecipientStanzaWriter newRecipientStanzaWriter(final RSAPublicKey rsaPublicKey) {
         return new SshRsaRecipientStanzaWriter(rsaPublicKey);
+    }
+
+    /**
+     * Create new ssh-rsa Recipient Stanza Writer using an RSA Public Key
+     *
+     * @param encoded Byte array containing an SSH RSA public key
+     * @return ssh-rsa Recipient Stanza Writer
+     * @throws GeneralSecurityException Thrown in failure to read public key
+     */
+    public static RecipientStanzaWriter newRecipientStanzaWriter(final byte[] encoded) throws GeneralSecurityException {
+        final SshRsaPublicKeyReader publicKeyReader = new SshRsaPublicKeyReader();
+        final ByteBuffer inputBuffer = ByteBuffer.wrap(encoded);
+        final RSAPublicKey rsaPublicKey = publicKeyReader.read(inputBuffer);
+        return newRecipientStanzaWriter(rsaPublicKey);
     }
 }
