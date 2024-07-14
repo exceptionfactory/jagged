@@ -22,7 +22,7 @@ import java.security.KeyPair;
 /**
  * Reader abstraction for loading Public and Private Key Pairs
  */
-public interface KeyPairReader {
+interface KeyPairReader {
     /**
      * Read Public and Private Key Pair
      *
