@@ -301,7 +301,9 @@ module supports encryption and decryption using public and private key pairs. Ke
 key agreement functions use the Java Cryptography Architecture framework. Key encoding and decoding functions use the
 `jagged-bech32` library.
 
-The `X25519KeyFactory` class implements
+The
+[X25519KeyFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-x25519/latest/com/exceptionfactory/jagged/x25519/X25519KeyFactory.html)
+class implements
 [java.security.KeyFactory](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/KeyFactory.html)
 and supports translating an encoded X25519 private key to the corresponding X25519 public key. The `translateKey` method
 accepts an instance of the
