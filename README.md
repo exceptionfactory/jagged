@@ -255,20 +255,30 @@ match age encryption scrypt recipient specifications.
 
 ## jagged-ssh
 
-The `jagged-ssh` module supports encryption and decryption using public and private SSH key pairs. The SSH key pair
+The
+[jagged-ssh](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-ssh/latest/com/exceptionfactory/jagged/ssh/package-summary.html)
+module supports encryption and decryption using public and private SSH key pairs. The SSH key pair
 implementation is compatible with the [agessh](https://pkg.go.dev/filippo.io/age/agessh) package, which defines
 recipient stanzas with an algorithm and an encoded fingerprint of the public key.
 
-The `SshEd25519RecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using an
+The
+[SshEd25519RecipientStanzaReaderFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-ssh/latest/com/exceptionfactory/jagged/ssh/SshEd25519RecipientStanzaReaderFactory.html)
+creates instances of `RecipientStanzaReader` using an
 [OpenSSH Version 1 Private Key](https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.key).
 
-The `SshEd25519RecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using an SSH Ed25519 public
+The
+[SshEd25519RecipientStanzaWriterFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-ssh/latest/com/exceptionfactory/jagged/ssh/SshEd25519RecipientStanzaWriterFactory.html)
+creates instances of `RecipientStanzaWriter` using an SSH Ed25519 public
 key encoded according to [RFC 8709 Section 4](https://www.rfc-editor.org/rfc/rfc8709#name-public-key-format).
 
-The `SshRsaRecipientStanzaReaderFactory` creates instances of `RecipientStanzaReader` using an RSA private key or an
+The
+[SshRsaRecipientStanzaReaderFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-ssh/latest/com/exceptionfactory/jagged/ssh/SshRsaRecipientStanzaReaderFactory.html)
+creates instances of `RecipientStanzaReader` using an RSA private key or an
 [OpenSSH Version 1 Private Key](https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.key).
 
-The `SshRsaRecipientStanzaWriterFactory` creates instances of `RecipientStanzaWriter` using an RSA public key or an SSH
+The
+[SshRsaRecipientStanzaWriterFactory](https://javadoc.io/doc/com.exceptionfactory.jagged/jagged-ssh/latest/com/exceptionfactory/jagged/ssh/SshRsaRecipientStanzaWriterFactory.html)
+creates instances of `RecipientStanzaWriter` using an RSA public key or an SSH
 RSA public key encoded according to [RFC 4253 Section 6.6](https://www.rfc-editor.org/rfc/rfc4253#section-6.6).
 
 The SSH Ed25519 implementation uses Elliptic Curve Diffie-Hellman with Curve25519 as defined in
