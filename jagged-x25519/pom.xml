@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.exceptionfactory.jagged</groupId>
         <artifactId>jagged</artifactId>
-        <version>0.4.1-SNAPSHOT</version>
+        <version>0.4.1</version>
     </parent>
 
     <name>jagged-x25519</name>
