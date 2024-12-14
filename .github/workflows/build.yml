@@ -19,6 +19,10 @@ jobs:
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
@@ -27,6 +31,8 @@ jobs:
           cache: 'maven'
       - name: Build
         run: ./mvnw --batch-mode --update-snapshots verify
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
       - name: Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -37,10 +43,6 @@ jobs:
     steps:
       - name: Checkout Sources
         uses: actions/checkout@v4
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: java
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
@@ -49,8 +51,6 @@ jobs:
           cache: 'maven'
       - name: Build
         run: ./mvnw --batch-mode --update-snapshots verify
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
   build-java-11:
     runs-on: ubuntu-latest
     name: Java 11
