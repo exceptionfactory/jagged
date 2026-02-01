@@ -6,7 +6,7 @@
 
     <groupId>com.exceptionfactory.jagged</groupId>
     <artifactId>jagged</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>jagged</name>
@@ -50,6 +50,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>2024-10-10T15:28:48Z</project.build.outputTimestamp>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
         <maven.version.required>3.9.12</maven.version.required>
         <maven.checkstyle.plugin.version>3.6.0</maven.checkstyle.plugin.version>
         <maven.clean.plugin.version>3.5.0</maven.clean.plugin.version>
@@ -142,81 +143,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <profiles>
-        <profile>
-            <id>jdk-1.8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <maven.compiler.source>8</maven.compiler.source>
-                <maven.compiler.target>8</maven.compiler.target>
-                <checkstyle.version>9.3</checkstyle.version>
-                <mockito.version>4.11.0</mockito.version>
-                <java.security.properties.location>../jagged-test/src/test/resources/java.security</java.security.properties.location>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>org.mockito</groupId>
-                    <artifactId>mockito-inline</artifactId>
-                    <version>4.11.0</version>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk18on</artifactId>
-                    <version>${bouncycastle.version}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <groupId>com.github.spotbugs</groupId>
-                            <artifactId>spotbugs-maven-plugin</artifactId>
-                            <version>4.8.6.6</version>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <!-- Enable Bouncy Castle Security Provider -->
-                            <argLine>
-                                -Djava.security.properties=${java.security.properties.location}
-                            </argLine>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>jdk-11</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <properties>
-                <maven.compiler.release>8</maven.compiler.release>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <compilerArgs>
-                                <arg>-Xlint:-options</arg>
-                            </compilerArgs>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <build>
         <pluginManagement>

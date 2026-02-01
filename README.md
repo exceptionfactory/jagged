@@ -16,8 +16,7 @@ Java implementation of age encryption
 
 # Runtime Requirements
 
-- Java 25, 21, 17, or 11
-- Java 8 with [Bouncy Castle Security Provider](https://bouncycastle.org/docs/docs1.8on/org/bouncycastle/jce/provider/BouncyCastleProvider.html)
+- Java 25, 21
 
 ## Java Cryptography Architecture
 
@@ -37,21 +36,7 @@ framework for the following algorithms:
 [JEP 324](https://openjdk.org/jeps/324) introduced X25519 Key Agreement in Java 11. 
 [JEP 329](https://openjdk.org/jeps/329) added ChaCha20-Poly1305 in Java 11.
 
-Jagged does not require additional dependencies when running on Java 11 or higher.
-
-Jagged on Java 8 requires an additional
-[Security Provider](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/security/Provider.html)
-to support X25519 and ChaCha20-Poly1305.
-
-## Bouncy Castle Security Provider
-
-The [Bouncy Castle](https://bouncycastle.org/java.html) framework includes the
-[BouncyCastleProvider](https://bouncycastle.org/docs/docs1.8on/org/bouncycastle/jce/provider/BouncyCastleProvider.html)
-which can be installed to support using Jagged on Java 8.
-
-The `jagged-x25519` library requires access to X25519 encoded keys. The default behavior of the Bouncy Castle library
-includes the public key together with the private key in the encoded representation, which differs from the standard
-Java implementation. The Jagged library provides conversion between encoded formats.
+Jagged does not require additional dependencies when running on Java 21 or higher.
 
 # Versioning
 
