@@ -75,7 +75,7 @@
         <spotbugs.plugin.version>4.9.8.5</spotbugs.plugin.version>
         <staging.deploy.directory>target/staging-deploy</staging.deploy.directory>
         <altDeploymentRepository>local::file:./${staging.deploy.directory}</altDeploymentRepository>
-        <maven.central.url>https://s01.oss.sonatype.org</maven.central.url>
+        <maven.central.url>https://central.sonatype.com/api/v1/publisher</maven.central.url>
     </properties>
 
     <modules>
@@ -471,16 +471,13 @@
                         </signing>
                         <deploy>
                             <maven>
-                                <nexus2>
-                                    <maven-central>
+                                <mavenCentral>
+                                    <release-deploy>
                                         <active>ALWAYS</active>
-                                        <url>${maven.central.url}/service/local</url>
-                                        <snapshotUrl>${maven.central.url}/content/repositories/snapshots/</snapshotUrl>
-                                        <closeRepository>true</closeRepository>
-                                        <releaseRepository>true</releaseRepository>
+                                        <url>${maven.central.url}</url>
                                         <stagingRepositories>${staging.deploy.directory}</stagingRepositories>
-                                    </maven-central>
-                                </nexus2>
+                                    </release-deploy>
+                                </mavenCentral>
                             </maven>
                         </deploy>
                     </jreleaser>
